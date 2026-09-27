@@ -27,7 +27,9 @@ jobs:
           cache: true
 
       - run: flutter pub get
-      - run: flutter test
+      # Goldens are Windows-rasterized baselines; they only run locally / on
+      # the opt-in Windows CI job.
+      - run: flutter test --exclude-tags golden
       - run: flutter build ios --release --no-codesign --build-number ${{ github.run_number }}
 
       - name: Write App Store Connect API key
@@ -92,6 +94,7 @@ jobs:
         with:
           name: purechess-ipa
           path: ios/build/export/*.ipa
+          retention-days: 3
 
       - name: Upload to TestFlight
         run: |
