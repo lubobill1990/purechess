@@ -1,17 +1,92 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'app/telemetry/analytics.dart';
+import 'app/telemetry/app_logger.dart';
+import 'app/telemetry/crash_guard.dart';
+import 'features/settings/privacy.dart';
+import 'features/settings/settings.dart';
 
 void main() {
-  runApp(const MyApp());
+  runGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    installCrashGuard();
+    await AppLogger.instance.init();
+    final prefs = await SharedPreferences.getInstance();
+    var version = '';
+    try {
+      final info = await PackageInfo.fromPlatform();
+      version = '${info.version}+${info.buildNumber}';
+    } catch (error, stack) {
+      reportHandledError('package_info', error, stack);
+    }
+    await Analytics.instance.init(prefs, appVersion: version);
+    logI('app', 'starting purechess $version');
+    runApp(MyApp(prefs: prefs));
+  });
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key, required this.prefs, this.analytics});
+
+  final SharedPreferences prefs;
+  final Analytics? analytics;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  Analytics get _analytics => widget.analytics ?? Analytics.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          widget.prefs.getBool(Analytics.privacyAcceptedKey) == true) {
+        return;
+      }
+      unawaited(
+        showDialog<void>(
+          context: _navigatorKey.currentContext!,
+          barrierDismissible: false,
+          builder: (_) =>
+              PrivacyNoticeDialog(prefs: widget.prefs, analytics: _analytics),
+        ),
+      );
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.resumed) {
+      unawaited(_analytics.flushNow());
+      unawaited(AppLogger.instance.flush());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      navigatorKey: _navigatorKey,
+      title: '纯弈国象',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,13 +105,25 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(
+        title: '纯弈国象',
+        prefs: widget.prefs,
+        analytics: _analytics,
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+    required this.title,
+    required this.prefs,
+    required this.analytics,
+  });
+
+  final SharedPreferences prefs;
+  final Analytics analytics;
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -84,6 +171,20 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            tooltip: '设置',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => SettingsScreen(
+                  prefs: widget.prefs,
+                  analytics: widget.analytics,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it

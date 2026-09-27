@@ -65,6 +65,31 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
   chess 语境（game_start/puzzle_result/engine_start/abnormal_exit 等），
   MEASUREMENT_ID/API_SECRET 用常量占位+TODO 注释。main.dart 接线。
   隐私同意弹窗直接带上（吸收 pureweiqi A1 经验）。
+  - **已实现**：`lib/app/telemetry/` 三件套、GA4 MP 每批最多 25 条、
+    最多 100 条 JSONL 待发队列（同步 flush 临时文件后原子替换，发送确认前
+    保留在磁盘）、失败保留补发、Dart/native phase 哨兵及崩溃分类上报。
+  - 首启确认前仅本地暂存，不启用网络或发送定时器；可选择关闭统计并继续。
+    关闭会取消请求并清空待发队列；设置提供开关与隐私政策占位页。日志与
+    哨兵保留在本机，不随统计上传。客户端随机标识每次启动重建，不持久化。
+  - `main.dart` 已接 `runGuarded`、logger/analytics 初始化、版本号及生命周期
+    flush（含恢复时重试）；Android INTERNET 与 macOS 出站网络权限已补齐。
+    当前计数器骨架保留，新增设置入口。
+  - **维护者待办**：在 `analytics.dart` 回填独立 chess GA4 Property 的
+    MEASUREMENT_ID/API_SECRET；占位值存在时，即使用户同意也不会发网络请求。
+    正式发布前补齐政策联系方式、生效日期、保留期限及第三方处理说明。
+  - 事件白名单：`app_open`、`game_start`、`game_end`、`puzzle_result`、
+    `engine_start`、`app_error`、`abnormal_exit`。后续功能调用
+    `Analytics.instance.event`，参数需在 `_eventParams` 中显式声明；禁止
+    PGN/FEN/着法、错误原文、堆栈及路径。`game_start` 允许 mode/difficulty/
+    player_color，`puzzle_result` 允许 correct/attempts/duration_ms/rating；
+    AI 启动前 `setPhase('chess_engine_start')`，成功后 `clearPhase(prefs: prefs)`。
+    原生侧可向 `nativeBreadcrumbPath` 写入并 fsync 阶段面包屑；非正常退出
+    仅上报哨兵是否存在与连续次数，不上传阶段文本。
+  - 验证覆盖队列落盘往返、请求失败/发送中退出统计、隐私持久化失败、
+    哨兵恢复、日志轮转及首启/设置 UI；验收命令：
+    `$env:NO_PROXY='localhost,127.0.0.1'; flutter pub get; flutter analyze; flutter test`。
+    本批验收：analyze 零 issue，28 项测试全绿（遥测 17、日志/崩溃 4、
+    隐私与设置 widget 7）。
 
 ### 批 2（M1 合并后并行）
 - **M2a 棋盘组件+双人对弈**［task/board］：棋盘 widget（拖/点双模式、
