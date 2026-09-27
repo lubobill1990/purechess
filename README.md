@@ -3,6 +3,44 @@
 An international-chess learning app. The M1 rules core is implemented in pure
 Dart, with no Flutter imports or third-party chess dependencies.
 
+## Local two-player chess (M2a)
+
+The home screen opens **双人对弈**, **我的棋谱**, and the existing privacy settings.
+The slate-blue board supports tap-to-select/tap-to-move and direct dragging,
+legal destinations, last-move and check highlights, coordinates, and a flipped
+view. Promotion always asks for queen/rook/bishop/knight; cancel leaves the
+position unchanged. SVG pieces are bundled for offline use; see
+[asset credits and licensing](docs/CREDITS.md).
+
+Black's controls stay at the top, rotated 180 degrees toward the opposite seat;
+white's controls stay below. Flipping changes the board view, not ownership of
+the controls. Only the active player can resign or offer a draw. Resignation
+requires confirmation; a draw offer pauses moves until the other player's bar
+accepts or declines. Both sides can undo one half-move, including after a
+finished game; undo removes that continuation from the saved main line.
+
+`lib/features/game/game_session.dart` is UI-independent and uses the existing
+core for all move validation. Local play **automatically adjudicates** threefold
+repetition and the 50-move rule, in addition to mate, stalemate and insufficient
+material. This is an explicit local-mode policy, not a change to the core's
+claimable-draw behavior. Mate/stalemate retain priority. Resignation and agreed
+draws also set the PGN result. Status and save feedback share a fixed-height
+72-pixel area so they never push the board.
+
+**保存棋谱** explicitly saves a snapshot (unfinished games have result `*`) to
+`<application documents>/purechess/records/*.pgn`. The repository follows the
+pureweiqi local-files pattern, without adding a state-management dependency:
+`open`, `list`, `read`, `save`. Saves use sanitized names, collision suffixes and
+flushed temporary files followed by rename; existing records are not overwritten.
+I/O failures remain visible and retryable. The initial library lists saved PGNs
+and opens selectable PGN text; graphical replay belongs to a later milestone.
+Leaving/restarting an unsaved game asks for confirmation. There is no implicit
+autosave or crash-resume in this milestone.
+
+Named routes live in `lib/app/router.dart`: `/`, `/game`, `/records`, `/settings`.
+Game start/end use the existing allowlisted analytics parameters; no moves,
+FEN, PGN or file paths are sent to analytics.
+
 ## Rules core
 
 | File | Responsibility |
@@ -81,6 +119,11 @@ flutter analyze
 flutter test
 dart run tool\perft.dart
 ```
+
+M2a-only tests: `flutter test test\widgets test\features test\widget_test.dart`.
+These cover both input modes/orientations, cancelled drags and promotions, all
+four promotions, special moves, turn guards, terminal outcomes, undo, persistence
+and save errors, navigation, and phone/landscape/tablet layout bounds.
 
 The standalone Dart benchmark checks all six standard
 [Chess Programming Wiki perft positions](https://www.chessprogramming.org/Perft_Results):

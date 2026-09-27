@@ -56,7 +56,7 @@ void main() {
     },
   );
 
-  testWidgets('accept persists choice and retains existing counter behavior', (
+  testWidgets('accept persists choice and opens local game from home', (
     tester,
   ) async {
     await launch(tester);
@@ -65,10 +65,14 @@ void main() {
     expect(find.text('隐私告知'), findsNothing);
     expect(prefs.getBool(Analytics.privacyAcceptedKey), isTrue);
     expect(analytics.consentGranted, isTrue);
-    expect(find.text('0'), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('双人对弈'), findsOneWidget);
+    await tester.tap(find.text('双人对弈'));
+    await tester.pumpAndSettle();
+    expect(find.text('面对面对弈'), findsOneWidget);
+    expect(find.byKey(const ValueKey('square-e2')), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('双人对弈'), findsOneWidget);
   });
 
   testWidgets(
