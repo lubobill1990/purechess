@@ -85,3 +85,91 @@ before release. This development milestone is not legal or store approval.
 was evaluated but is **not** a dependency. Its source and credits are at
 <https://github.com/loloof64/StockfishChessEngineFlutter>. See
 `CHESS_PLAN.md` for the reproducible desktop failure that ruled it out.
+
+## 十九世纪名局 PGN（M3d）
+
+资产：`assets/library/classics.pgn`，**21 局、1183 个半回合、105 条原创中文
+简注（每局 5 条，含开局导读）**。全部对局早于 1900 年；离线随包，不在运行时
+请求来源网站。每局的 `Id` 是稳定阅读书签，`Source` 标签保存直接来源，
+`Title` / `Theme` / `Annotator` 及中文注释由本项目新写。
+
+### 公版依据与使用边界
+
+- 本项目转录的是**实际发生的着法、对局者、时间、地点与结果等历史事实**，
+  并非现代作者的讲解文章、分析变化、图片或译文。事实与作者表达须区分：
+  [Feist Publications v. Rural Telephone, 499 U.S. 340 (1991)](https://www.law.cornell.edu/supremecourt/text/499/340)
+  明确说明事实本身不受版权保护，而原创的选择、编排和表达可能受保护。
+- 「公版棋谱」在这里指这些历史事实性棋谱，不是把整个下载网站或数据库
+  宣称为公版。免费可下载**不等于** CC0 或允许复制现代注释。我们从大型棋手
+  集合中独立选出教学用局，重新编排、重新注释，不分发下载的完整数据库，
+  不复制网页正文及第三方评注。数据库特殊权利及各发行地规则仍须发布前复核。
+- 所收对局年代为 1851–1895；古老年代为历史资料溯源提供辅助依据，但不以
+  「棋手去世超过若干年」替代事实/表达的区分。中文注释是本项目新作品，
+  并不冒称十九世纪原注或公共领域文本。
+- PGN Mentor 原谱若把将杀写为 `+`，本项目仅将实际将杀着规范为 `#`：
+  歌剧院局、不朽局、常青局、罗萨内斯—安德森 1863、斯坦尼茨—蒙格雷迪恩
+  1862、斯坦尼茨—洛克、皮尔斯伯里—塔拉什，共 7 处。**未改任何实际走子**。
+  core 严格 SAN 解析、逐着合法性、SAN 往返及全局撤回测试均覆盖。
+
+### 来源与名局清单
+
+下载/核对日期：2026-09-28。PGN Mentor 的
+[公开下载索引](https://www.pgnmentor.com/files.html)提供按棋手的 ZIP；
+下表中 M / A / S / Z / L / P 分别对应下方存档 URL。
+未确认的月日保留为 `??`，不臆造精确日期；表中简称仅便于阅读，PGN 保留
+来源的棋手拼写。
+
+| 稳定 Id | 名局 / 对阵 | 年份 | 半回合 | 来源 |
+| --- | --- | --- | ---: | --- |
+| `opera-1858` | 歌剧院局：莫菲—布伦瑞克公爵、伊苏阿尔伯爵 | 1858 | 33 | M |
+| `immortal-1851` | 不朽局：安德森—基泽里茨基 | 1851 | 45 | A |
+| `evergreen-1852` | 常青局：安德森—杜弗雷纳 | 1852 | 47 | A |
+| `paulsen-morphy-1857` | 保尔森—莫菲：弃后追击 | 1857 | 56 | M |
+| `morphy-anderssen-3-1858` | 莫菲—安德森，巴黎第 3 局 | 1858 | 39 | M |
+| `morphy-anderssen-7-1858` | 莫菲—安德森，巴黎第 7 局 | 1858 | 49 | M |
+| `morphy-anderssen-9-1858` | 莫菲—安德森，巴黎第 9 局 | 1858 | 33 | M |
+| `morphy-anderssen-11-1858` | 莫菲—安德森，巴黎第 11 局 | 1858 | 71 | M |
+| `anderssen-kieseritzky-1851` | 安德森—基泽里茨基：伦敦伊文斯弃兵局 | 1851 | 73 | A |
+| `rosanes-anderssen-1862` | 罗萨内斯—安德森：后换开线 | 1862 | 38 | A |
+| `rosanes-anderssen-1863` | 罗萨内斯—安德森：让出角车 | 1863 | 46 | A |
+| `steinitz-blackburne-1862` | 斯坦尼茨—布莱克本：f 线攻势 | 1862 | 83 | S |
+| `steinitz-mongredien-1862` | 斯坦尼茨—蒙格雷迪恩：升车攻王 | 1862 | 57 | S |
+| `steinitz-mongredien-1863` | 斯坦尼茨—蒙格雷迪恩：异侧易位 | 1863 | 43 | S |
+| `steinitz-rock-1863` | 斯坦尼茨—洛克：追王到 a 线 | 1863 | 35 | S |
+| `steinitz-blackburne-1876` | 斯坦尼茨—布莱克本：双象瞄准王翼 | 1876 | 67 | S |
+| `steinitz-bardeleben-1895` | 斯坦尼茨—巴德莱本：黑斯廷斯的不朽车 | 1895 | 49 | S |
+| `zukertort-blackburne-1883` | 楚凯尔托特—布莱克本 | 1883 | 65 | Z |
+| `lasker-bauer-1889` | 拉斯克—鲍尔：双象牺牲 | 1889 | 75 | L |
+| `pillsbury-tarrasch-1895` | 皮尔斯伯里—塔拉什 | 1895 | 103 | P |
+| `iglesias-capablanca-1893` | 伊格莱西亚斯—卡帕布兰卡：白方让后 | 1893-09-17 | 76 | C |
+
+- M: <https://www.pgnmentor.com/players/Morphy.zip>
+- A: <https://www.pgnmentor.com/players/Anderssen.zip>
+- S: <https://www.pgnmentor.com/players/Steinitz.zip>
+- Z: <https://www.pgnmentor.com/players/Zukertort.zip>
+- L: <https://www.pgnmentor.com/players/Lasker.zip>
+- P: <https://www.pgnmentor.com/players/Pillsbury.zip>
+- C: <https://www.chessgames.com/perl/chessgame?gid=1481959>，仅转录该页公开的
+  `olga-data` PGN 中对局事实，不使用 `notes` 或计算机评注。起始 FEN 为
+  `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1`：
+  **伊格莱西亚斯执白让后，卡帕布兰卡执黑接受让子**，而不是卡帕布兰卡让后。
+  `SetUp "1"`、FEN、日期和 76 个半回合均保留。
+
+历史交叉核对：
+[歌剧院局](https://en.wikipedia.org/wiki/Opera_Game)、
+[不朽局](https://en.wikipedia.org/wiki/Immortal_Game)。
+只使用事实核对，不复制维基文章或注释，因此本资产不将维基正文的 CC-BY-SA
+许可混作棋谱事实的许可。**不朽局采用通行的 23.Be7# 完整版本**，已有史料对
+实战是否提前结束提出疑问，读者开局导读明确提醒；巴德莱本局只到 25.Rxh7+，
+不加入赛后展示的将杀续着。
+
+下载 ZIP 的 SHA-256（供来源版本复核，不要求用户运行时联网）：
+
+```text
+M 0fbc42563014f6467a0ce7356d23cfb50ddc6a35b72a4f84b3030240caaaf93e
+A a7b44e18652e06058dd36f32d10e3f425bf645a1aa71703714494209f01175d4
+S b402eb57e0f64ad1291221bc89654a87e1eb1e9c015ff364e3fd31dee0cb593b
+Z 55dc6b42fc143f23e48b23b5321a0f7ddd3c5c1aa3282f2770534386b990806c
+L bb1bb16d87a198905f043d4f8be900dc96c966f69b1f278887e3143139eb7a1d
+P 71021bf6b738ee80057a33f5ba890c6a816ac989042749557b90987144833658
+```
