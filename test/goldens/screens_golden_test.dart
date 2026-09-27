@@ -271,7 +271,11 @@ void main() {
             expect(find.text('AI 尚未启动'), findsOneWidget);
             expect(find.text('隐私政策'), findsOneWidget);
             expect(
-              tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+              tester
+                  .widget<SwitchListTile>(
+                    find.byKey(const ValueKey('analytics-toggle')),
+                  )
+                  .value,
               isFalse,
             );
         }
