@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/telemetry/analytics.dart';
+import 'ai_status_tile.dart';
 import 'privacy.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -41,6 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(title: const Text('设置')),
       body: ListView(
         children: [
+          AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
           SwitchListTile(
             title: const Text('匿名使用统计'),
             subtitle: const Text('匿名使用与崩溃类别；不含棋局内容，可随时关闭'),
