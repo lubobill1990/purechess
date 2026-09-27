@@ -13,19 +13,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_logger.dart';
 
-// TODO: Maintainer: create a separate chess GA4 property and fill MEASUREMENT_ID.
-const _measurementId = 'TODO_CHESS_MEASUREMENT_ID';
-// TODO: Maintainer: fill API_SECRET from the new chess web data stream.
-const _apiSecret = 'TODO_CHESS_API_SECRET';
+// GA4 property "purechess" (556128870), web stream "purechess app".
+const _measurementId = 'G-BBWH7XT5SG';
+const _apiSecret = 'qHpqFsrIS_6PXLU0NsjaEg';
 
 class Analytics {
   static final Analytics instance = Analytics._();
-  Analytics._() : _storageDirectory = null, _endpointOverride = null;
+  Analytics._()
+    : _storageDirectory = null,
+      _endpointOverride = null,
+      _testMode = false;
 
   @visibleForTesting
   Analytics.testing({required Directory directory, Uri? endpoint})
     : _storageDirectory = directory,
-      _endpointOverride = endpoint;
+      _endpointOverride = endpoint,
+      _testMode = true;
 
   static const privacyAcceptedKey = 'privacyAccepted';
   static const enabledKey = 'analyticsEnabled';
@@ -50,6 +53,8 @@ class Analytics {
 
   final Directory? _storageDirectory;
   final Uri? _endpointOverride;
+  // Test instances must never fall back to the production GA endpoint.
+  final bool _testMode;
   bool _enabled = true;
   bool _prepared = false;
   bool _consentGranted = false;
@@ -71,9 +76,9 @@ class Analytics {
 
   bool get enabled => _enabled;
   bool get consentGranted => _consentGranted;
-  bool get _configured =>
-      _endpointOverride != null ||
-      (!_measurementId.startsWith('TODO_') && !_apiSecret.startsWith('TODO_'));
+  bool get _configured => _testMode
+      ? _endpointOverride != null
+      : !_measurementId.startsWith('TODO_') && !_apiSecret.startsWith('TODO_');
   bool get _canSend =>
       _prepared && !_disposed && _enabled && _consentGranted && _configured;
 
