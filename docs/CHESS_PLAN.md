@@ -232,6 +232,44 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
   文案；线性解锁；毕业引导每日战术题。
 - **M3d 首页学习动线+名局库**［task/home］：镜像 pureweiqi P0-2；
   公版名局 20+ 局带简注，阅读模式。
+  - **已实现**：未毕业显示「继续教程第 N 关」主卡；毕业后展示每日题、
+    新/继续对局（推荐难度）、读名局/继续看的名局三卡；双人对弈、
+    我的棋谱、名局库保留为次级入口。页面内使用深海蓝/银白的完整
+    明暗阅读主题，跟随系统，不改其他并行分支页面的全局主题。
+  - **并行集成边界**：只读 `tutorial_progress` 与本地日历日
+    `daily_YYYYMMDD`，绝不创建、修补或覆盖这两个功能的进度。
+    原计划仅指定键名，未定义值类型：本分支的展示适配器接受完成数量
+    `int`，或 JSON 字符串 `{"completed": n, "total": m}`（也接受 JSON 整数）。
+    整数简版默认教程 18 关、每日 10 题；不同教程总数应由 JSON `total`
+    明确提供。缺键显示尚无记录，损坏/越界显示错误而不伪造毕业。
+    路由返回、应用恢复前台及跨本地午夜刷新展示。
+  - **路由接线点**：`AppRouter.routes` 可注入 `tutorialBuilder`、
+    `dailyBuilder`、`aiGameBuilder`；默认明确显示「正在准备中」，不是
+    模拟教程/每日题/AI。路由为 `/tutorial`、`/puzzles/daily`、`/game/new`；
+    原 `/game` 仍是双人对弈。对局分支通过 `recommendedDifficulty`
+    （1–10）与 `canResumeGame` 提供首页摘要；点击携带
+    `{"difficulty": n, "resume": bool}`，教程点击携带 1-based `lesson`。
+    未显式注入难度时，只读 task/game 已提交的
+    `chess.ai.recommendedLevel`（与 `AiDifficulty.preferenceKey` 相同），
+    对局返回后重新读取；缺失时推荐入门第 1 档，损坏时明确提示，不覆盖原值。
+    不虚构可恢复对局。`/game/new` 与该分支的 `AppRouter.newGame` 对齐。
+  - **名局阅读**：`/library` 目录、`/library/reading` 续读（无书签时
+    从歌剧院局开始）；`assets/library/classics.pgn` 共 21 局，
+    1183 个半回合、每局 5 条原创中文简注。含歌剧院/不朽/常青局及
+    卡帕布兰卡 1893 年接受让后的早期对局（保留特殊 FEN）。
+    来源、事实性公版依据、历史收尾分歧与 7 处 SAN 将杀符规范化见 CREDITS。
+  - 大字注释、禁用走子的棋盘、上/下一步、方向键、滑动进度、结尾提示；
+    手机纵向/平板横向布局。单键 `library_reading` 保存
+    `{"id":"稳定 PGN Id","ply":非负半回合位置}`，每次进入或走步写入，
+    写入串行化且失败可见/可重试；坏书签或失效位置回到目录并提示。
+    资产加载失败显示重试，不以空目录冒充成功。
+  - **验收（2026-09-28）**：新增 79 项测试；21 局逐着 core 合法性、
+    SAN 往返、PGN 注释往返、全部撤回恢复初始 FEN，7 个将杀收尾规范化。
+    覆盖只读进度、毕业切换、午夜刷新、路由占位/注入、书签续读与写入失败、
+    明暗两主题下 320×568 / 390×844 / 844×390 / 1024×1366
+    和 2 倍字号。`flutter analyze` 零 issue；
+    `NO_PROXY=localhost,127.0.0.1` 下 `flutter test` **596 通过、1 个
+    opt-in 原生 AI 冒烟跳过**，未 push、未触发 workflow。
 
 ### 批 4（收尾）
 - 音效/庆祝、golden 测试、每日推送、备份导入导出（全部照抄 pureweiqi
