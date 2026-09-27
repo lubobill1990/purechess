@@ -42,6 +42,8 @@ class Analytics {
     'celebrate_shown': {'source', 'result'},
     'daily_reminder_toggle': {'on'},
     'engine_start': {'duration_ms', 'success'},
+    'backup_export': {'ok'},
+    'backup_import': {'ok'},
     'app_error': {'error_kind'},
     'abnormal_exit': {'streak', 'dart_sentinel', 'native_sentinel'},
   };

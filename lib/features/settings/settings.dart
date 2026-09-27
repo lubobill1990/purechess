@@ -8,6 +8,7 @@ import '../../app/sound.dart';
 import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import 'ai_status_tile.dart';
+import 'backup.dart';
 import 'daily_reminder_settings.dart';
 import 'privacy.dart';
 
@@ -98,6 +99,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
           DailyReminderTiles(service: _reminders),
+          ListTile(
+            leading: const Icon(Icons.backup_outlined),
+            title: const Text('备份与恢复'),
+            subtitle: const Text('导出棋谱与学习进度，或合并恢复备份'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BackupScreen(
+                  prefs: widget.prefs,
+                  analytics: widget.analytics,
+                ),
+              ),
+            ),
+          ),
           SwitchListTile(
             key: const ValueKey('analytics-toggle'),
             title: const Text('匿名使用统计'),
