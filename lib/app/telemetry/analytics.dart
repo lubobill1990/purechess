@@ -40,6 +40,8 @@ class Analytics {
     'game_end': {'mode', 'difficulty', 'duration_ms', 'move_count'},
     'puzzle_result': {'correct', 'attempts', 'duration_ms', 'rating'},
     'engine_start': {'duration_ms', 'success'},
+    'backup_export': {'ok'},
+    'backup_import': {'ok'},
     'app_error': {'error_kind'},
     'abnormal_exit': {'streak', 'dart_sentinel', 'native_sentinel'},
   };

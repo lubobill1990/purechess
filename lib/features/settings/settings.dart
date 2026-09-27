@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/telemetry/analytics.dart';
 import 'ai_status_tile.dart';
+import 'backup.dart';
 import 'privacy.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -43,6 +44,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
+          ListTile(
+            leading: const Icon(Icons.backup_outlined),
+            title: const Text('备份与恢复'),
+            subtitle: const Text('导出棋谱与学习进度，或合并恢复备份'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BackupScreen(
+                  prefs: widget.prefs,
+                  analytics: widget.analytics,
+                ),
+              ),
+            ),
+          ),
           SwitchListTile(
             title: const Text('匿名使用统计'),
             subtitle: const Text('匿名使用与崩溃类别；不含棋局内容，可随时关闭'),

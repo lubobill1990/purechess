@@ -178,6 +178,34 @@ The opt-in smoke checks all ten levels, legal moves/PVs, a mate-in-one score,
 and stop/restart with a second handshake. Without that environment variable it
 is explicitly skipped; ordinary tests inject fake transports/native clients.
 
+## 备份与恢复
+
+设置 → **备份与恢复** 可将本地 PGN 棋谱、教程/谜题完成记录、错题本、
+每日题、名局阅读书签和 AI 推荐难度导出为一个 ZIP，通过系统分享面板保存。
+备份不加密，可能包含棋谱中的姓名与评注；不含内置题库、诊断日志、
+匿名统计开关或隐私同意。分享面板返回不等于云端保存完成，请确认目标位置。
+
+导入先完整校验，再显示棋谱数量、教程/谜题进度与每日记录预览，确认后合并：
+教程取较大值；谜题/每日完成 ID 取并集；错题取并集并移除已完成题；
+同一名局书签取较大步数，不同名局保留本地书签；备份中的 AI 难度覆盖本地值。
+同一天题目清单不一致时明确拒绝整个导入，不丢弃任何完成记录。
+棋谱按 PGN `Id` 去重，同 ID 保留本地版本；文件同名但 ID 不同则另存。
+新棋谱保存时生成稳定 ID，旧版本无 ID 的棋谱以 `legacy:<原文件名>` 标识，
+导入后写入 PGN，即使因同名重命名也可重复导入而不复制。
+
+格式 v1：`manifest.json` 包含 `format: "purechess-backup"`、整数 `version: 1`、
+UTC `createdAt`、白名单 `preferences` 与 `records: [{id, file}]`；
+棋谱位于 `records/*.pgn`。拒绝非法 PGN、未知版本/进度、缺失或未登记文件、
+重复 ID/路径、链接、加密 ZIP、不安全路径和 CRC 错误。
+限制：ZIP 64 MiB、单文件解压 8 MiB、总解压 128 MiB、最多 10,000 个条目。
+解压使用限流输出，伪造 ZIP 大小也不能绕过限制。
+
+恢复先在应用沙盒内暂存全部内容，再发布文件和设置。写入失败回滚；
+未提交的事务保留磁盘日志，下次启动在加载应用状态前回滚；
+棋谱保存与恢复在同一 isolate 内串行。`backup_export` / `backup_import`
+只记录 `ok`（取消为 false），不发送备份内容。iOS 已有相册、相机、
+使用期间定位三项 purpose strings，供文件选择组件的可选能力使用。
+
 ## Validation (PowerShell)
 
 ```powershell

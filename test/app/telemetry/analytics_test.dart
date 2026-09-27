@@ -117,6 +117,22 @@ void main() {
     expect(pending(), isEmpty);
   });
 
+  test(
+    'backup events retain only outcome and never archive contents',
+    () async {
+      final client = createClient();
+      await client.prepare(prefs);
+      client.event('backup_export', {'ok': true, 'pgn': 'private game'});
+      client.event('backup_import', {'ok': false, 'path': 'private path'});
+      final events = pending();
+      expect(events[1]['name'], 'backup_export');
+      expect(events[1]['params']['ok'], 1);
+      expect(events[2]['name'], 'backup_import');
+      expect(events[2]['params']['ok'], 0);
+      expect(pendingFile().readAsStringSync(), isNot(contains('private')));
+    },
+  );
+
   test('placeholder GA configuration never contacts the network', () async {
     final client = createClient(configured: false);
     await client.init(prefs);

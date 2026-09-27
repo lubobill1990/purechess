@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:path_provider/path_provider.dart';
 
@@ -23,7 +24,7 @@ class RecordFileInfo {
 class RecordsRepository {
   RecordsRepository(this.dir);
 
-  static Future<void> _pendingSave = Future<void>.value();
+  static Future<void>? _pendingSave;
   final Directory dir;
 
   static Future<RecordsRepository> open() async {
@@ -62,19 +63,31 @@ class RecordsRepository {
       Pgn.parse(await File(path).readAsString());
 
   Future<String> save(GameRecord record, {String? name}) async {
+    record.tags.putIfAbsent('Id', () {
+      final random = Random.secure();
+      return List.generate(
+        16,
+        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ).join();
+    });
     final pgn = Pgn.generate(record);
     final base = _sanitize(
       name ??
           '${record.tags['Date'] ?? '对局'}-${DateTime.now().microsecondsSinceEpoch}',
     );
-    // POSIX locks are process-scoped, so also serialize saves in this isolate.
+    return exclusive(() => _publish(pgn, base));
+  }
+
+  // Backup publication and normal saves must not interleave in this isolate.
+  static Future<T> exclusive<T>(Future<T> Function() action) async {
     final previous = _pendingSave;
     final done = Completer<void>();
     _pendingSave = done.future;
-    await previous;
+    if (previous != null) await previous;
     try {
-      return await _publish(pgn, base);
+      return await action();
     } finally {
+      if (identical(_pendingSave, done.future)) _pendingSave = null;
       done.complete();
     }
   }

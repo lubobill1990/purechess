@@ -9,6 +9,8 @@ import 'app/telemetry/analytics.dart';
 import 'app/telemetry/app_logger.dart';
 import 'app/telemetry/crash_guard.dart';
 import 'features/settings/privacy.dart';
+import 'features/library/records_repository.dart';
+import 'features/settings/backup_service.dart';
 
 void main() {
   runGuarded(() async {
@@ -16,6 +18,10 @@ void main() {
     installCrashGuard();
     await AppLogger.instance.init();
     final prefs = await SharedPreferences.getInstance();
+    await BackupService.recoverPending(
+      prefs,
+      (await RecordsRepository.open()).dir,
+    );
     var version = '';
     try {
       final info = await PackageInfo.fromPlatform();
