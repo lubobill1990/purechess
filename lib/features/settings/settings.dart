@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/sound.dart';
 import '../../app/telemetry/analytics.dart';
+import '../../app/telemetry/crash_guard.dart';
 import 'ai_status_tile.dart';
 import 'privacy.dart';
 
@@ -21,6 +23,30 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _saving = false;
+  bool _savingSound = false;
+
+  Future<void> _setSoundEnabled(bool value) async {
+    setState(() => _savingSound = true);
+    if (!value) SoundService.stopAll();
+    try {
+      if (!await widget.prefs.setBool(SoundService.enabledKey, value)) {
+        throw StateError('Sound preference write failed');
+      }
+    } catch (error, stack) {
+      reportHandledError('sound_settings', error, stack);
+      try {
+        await widget.prefs.reload();
+      } catch (error, stack) {
+        reportHandledError('sound_settings_reload', error, stack);
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('音效设置保存失败，请重试')));
+      }
+    } finally {
+      if (mounted) setState(() => _savingSound = false);
+    }
+  }
 
   Future<void> _setEnabled(bool value) async {
     setState(() => _saving = true);
@@ -42,6 +68,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(title: const Text('设置')),
       body: ListView(
         children: [
+          SwitchListTile(
+            title: const Text('音效'),
+            subtitle: const Text('落子、吃子、将军与完成提示音'),
+            value: widget.prefs.getBool(SoundService.enabledKey) ?? true,
+            onChanged: _savingSound ? null : _setSoundEnabled,
+          ),
           AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
           SwitchListTile(
             title: const Text('匿名使用统计'),

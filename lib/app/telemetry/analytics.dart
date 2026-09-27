@@ -39,6 +39,7 @@ class Analytics {
     'game_start': {'mode', 'difficulty', 'player_color'},
     'game_end': {'mode', 'difficulty', 'duration_ms', 'move_count'},
     'puzzle_result': {'correct', 'attempts', 'duration_ms', 'rating'},
+    'celebrate_shown': {'source', 'result'},
     'engine_start': {'duration_ms', 'success'},
     'app_error': {'error_kind'},
     'abnormal_exit': {'streak', 'dart_sentinel', 'native_sentinel'},

@@ -279,6 +279,7 @@ class _LearningCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Card(
       child: InkWell(
+        enableFeedback: false,
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
         child: Padding(

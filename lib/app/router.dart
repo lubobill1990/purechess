@@ -36,17 +36,19 @@ class AppRouter {
       recommendedDifficulty: recommendedDifficulty,
       canResumeGame: canResumeGame,
     ),
-    game: (_) => GameScreen(analytics: analytics),
+    game: (_) => GameScreen(analytics: analytics, prefs: prefs),
     newGame: (_) => NewGameScreen(prefs: prefs, analytics: analytics),
     records: (_) => const RecordsScreen(),
     puzzles: (_) => PuzzleScreen(prefs: prefs, analytics: analytics),
     settings: (_) => SettingsScreen(prefs: prefs, analytics: analytics),
     tutorial: (_) => TutorialScreen(prefs: prefs, analytics: analytics),
-    dailyPuzzle: (_) => TutorialDailyScreen(analytics: analytics),
+    dailyPuzzle: (_) => TutorialDailyScreen(analytics: analytics, prefs: prefs),
     library: (_) => ClassicLibraryScreen(prefs: prefs),
     reading: (_) => ClassicLibraryScreen(prefs: prefs, resume: true),
     // Home's daily entry keeps its own path; both it and [dailyPuzzle]
     // resolve to the daily tactics screen.
-    daily: dailyBuilder ?? (_) => TutorialDailyScreen(analytics: analytics),
+    daily:
+        dailyBuilder ??
+        (_) => TutorialDailyScreen(analytics: analytics, prefs: prefs),
   };
 }

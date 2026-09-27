@@ -89,14 +89,18 @@ void main() {
       await tester.tap(find.byTooltip('设置'));
       await tester.pumpAndSettle();
       expect(
-        tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+        tester
+            .widget<SwitchListTile>(
+              find.widgetWithText(SwitchListTile, '匿名使用统计'),
+            )
+            .value,
         false,
       );
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
       await tester.pumpAndSettle();
       expect(analytics.enabled, isTrue);
       expect(prefs.getBool(Analytics.enabledKey), isTrue);
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
       await tester.pumpAndSettle();
       expect(analytics.enabled, isFalse);
       await tester.tap(find.text('隐私政策'));
@@ -139,12 +143,14 @@ void main() {
     await tester.tap(find.byTooltip('设置'));
     await tester.pumpAndSettle();
     store.failKey = 'flutter.${Analytics.enabledKey}';
-    await tester.tap(find.byType(SwitchListTile));
+    await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
     await tester.pumpAndSettle();
     expect(find.text('统计设置保存失败，请重试'), findsOneWidget);
     expect(analytics.enabled, isFalse);
     expect(
-      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      tester
+          .widget<SwitchListTile>(find.widgetWithText(SwitchListTile, '匿名使用统计'))
+          .value,
       false,
     );
   });

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/play_feedback.dart';
 import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
@@ -170,6 +171,7 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
                       for (final theme in puzzleThemes.entries)
                         Card(
                           child: ExpansionTile(
+                            enableFeedback: false,
                             title: Text(theme.value.title),
                             subtitle: Text(
                               '${catalog.packs.where((pack) => pack.theme == theme.key).fold<int>(0, (sum, pack) => sum + pack.puzzles.length)} 题',
@@ -547,40 +549,62 @@ class _PuzzleSolveScreenState extends State<PuzzleSolveScreen> {
           '第 ${_index + 1} / ${widget.ids.length} 题 · ${_attempt.problem.rating}',
         ),
       ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final landscape =
-                constraints.maxWidth >= 600 &&
-                constraints.maxWidth > constraints.maxHeight;
-            if (landscape) {
-              final size = math.min(
-                constraints.maxHeight - 24,
-                constraints.maxWidth * .5 - 32,
-              );
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _board(size),
-                  const SizedBox(width: 24),
-                  SizedBox(
-                    width: math.min(360, constraints.maxWidth - size - 56),
-                    child: SingleChildScrollView(child: _controls()),
+      body: PlayFeedback(
+        session: _attempt,
+        board: _attempt.board,
+        source: widget.day == null ? 'puzzle' : 'daily',
+        prefs: widget.repository.prefs,
+        analytics: widget.analytics,
+        result: switch (_attempt.status) {
+          PuzzleStatus.playing => FeedbackResult.playing,
+          PuzzleStatus.solved => FeedbackResult.correct,
+          PuzzleStatus.failed => FeedbackResult.incorrect,
+        },
+        celebration:
+            _attempt.status == PuzzleStatus.solved &&
+                !_saving &&
+                _saveError == null
+            ? (widget.ids.every(
+                    widget.repository.completed(widget.day).contains,
+                  )
+                  ? (widget.day == null ? '题集完成！' : '每日练习完成！')
+                  : '解题成功！')
+            : null,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final landscape =
+                  constraints.maxWidth >= 600 &&
+                  constraints.maxWidth > constraints.maxHeight;
+              if (landscape) {
+                final size = math.min(
+                  constraints.maxHeight - 24,
+                  constraints.maxWidth * .5 - 32,
+                );
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _board(size),
+                    const SizedBox(width: 24),
+                    SizedBox(
+                      width: math.min(360, constraints.maxWidth - size - 56),
+                      child: SingleChildScrollView(child: _controls()),
+                    ),
+                  ],
+                );
+              }
+              final width = math.min(560.0, constraints.maxWidth - 32);
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: SizedBox(
+                    width: width,
+                    child: Column(children: [_board(width), _controls()]),
                   ),
-                ],
-              );
-            }
-            final width = math.min(560.0, constraints.maxWidth - 32);
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: SizedBox(
-                  width: width,
-                  child: Column(children: [_board(width), _controls()]),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     ),

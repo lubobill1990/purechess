@@ -117,6 +117,28 @@ void main() {
     expect(pending(), isEmpty);
   });
 
+  test(
+    'celebration schema keeps only source and result across replay',
+    () async {
+      final first = createClient();
+      await first.prepare(prefs);
+      first.event('celebrate_shown', {
+        'source': 'ai',
+        'result': 'win',
+        'fen': 'private position',
+        'title': 'private text',
+      });
+      expect(pending().last['name'], 'celebrate_shown');
+      expect(pending().last['params']['source'], 'ai');
+      expect(pendingFile().readAsStringSync(), isNot(contains('private')));
+      first.dispose();
+      final second = createClient();
+      await second.prepare(prefs);
+      expect(pending()[1]['params']['result'], 'win');
+      expect(pending()[1]['params']['deferred'], 1);
+    },
+  );
+
   test('placeholder GA configuration never contacts the network', () async {
     final client = createClient(configured: false);
     await client.init(prefs);
