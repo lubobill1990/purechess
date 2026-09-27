@@ -40,7 +40,11 @@ jobs:
             [ -e "$DEST/$n" ] || curl --retry 5 --retry-all-errors --location \
               -o "$DEST/$n" "https://tests.stockfishchess.org/api/nn/$n"
           done
-          ls -la "$DEST"/*.nnue
+          # incbin resolves relative paths against the compiler CWD, which is
+          # ios/Pods on this toolchain — mirror the weights there too.
+          mkdir -p ios/Pods
+          cp "$DEST"/*.nnue ios/Pods/
+          ls -la "$DEST"/*.nnue ios/Pods/*.nnue
 
       # Goldens are Windows-rasterized baselines; they only run locally / on
       # the opt-in Windows CI job.

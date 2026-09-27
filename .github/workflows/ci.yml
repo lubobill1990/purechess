@@ -40,7 +40,10 @@ jobs:
             [ -e "$DEST/$n" ] || curl --retry 5 --retry-all-errors --location \
               -o "$DEST/$n" "https://tests.stockfishchess.org/api/nn/$n"
           done
-          ls -la "$DEST"/*.nnue
+          # incbin resolves relative paths against the compiler CWD (ios/Pods).
+          mkdir -p ios/Pods
+          cp "$DEST"/*.nnue ios/Pods/
+          ls -la "$DEST"/*.nnue ios/Pods/*.nnue
       - run: flutter build ios --no-codesign
       - uses: actions/upload-artifact@v4
         with:
