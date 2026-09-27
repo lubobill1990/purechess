@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 import 'support/preferences_store.dart';
+import 'support/fake_reminder_backend.dart';
 
 void main() {
   late Directory dir;
@@ -31,7 +32,13 @@ void main() {
   });
 
   Future<void> launch(WidgetTester tester) async {
-    await tester.pumpWidget(MyApp(prefs: prefs, analytics: analytics));
+    await tester.pumpWidget(
+      MyApp(
+        prefs: prefs,
+        analytics: analytics,
+        reminderBackend: FakeReminderBackend()..supported = false,
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -91,16 +98,16 @@ void main() {
       expect(
         tester
             .widget<SwitchListTile>(
-              find.widgetWithText(SwitchListTile, '匿名使用统计'),
+              find.byKey(const ValueKey('analytics-toggle')),
             )
             .value,
         false,
       );
-      await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
+      await tester.tap(find.byKey(const ValueKey('analytics-toggle')));
       await tester.pumpAndSettle();
       expect(analytics.enabled, isTrue);
       expect(prefs.getBool(Analytics.enabledKey), isTrue);
-      await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
+      await tester.tap(find.byKey(const ValueKey('analytics-toggle')));
       await tester.pumpAndSettle();
       expect(analytics.enabled, isFalse);
       await tester.tap(find.text('隐私政策'));
@@ -143,13 +150,15 @@ void main() {
     await tester.tap(find.byTooltip('设置'));
     await tester.pumpAndSettle();
     store.failKey = 'flutter.${Analytics.enabledKey}';
-    await tester.tap(find.widgetWithText(SwitchListTile, '匿名使用统计'));
+    await tester.tap(find.byKey(const ValueKey('analytics-toggle')));
     await tester.pumpAndSettle();
     expect(find.text('统计设置保存失败，请重试'), findsOneWidget);
     expect(analytics.enabled, isFalse);
     expect(
       tester
-          .widget<SwitchListTile>(find.widgetWithText(SwitchListTile, '匿名使用统计'))
+          .widget<SwitchListTile>(
+            find.byKey(const ValueKey('analytics-toggle')),
+          )
           .value,
       false,
     );

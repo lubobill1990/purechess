@@ -10,6 +10,9 @@
 	<string>纯弈国际象棋</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Local notifications use UNUserNotificationCenter authorization, not a
+	     purpose-string key or background remote-notification entitlement.
+	     Keep the existing purpose strings required by optional import plugins. -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>用于从相册选择棋谱文件或图片导入到应用中。</string>
 	<key>NSCameraUsageDescription</key>
