@@ -7,7 +7,15 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Purechess</string>
+	<string>纯弈国际象棋</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>用于从相册选择棋谱文件或图片导入到应用中。</string>
+	<key>NSCameraUsageDescription</key>
+	<string>用于拍摄照片以导入棋局内容。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>第三方文件选择组件的可选能力需要此声明，本应用不会主动收集位置信息。</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
