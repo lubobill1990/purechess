@@ -318,3 +318,9 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
 7. pubspec 并行任务都会碰 → 新依赖追加在依赖区末尾，合并冲突维护者解。
 8. UI 结果文案区固定高度，别让文本变化推动棋盘。
 9. copilot 产物必须独立复跑 analyze+test 验收，自报不作数。
+10. stockfish pod 的 NNUE 权重靠 script phase curl 下载，Xcode 15+ 用户
+    脚本沙盒会拦（报 Could not find incbin file）。CI 在 pub get 后把
+    权重预取到 pub-cache 的 ios/Stockfish/src；本地 mac 构建同理预放。
+11. 并行分支合并冲突必须手工逐块解，绝不能 sed 删标记了事（批 3
+    router.dart 重复路由事故）；纯追加型（pubspec 依赖、遥测白名单、
+    并列测试）两边都留。
