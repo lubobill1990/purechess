@@ -10,6 +10,7 @@ import '../features/puzzle/puzzle_screen.dart';
 import '../features/settings/settings.dart';
 import '../features/tutorial/tutorial_screen.dart';
 import 'telemetry/analytics.dart';
+import 'notifications.dart';
 
 class AppRouter {
   static const home = '/';
@@ -27,6 +28,7 @@ class AppRouter {
   static Map<String, WidgetBuilder> routes({
     required SharedPreferences prefs,
     required Analytics analytics,
+    DailyReminderService? reminders,
     WidgetBuilder? dailyBuilder,
     int? recommendedDifficulty,
     bool canResumeGame = false,
@@ -40,7 +42,11 @@ class AppRouter {
     newGame: (_) => NewGameScreen(prefs: prefs, analytics: analytics),
     records: (_) => const RecordsScreen(),
     puzzles: (_) => PuzzleScreen(prefs: prefs, analytics: analytics),
-    settings: (_) => SettingsScreen(prefs: prefs, analytics: analytics),
+    settings: (_) => SettingsScreen(
+      prefs: prefs,
+      analytics: analytics,
+      reminders: reminders,
+    ),
     tutorial: (_) => TutorialScreen(prefs: prefs, analytics: analytics),
     dailyPuzzle: (_) => TutorialDailyScreen(analytics: analytics),
     library: (_) => ClassicLibraryScreen(prefs: prefs),

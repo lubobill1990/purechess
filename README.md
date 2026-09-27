@@ -41,6 +41,43 @@ Named routes live in `lib/app/router.dart`: `/`, `/game`, `/records`, `/settings
 Game start/end use the existing allowlisted analytics parameters; no moves,
 FEN, PGN or file paths are sent to analytics.
 
+## Daily tactics reminders
+
+Settings include **每日战术题提醒** (off by default) and a 24-hour time picker
+(default **20:00**). `dailyReminderSettings` stores enabled/hour/minute together
+in SharedPreferences. Only enabling requests notification authorization; denial
+leaves the switch off and shows system-settings guidance. Scheduling/storage
+failures are visible and retryable. Startup/resume restore scheduling and check
+revoked permissions without prompting.
+
+The injectable `ReminderBackend` uses the same dependency constraints as
+pureweiqi (`flutter_local_notifications: ^22.3.1`, `timezone: ^0.11.0`).
+`flutter_timezone` supplies the device's IANA zone rather than assuming UTC.
+One repeating calendar notification (ID 7300) stays below iOS's pending limit;
+calendar arithmetic handles DST, and resume refreshes the zone after travel.
+Android uses inexact idle-safe scheduling (delivery may be delayed by the OS),
+without exact-alarm access, with reboot/update receivers and a retained
+monochrome notification icon. iOS uses `UNUserNotificationCenter` authorization
+and the AppDelegate delegate; local notifications need **no** invented
+Info.plist notification-purpose key, background mode, or push entitlement.
+Existing photo/camera/location purpose strings remain intact for release safety.
+
+Taps, including cold launch, open the existing `/puzzles/daily` daily tactics
+screen; first-launch privacy consent remains in front. Successful enabled-state
+changes emit allowlisted `daily_reminder_toggle` with `on`, respecting the
+existing statistics opt-out. Desktop/web explicitly show reminders as unsupported.
+
+Before release, verify permission denial/re-enable, notification taps with the
+app terminated, and reboot delivery on Android 13+ and an iOS device/TestFlight.
+Windows unit/widget tests do not substitute for signed mobile-device validation.
+Local verification (2026-09-28): `flutter analyze` reports zero issues;
+`NO_PROXY=localhost,127.0.0.1` + `flutter test` passes 1861 tests, with one existing
+opt-in native-engine test skipped. Thirty new tests cover calendar/DST scheduling,
+permissions, persistence/rollback, notification adapters, UI and cold/warm routing.
+The additional Android debug-build attempt is blocked before app compilation by
+the existing `stockfish` 1.8.1 Gradle script's removed `jcenter()` call; it is not
+an Android build pass. iOS signing/device delivery remains unverified on Windows.
+
 ## Rules core
 
 | File | Responsibility |

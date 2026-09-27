@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/notifications.dart';
 import '../../app/telemetry/analytics.dart';
 import 'ai_status_tile.dart';
+import 'daily_reminder_settings.dart';
 import 'privacy.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -10,10 +14,12 @@ class SettingsScreen extends StatefulWidget {
     super.key,
     required this.prefs,
     required this.analytics,
+    this.reminders,
   });
 
   final SharedPreferences prefs;
   final Analytics analytics;
+  final DailyReminderService? reminders;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -21,6 +27,22 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _saving = false;
+  late final DailyReminderService _reminders;
+
+  @override
+  void initState() {
+    super.initState();
+    _reminders =
+        widget.reminders ??
+        DailyReminderService(widget.prefs, analytics: widget.analytics);
+    if (widget.reminders == null) unawaited(_reminders.refresh());
+  }
+
+  @override
+  void dispose() {
+    if (widget.reminders == null) _reminders.dispose();
+    super.dispose();
+  }
 
   Future<void> _setEnabled(bool value) async {
     setState(() => _saving = true);
@@ -43,7 +65,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         children: [
           AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
+          DailyReminderTiles(service: _reminders),
           SwitchListTile(
+            key: const ValueKey('analytics-toggle'),
             title: const Text('匿名使用统计'),
             subtitle: const Text('匿名使用与崩溃类别；不含棋局内容，可随时关闭'),
             value: widget.analytics.enabled,
