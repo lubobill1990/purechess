@@ -170,23 +170,19 @@ void main() {
     expect(find.text('今日还没有练习记录。'), findsOneWidget);
   });
 
-  testWidgets(
-    'unmerged tutorial and AI destinations show explicit placeholders',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          routes: AppRouter.routes(prefs: prefs, analytics: Analytics.instance),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('继续教程第 1 关'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('教程正在准备中'), findsOneWidget);
-      await tester.tap(find.text('返回首页'));
-      await tester.pumpAndSettle();
-      expect(find.text('继续教程第 1 关'), findsOneWidget);
-    },
-  );
+  testWidgets('tutorial entry navigates to the real tutorial screen', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        routes: AppRouter.routes(prefs: prefs, analytics: Analytics.instance),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('继续教程第 1 关'));
+    await tester.pumpAndSettle();
+    expect(find.text('新手互动教程'), findsOneWidget);
+  });
 
   testWidgets('router accepts independently supplied feature builders', (
     tester,
