@@ -1,0 +1,833 @@
+[
+  {
+    "id": "000rO",
+    "fen": "3R4/8/8/KB2b3/1p6/1P2k3/3p4/8 b - - 0 58",
+    "line": [
+      "e5c7",
+      "a5b4",
+      "c7d8"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "master",
+      "short"
+    ],
+    "rating": 1110
+  },
+  {
+    "id": "001wr",
+    "fen": "r4rk1/p3ppbp/Pp1q1np1/3PpbB1/2B5/2N2P2/1PPQ2PP/3RR1K1 b - - 0 18",
+    "line": [
+      "d6c5",
+      "g1h1",
+      "c5c4"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "master",
+      "masterVsMaster",
+      "middlegame",
+      "short"
+    ],
+    "rating": 974
+  },
+  {
+    "id": "002GQ",
+    "fen": "5rk1/5ppp/4p3/4N3/8/1Pn5/5PPP/2R3K1 b - - 1 28",
+    "line": [
+      "c3e2",
+      "g1f1",
+      "e2c1"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 654
+  },
+  {
+    "id": "003Jb",
+    "fen": "6k1/Q2bqr1p/2rpp1pR/p7/Pp2P3/1B3P2/1PP3P1/2KR4 b - - 7 22",
+    "line": [
+      "e7g5",
+      "c1b1",
+      "g5h6"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "master",
+      "middlegame",
+      "short"
+    ],
+    "rating": 993
+  },
+  {
+    "id": "003jH",
+    "fen": "rn3rk1/p5pp/3N4/4np1q/5Q2/1P6/PB1P1KP1/2R4R b - - 1 25",
+    "line": [
+      "e5d3",
+      "f2e3",
+      "d3f4",
+      "h1h5",
+      "f4h5"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "long",
+      "middlegame"
+    ],
+    "rating": 1057
+  },
+  {
+    "id": "003jb",
+    "fen": "r3kb1r/p4ppp/b3p3/2pq4/3Q4/4BN2/PPP2PPP/R3K2R w KQkq - 0 12",
+    "line": [
+      "d4a4",
+      "a6b5",
+      "a4b5"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "master",
+      "middlegame",
+      "short"
+    ],
+    "rating": 960
+  },
+  {
+    "id": "003jv",
+    "fen": "7R/1p2k2p/p2n2p1/4K3/8/6P1/P6P/8 b - - 11 37",
+    "line": [
+      "d6f7",
+      "e5e4",
+      "f7h8"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 1006
+  },
+  {
+    "id": "003o0",
+    "fen": "r1bqk2r/pp1nbppp/3p4/1B1p4/3P1B2/5N2/PPP2PPP/R2QK2R b KQkq - 3 9",
+    "line": [
+      "d8a5",
+      "d1d2",
+      "a5b5"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "master",
+      "opening",
+      "short"
+    ],
+    "rating": 1001
+  },
+  {
+    "id": "003r5",
+    "fen": "r2qr1k1/ppp2ppp/4P3/8/1nP2Q2/2N2N1P/PP3KP1/R4R2 b - - 0 15",
+    "line": [
+      "b4d3",
+      "f2g1",
+      "d3f4"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1130
+  },
+  {
+    "id": "004nd",
+    "fen": "3q2k1/3r4/pp3p1Q/2b1n3/P3N3/2P5/1P4PP/R6K w - - 1 25",
+    "line": [
+      "e4f6",
+      "d8f6",
+      "h6f6"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 898
+  },
+  {
+    "id": "0050w",
+    "fen": "5rk1/1p2p2p/p2p4/2pPb2R/2P1P3/1P1BKPrR/8/8 w - - 5 31",
+    "line": [
+      "h3g3",
+      "e5g3",
+      "h5g5",
+      "g8f7",
+      "g5g3"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "long"
+    ],
+    "rating": 1131
+  },
+  {
+    "id": "008P4",
+    "fen": "8/4k3/1p1p4/rP2p1p1/P2nP1P1/3B4/3K4/R7 b - - 1 35",
+    "line": [
+      "d4b3",
+      "d2c3",
+      "b3a1"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 708
+  },
+  {
+    "id": "009tE",
+    "fen": "6k1/6pp/p1N5/1pP2bp1/5P2/8/PPP5/3K4 w - - 0 29",
+    "line": [
+      "c6e7",
+      "g8f7",
+      "e7f5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 628
+  },
+  {
+    "id": "00Aas",
+    "fen": "3r1rk1/1p2q1pp/5p2/8/1P1n4/6Q1/PPBB1PPP/R4RK1 b - - 0 20",
+    "line": [
+      "d4e2",
+      "g1h1",
+      "e2g3",
+      "f2g3",
+      "d8d2"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "long",
+      "middlegame"
+    ],
+    "rating": 1107
+  },
+  {
+    "id": "00BNd",
+    "fen": "1rr3k1/4ppbp/3p1np1/1b1N4/P2BP3/5P2/P2R2PP/R5K1 w - - 0 22",
+    "line": [
+      "d5e7",
+      "g8f8",
+      "e7c8"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 912
+  },
+  {
+    "id": "00Bn4",
+    "fen": "1k6/pp6/4nNp1/P3r2p/3p4/7P/3R1PPK/8 w - - 1 41",
+    "line": [
+      "f6d7",
+      "b8c7",
+      "d7e5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 689
+  },
+  {
+    "id": "00DPI",
+    "fen": "3r2k1/1B3p1p/6p1/3N4/3p2r1/8/5KP1/3R4 w - - 0 36",
+    "line": [
+      "d5f6",
+      "g8g7",
+      "f6g4"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 953
+  },
+  {
+    "id": "00EBZ",
+    "fen": "3rr1k1/p4pp1/1pp4p/3pPQ2/1P3P2/2P2RqP/P2R2P1/6K1 b - - 2 24",
+    "line": [
+      "g3e1",
+      "g1h2",
+      "e1d2"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 818
+  },
+  {
+    "id": "00Evs",
+    "fen": "5qk1/pQ3p2/7p/b2N1bp1/P3r3/5K2/7P/R4B2 w - - 0 25",
+    "line": [
+      "d5f6",
+      "g8h8",
+      "f6e4"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1058
+  },
+  {
+    "id": "00GBX",
+    "fen": "r6k/pp2n1pp/2nN4/4p1r1/1PB5/2P4b/P3Nb1P/R2R3K w - - 0 23",
+    "line": [
+      "d6f7",
+      "h8g8",
+      "f7g5"
+    ],
+    "themes": [
+      "advantage",
+      "discoveredAttack",
+      "discoveredCheck",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 874
+  },
+  {
+    "id": "00Gvp",
+    "fen": "8/2kn1p2/8/3P4/R7/2PKN3/1r6/8 b - - 14 70",
+    "line": [
+      "d7c5",
+      "d3d4",
+      "c5a4"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 896
+  },
+  {
+    "id": "00HLP",
+    "fen": "r4rk1/3nqpp1/4p2p/1p2P3/2pn1Q2/P6N/1P3PPP/1B1R1RK1 b - - 1 24",
+    "line": [
+      "d4e2",
+      "g1h1",
+      "e2f4"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 797
+  },
+  {
+    "id": "00HZa",
+    "fen": "6k1/6pp/1p6/p1n5/4q3/1P2pN2/P4PPP/3Q2K1 w - - 0 29",
+    "line": [
+      "d1d8",
+      "g8f7",
+      "f3g5",
+      "f7g6",
+      "g5e4"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "long",
+      "master"
+    ],
+    "rating": 937
+  },
+  {
+    "id": "00IEW",
+    "fen": "2r3k1/6p1/R6p/3P1N2/8/3K4/5b2/8 w - - 6 58",
+    "line": [
+      "f5e7",
+      "g8f7",
+      "e7c8"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 843
+  },
+  {
+    "id": "00ISm",
+    "fen": "5r2/5p1k/2ppq1p1/4p1b1/4N2P/3P4/1P1R1P2/4K1R1 w - - 0 30",
+    "line": [
+      "e4g5",
+      "h7h6",
+      "g5e6"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 907
+  },
+  {
+    "id": "00K0G",
+    "fen": "8/8/8/2Pk4/pK4p1/3N4/4bP2/8 w - - 8 60",
+    "line": [
+      "d3f4",
+      "d5c6",
+      "f4e2"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "master",
+      "short"
+    ],
+    "rating": 777
+  },
+  {
+    "id": "00Kxt",
+    "fen": "r2q1r2/p3ppkp/3p2P1/1N2n3/4P1P1/5P2/PPPQ4/R3K2R b KQ - 0 16",
+    "line": [
+      "e5f3",
+      "e1e2",
+      "f3d2"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 932
+  },
+  {
+    "id": "00LG5",
+    "fen": "6k1/5r1p/4b1pQ/5q2/3B3P/2P5/4R1P1/6K1 b - - 8 36",
+    "line": [
+      "f5f1",
+      "g1h2",
+      "f1e2"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 1113
+  },
+  {
+    "id": "00M6i",
+    "fen": "6k1/6pp/p7/2N1bp2/P1P5/1r6/6PP/2R3K1 b - - 2 33",
+    "line": [
+      "e5d4",
+      "g1f1",
+      "d4c5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 1143
+  },
+  {
+    "id": "00MyT",
+    "fen": "r3q3/1ppknr2/p5pB/2QPn3/4P3/8/PP4BP/2K2R1R b - - 0 22",
+    "line": [
+      "e5d3",
+      "c1c2",
+      "d3c5"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 923
+  },
+  {
+    "id": "00Nej",
+    "fen": "6k1/1p3pp1/pB2q2p/2P1b3/1P6/6QP/4r1P1/3R3K w - - 5 34",
+    "line": [
+      "d1d8",
+      "g8h7",
+      "g3d3",
+      "e6g6",
+      "d3e2"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "long"
+    ],
+    "rating": 1008
+  },
+  {
+    "id": "00OPi",
+    "fen": "5k2/5p1p/1p1P2p1/1B6/4KP2/1P4P1/n6P/8 b - - 1 38",
+    "line": [
+      "a2c3",
+      "e4d4",
+      "c3b5"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "master",
+      "short"
+    ],
+    "rating": 589
+  },
+  {
+    "id": "00OxK",
+    "fen": "3r2k1/1p3p2/p1n2P2/2P3P1/1PR1p3/P2pP3/3B4/6K1 b - - 1 33",
+    "line": [
+      "c6e5",
+      "c4e4",
+      "e5f3",
+      "g1f2",
+      "f3d2"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "exposedKing",
+      "fork",
+      "long"
+    ],
+    "rating": 1149
+  },
+  {
+    "id": "00PGi",
+    "fen": "3r1q1k/p1pb2pp/1pnp4/6N1/5B2/1Q4P1/PP4PP/4R2K w - - 0 25",
+    "line": [
+      "g5f7",
+      "f8f7",
+      "b3f7"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1081
+  },
+  {
+    "id": "00Pc8",
+    "fen": "r1b2r2/pp1n2k1/2p3pp/4Np2/2BP4/8/PP4PP/2KRR3 w - - 1 19",
+    "line": [
+      "e5d7",
+      "c8d7",
+      "e1e7",
+      "g7f6",
+      "e7d7"
+    ],
+    "themes": [
+      "advantage",
+      "clearance",
+      "fork",
+      "long",
+      "middlegame"
+    ],
+    "rating": 1053
+  },
+  {
+    "id": "00QOa",
+    "fen": "6rk/1pR3p1/6Bp/2b4P/8/pP3PK1/P1P5/8 b - - 0 32",
+    "line": [
+      "c5d6",
+      "f3f4",
+      "d6c7"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 835
+  },
+  {
+    "id": "00Rcs",
+    "fen": "3k4/ppp2p1r/4p2P/5n2/3PK1N1/2P5/P1P3P1/7R b - - 0 30",
+    "line": [
+      "f5g3",
+      "e4f4",
+      "g3h1"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 863
+  },
+  {
+    "id": "00RiT",
+    "fen": "8/pp1k1p2/4p3/2ppPr1r/7P/2P2pP1/P1P5/2K1RR2 w - - 0 23",
+    "line": [
+      "g3g4",
+      "f5e5",
+      "g4h5"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "rookEndgame",
+      "short"
+    ],
+    "rating": 1084
+  },
+  {
+    "id": "00SIE",
+    "fen": "2k3nr/ppp2ppp/2n5/8/8/1Q2P3/q4rPP/1R2KB1R w K - 0 16",
+    "line": [
+      "b3b7",
+      "c8d7",
+      "b1d1"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1188
+  },
+  {
+    "id": "00Svg",
+    "fen": "8/p7/1p4k1/2pN2p1/4Pp2/P1P4r/1P2K1R1/8 b - - 7 50",
+    "line": [
+      "f4f3",
+      "e2f2",
+      "f3g2"
+    ],
+    "themes": [
+      "advancedPawn",
+      "advantage",
+      "endgame",
+      "fork",
+      "master",
+      "short"
+    ],
+    "rating": 1182
+  },
+  {
+    "id": "00TAb",
+    "fen": "6k1/5pp1/p1N5/1n1b3p/1B4P1/P4P1P/2K5/8 w - - 3 43",
+    "line": [
+      "c6e7",
+      "g8h7",
+      "e7d5"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "master",
+      "short"
+    ],
+    "rating": 731
+  },
+  {
+    "id": "00TOX",
+    "fen": "b7/2k1pp2/ppn2qp1/8/4B3/1PNR4/P1P2PP1/5K2 w - - 0 27",
+    "line": [
+      "c3d5",
+      "c7b8",
+      "d5f6"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 802
+  },
+  {
+    "id": "00Ta0",
+    "fen": "4k3/1R6/6N1/5p1p/7P/2r3PK/5b2/8 b - - 0 47",
+    "line": [
+      "c3g3",
+      "h3h2",
+      "g3g6"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 1183
+  },
+  {
+    "id": "00UIZ",
+    "fen": "3k3r/rp1qb3/2p2nQ1/p2p2N1/3P2pP/P3P1P1/1P3P2/1K1R3R w - - 7 27",
+    "line": [
+      "g5f7",
+      "d8c7",
+      "f7h8"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1036
+  },
+  {
+    "id": "00UgJ",
+    "fen": "1r1q1rk1/1b4b1/4p1Bp/3pP3/p2B2P1/7Q/PPP5/2KR3R b - - 0 23",
+    "line": [
+      "d8g5",
+      "c1b1",
+      "g5g6"
+    ],
+    "themes": [
+      "advantage",
+      "fork",
+      "middlegame",
+      "short"
+    ],
+    "rating": 918
+  },
+  {
+    "id": "00Ui0",
+    "fen": "r5k1/5pp1/2p5/P1N4p/2PR1n2/1P3P2/5P1P/6K1 b - - 0 26",
+    "line": [
+      "f4e2",
+      "g1f1",
+      "e2d4"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 697
+  },
+  {
+    "id": "00VGt",
+    "fen": "3K4/8/2P5/R5pp/1n6/5PkP/6P1/8 b - - 4 61",
+    "line": [
+      "b4c6",
+      "d8d7",
+      "c6a5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 1061
+  },
+  {
+    "id": "00Vt0",
+    "fen": "1k4r1/pp3p2/4p3/2N1q3/1P1bp3/P3P3/5P2/2RR1K2 w - - 2 28",
+    "line": [
+      "c5d7",
+      "b8a8",
+      "d7e5"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 885
+  },
+  {
+    "id": "00WiX",
+    "fen": "8/5kpp/1p2p3/p1p1Q3/2Pn4/6P1/P4P1P/6K1 b - - 0 32",
+    "line": [
+      "d4f3",
+      "g1f1",
+      "f3e5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "fork",
+      "short"
+    ],
+    "rating": 960
+  },
+  {
+    "id": "00Y5Q",
+    "fen": "rnbq1rk1/pp2b2p/4p2Q/3p1p2/2pP4/P1N5/1PP1PPPP/2KR1BNR b - - 0 11",
+    "line": [
+      "e7g5",
+      "h6g5",
+      "d8g5"
+    ],
+    "themes": [
+      "crushing",
+      "fork",
+      "opening",
+      "short"
+    ],
+    "rating": 908
+  }
+]

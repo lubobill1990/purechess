@@ -1,0 +1,834 @@
+[
+  {
+    "id": "001Wz",
+    "fen": "6k1/5ppp/r1p5/p1n1rP2/8/2P2N1P/2P3P1/3R2K1 w - - 0 22",
+    "line": [
+      "d1d8",
+      "e5e8",
+      "d8e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1118
+  },
+  {
+    "id": "001om",
+    "fen": "5r1k/pp4pp/5p2/1BbQp1r1/7K/7P/1PP3P1/3R3R b - - 3 26",
+    "line": [
+      "c5f2",
+      "g2g3",
+      "f2g3"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "morphysMate",
+      "short"
+    ],
+    "rating": 1018
+  },
+  {
+    "id": "001w5",
+    "fen": "1rb3k1/q4rP1/4p2p/3p3p/3P1P2/2P5/2QK3P/3R2R1 w - - 1 30",
+    "line": [
+      "c2h7",
+      "g8h7",
+      "g7g8q"
+    ],
+    "themes": [
+      "advancedPawn",
+      "attraction",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "promotion",
+      "short"
+    ],
+    "rating": 1034
+  },
+  {
+    "id": "002Mm",
+    "fen": "rn1qrk2/ppp3pQ/3p1pP1/3Pp3/2P1P3/8/PP3PP1/R1B1K3 w Q - 3 17",
+    "line": [
+      "h7h8",
+      "f8e7",
+      "h8g7"
+    ],
+    "themes": [
+      "deflection",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 918
+  },
+  {
+    "id": "002X3",
+    "fen": "6k1/2q2p1p/4pPp1/4P3/p1pP1P2/r1P5/6QP/4B1K1 w - - 0 34",
+    "line": [
+      "g2a8",
+      "c7b8",
+      "a8b8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 970
+  },
+  {
+    "id": "002p5",
+    "fen": "r1bqr1k1/pp1nbpp1/2p5/3n2P1/2BP4/P7/1PQNNPP1/R3K2R w KQ - 1 14",
+    "line": [
+      "c2h7",
+      "g8f8",
+      "h7h8"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 908
+  },
+  {
+    "id": "004X6",
+    "fen": "1r4k1/p4ppp/2Q5/3pq3/8/P6P/2PR1PP1/1R4K1 b - - 0 26",
+    "line": [
+      "b8b1",
+      "d2d1",
+      "b1d1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1152
+  },
+  {
+    "id": "004XI",
+    "fen": "8/3k1p2/4p3/p2p4/3P1P2/q3P1rP/7r/1QR2K2 w - - 2 35",
+    "line": [
+      "b1b7",
+      "d7e8",
+      "c1c8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 982
+  },
+  {
+    "id": "005nD",
+    "fen": "3rk2r/2qn2p1/p1Q1p3/3n3p/8/8/PP4PP/5R1K w k - 0 24",
+    "line": [
+      "c6e6",
+      "d5e7",
+      "e6f7"
+    ],
+    "themes": [
+      "fork",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1105
+  },
+  {
+    "id": "0061g",
+    "fen": "6k1/pp3pp1/2p1q1Pp/3b4/8/6Q1/PB3Pp1/3r1NK1 w - - 0 28",
+    "line": [
+      "g3b8",
+      "e6e8",
+      "b8e8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 801
+  },
+  {
+    "id": "006HV",
+    "fen": "1r6/5k2/2Q1pNp1/p5Pp/1p2P2P/2P4R/KP3P2/3q4 b - - 0 31",
+    "line": [
+      "b4b3",
+      "a2a3",
+      "d1a1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1159
+  },
+  {
+    "id": "0071N",
+    "fen": "6k1/p4pp1/1p5p/4b3/4B3/4P1P1/P1R2PKP/1q1r4 w - - 0 31",
+    "line": [
+      "c2c8",
+      "d1d8",
+      "c8d8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "pillsburysMate",
+      "short"
+    ],
+    "rating": 555
+  },
+  {
+    "id": "007Rn",
+    "fen": "4r1k1/p4p1p/1p6/6B1/3P2n1/P4Q2/1P4P1/7K b - - 0 34",
+    "line": [
+      "e8e1",
+      "f3f1",
+      "e1f1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 990
+  },
+  {
+    "id": "008oX",
+    "fen": "6k1/2R3pp/2p4q/1p1p4/3P4/P7/1PP2R2/1K1Nr3 w - - 4 33",
+    "line": [
+      "c7c8",
+      "e1e8",
+      "c8e8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 976
+  },
+  {
+    "id": "0092z",
+    "fen": "2r3k1/3R1ppp/p1q5/2p2Q2/P7/7P/5PP1/6K1 w - - 4 27",
+    "line": [
+      "f5f7",
+      "g8h8",
+      "f7g7"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 991
+  },
+  {
+    "id": "009IO",
+    "fen": "3r4/4kp1r/p2Np1p1/3bP3/P2n4/8/1P3RPP/5RK1 w - - 5 26",
+    "line": [
+      "f2f7",
+      "h7f7",
+      "f1f7"
+    ],
+    "themes": [
+      "hookMate",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1162
+  },
+  {
+    "id": "009bR",
+    "fen": "4r2k/3q3r/1p4pQ/p1pP4/2P4P/1N4p1/PP3RK1/8 w - - 2 38",
+    "line": [
+      "f2f8",
+      "e8f8",
+      "h6f8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1024
+  },
+  {
+    "id": "009f8",
+    "fen": "8/1p4p1/pb2pp1p/3n1k2/3P4/P3BN1P/1P2KPP1/8 w - - 1 27",
+    "line": [
+      "f3h4",
+      "f5e4",
+      "f2f3"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1149
+  },
+  {
+    "id": "009lk",
+    "fen": "1R6/6pk/2p4p/3bP2r/5B1P/2P1RqP1/P4P1Q/6K1 b - - 3 40",
+    "line": [
+      "f3d1",
+      "e3e1",
+      "d1e1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 917
+  },
+  {
+    "id": "009oc",
+    "fen": "5Q2/pbp3np/1p1pq1pk/1P6/P6P/6K1/8/8 w - - 0 33",
+    "line": [
+      "f8f4",
+      "g6g5",
+      "f4g5"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1165
+  },
+  {
+    "id": "009uB",
+    "fen": "3br1kr/7p/4p1pQ/P5P1/1B5P/P6q/5R2/6K1 w - - 2 36",
+    "line": [
+      "f2f8",
+      "e8f8",
+      "h6f8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1085
+  },
+  {
+    "id": "00Bse",
+    "fen": "8/5p2/1R6/6pk/8/3r2PP/5K2/8 w - - 4 41",
+    "line": [
+      "g3g4",
+      "h5h4",
+      "b6h6"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "rookEndgame",
+      "short"
+    ],
+    "rating": 830
+  },
+  {
+    "id": "00CFp",
+    "fen": "rn1q3k/pp4pp/1b2B3/4N3/5Q2/2p5/PP4PP/RN5K b - - 0 16",
+    "line": [
+      "d8d1",
+      "f4f1",
+      "d1f1"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 477
+  },
+  {
+    "id": "00Cfq",
+    "fen": "6k1/ppR2pp1/4p1p1/4P1N1/3r2P1/1P4K1/P3r3/8 w - - 6 31",
+    "line": [
+      "c7c8",
+      "d4d8",
+      "c8d8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 583
+  },
+  {
+    "id": "00CpR",
+    "fen": "6k1/B7/2p2pK1/3nr2p/8/1Q3PP1/P6r/8 w - - 1 32",
+    "line": [
+      "b3b8",
+      "e5e8",
+      "b8e8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 632
+  },
+  {
+    "id": "00CtS",
+    "fen": "Q7/5qk1/p2p4/b1p1pr2/P7/6P1/4KP1R/8 w - - 4 39",
+    "line": [
+      "a8h8",
+      "g7g6",
+      "h8h6"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short",
+      "swallowstailMate"
+    ],
+    "rating": 967
+  },
+  {
+    "id": "00F2o",
+    "fen": "6k1/4qpp1/3p3p/8/2BP4/1PQ5/3n1PPP/6K1 b - - 0 29",
+    "line": [
+      "e7e1",
+      "c4f1",
+      "e1f1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 978
+  },
+  {
+    "id": "00H8a",
+    "fen": "5bk1/2R4p/6p1/8/4NP1P/3bP1K1/r7/8 w - - 3 46",
+    "line": [
+      "e4f6",
+      "g8h8",
+      "c7h7"
+    ],
+    "themes": [
+      "arabianMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 798
+  },
+  {
+    "id": "00HEh",
+    "fen": "3r2k1/pp3ppp/2p3b1/2n3P1/2B2q1P/5N2/PPP1QP2/4R1K1 w - - 0 24",
+    "line": [
+      "e2e8",
+      "d8e8",
+      "e1e8"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 812
+  },
+  {
+    "id": "00HzH",
+    "fen": "5rk1/p2q2p1/1p2p1Np/3p3P/3Pb1P1/2P5/PP3R2/6K1 w - - 0 34",
+    "line": [
+      "f2f8",
+      "g8h7",
+      "f8h8"
+    ],
+    "themes": [
+      "endgame",
+      "hookMate",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 762
+  },
+  {
+    "id": "00HzR",
+    "fen": "8/8/p2k4/1pp5/7P/1PKP1RP1/7r/8 b - - 1 46",
+    "line": [
+      "b5b4",
+      "c3c4",
+      "h2c2"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "rookEndgame",
+      "short"
+    ],
+    "rating": 956
+  },
+  {
+    "id": "00J1Y",
+    "fen": "1q3r2/p5k1/1p2pbpp/2p5/2P1p3/2P2PQP/PP3P2/6RK w - - 0 30",
+    "line": [
+      "g3g6",
+      "g7h8",
+      "g6h6"
+    ],
+    "themes": [
+      "deflection",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1139
+  },
+  {
+    "id": "00JS1",
+    "fen": "2r5/1p2k1pp/4p3/1N3p2/5P2/P2nP3/3R2PP/6K1 b - - 1 24",
+    "line": [
+      "c8c1",
+      "d2d1",
+      "c1d1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 528
+  },
+  {
+    "id": "00JfN",
+    "fen": "r6r/1bpnk3/1p1pB3/pP1P4/P3PQP1/2b2N1q/2P2P2/R3R1K1 w - - 0 25",
+    "line": [
+      "f4f7",
+      "e7d8",
+      "f7d7"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 971
+  },
+  {
+    "id": "00Keu",
+    "fen": "R7/1p3kp1/2pK3p/3p1PP1/3r2nP/8/1P6/8 w - - 0 40",
+    "line": [
+      "g5g6",
+      "f7f6",
+      "a8f8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 882
+  },
+  {
+    "id": "00LNB",
+    "fen": "kr6/1pR4p/p4R2/n7/P3p3/3rB3/6PP/6K1 w - - 1 39",
+    "line": [
+      "f6a6",
+      "b7a6",
+      "c7a7"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "operaMate",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1025
+  },
+  {
+    "id": "00LdT",
+    "fen": "r5k1/pbp2ppp/6q1/3p4/3p3r/2P1R1P1/PP2QP1P/R5K1 w - - 0 21",
+    "line": [
+      "e3e8",
+      "a8e8",
+      "e2e8"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 587
+  },
+  {
+    "id": "00Lqo",
+    "fen": "2Q5/p5pk/1r2p3/K2pP2p/3P4/2P4R/Pq6/8 w - - 0 42",
+    "line": [
+      "h3h5",
+      "h7g6",
+      "c8e8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1175
+  },
+  {
+    "id": "00Lvv",
+    "fen": "2k2br1/1pprn3/p4p2/4p2Q/4P2P/2N1q3/PP4PK/3R4 w - - 0 23",
+    "line": [
+      "h5e8",
+      "d7d8",
+      "d1d8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "queensideAttack",
+      "short"
+    ],
+    "rating": 797
+  },
+  {
+    "id": "00M92",
+    "fen": "3q1r1k/p3r1pp/1p1b1p2/2p5/3pR2N/1QPn2P1/PP1B1P1P/R5K1 w - - 0 22",
+    "line": [
+      "h4g6",
+      "h7g6",
+      "e4h4"
+    ],
+    "themes": [
+      "clearance",
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1077
+  },
+  {
+    "id": "00MGA",
+    "fen": "r3r1k1/6b1/p2Nn2p/1P1Qp3/6nq/2P3P1/1PB2P2/R1B1R1K1 b - - 0 30",
+    "line": [
+      "h4h2",
+      "g1f1",
+      "h2f2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 915
+  },
+  {
+    "id": "00Mgf",
+    "fen": "2RQ4/p4pp1/4p1kp/8/6PP/4qPK1/1r6/8 w - - 0 36",
+    "line": [
+      "h4h5",
+      "g6h7",
+      "d8g8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1124
+  },
+  {
+    "id": "00NAM",
+    "fen": "r5k1/pp3ppp/8/3p4/2qP4/4R2P/2P1QPPK/8 w - - 2 22",
+    "line": [
+      "e3e8",
+      "a8e8",
+      "e2e8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 715
+  },
+  {
+    "id": "00NaX",
+    "fen": "4r1k1/1p2r3/p1p5/3p1p2/PP1P1P1p/2Q3pP/5PP1/4R1K1 b - - 0 39",
+    "line": [
+      "e7e1",
+      "c3e1",
+      "e8e1"
+    ],
+    "themes": [
+      "endgame",
+      "kingsideAttack",
+      "master",
+      "mate",
+      "mateIn2",
+      "queenRookEndgame",
+      "short"
+    ],
+    "rating": 428
+  },
+  {
+    "id": "00O14",
+    "fen": "6k1/3P1pp1/4p3/p7/3QR3/3q1PP1/1P3PK1/2r5 b - - 1 37",
+    "line": [
+      "d3f1",
+      "g2h2",
+      "f1h1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 996
+  },
+  {
+    "id": "00OCQ",
+    "fen": "1rr3k1/5p1p/p5pQ/4p3/4q3/B1P1P3/PP1R1PPP/2KR4 b - - 0 27",
+    "line": [
+      "c8c3",
+      "b2c3",
+      "b8b1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "queensideAttack",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1160
+  },
+  {
+    "id": "00OOp",
+    "fen": "5rk1/1bR3q1/pQ6/8/6P1/4R3/P7/6K1 b - - 0 28",
+    "line": [
+      "g7g4",
+      "e3g3",
+      "g4g3"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1053
+  },
+  {
+    "id": "00QZ3",
+    "fen": "r1bq1k1r/ppppn1pp/2n5/b5N1/4P3/B1P5/P4PPP/RN1QK2R w KQ - 2 10",
+    "line": [
+      "d1f3",
+      "f8e8",
+      "f3f7"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "opening",
+      "short"
+    ],
+    "rating": 1173
+  },
+  {
+    "id": "00Rk3",
+    "fen": "8/1p2rppk/5q1p/Q4R2/2P5/PP5P/5PP1/5K2 b - - 0 32",
+    "line": [
+      "f6a1",
+      "a5e1",
+      "e7e1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 950
+  },
+  {
+    "id": "00Ru6",
+    "fen": "3r1r1k/p6p/1p4pP/2p5/2PbBQ2/2q5/P1P1K3/5R2 w - - 1 35",
+    "line": [
+      "f4f8",
+      "d8f8",
+      "f1f8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 974
+  }
+]

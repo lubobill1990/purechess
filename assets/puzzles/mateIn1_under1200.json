@@ -1,0 +1,739 @@
+[
+  {
+    "id": "000rZ",
+    "fen": "2kr1b1r/p1p2pp1/2pqN3/7p/6n1/2NPB3/PPP2PPP/R2Q1RK1 b - - 0 13",
+    "line": [
+      "d6h2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening"
+    ],
+    "rating": 616
+  },
+  {
+    "id": "001KR",
+    "fen": "6k1/p1p3pp/4N3/1p6/2q1r1n1/2B5/PP4PP/3R1R1K w - - 0 29",
+    "line": [
+      "f1f8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 563
+  },
+  {
+    "id": "001pC",
+    "fen": "r4rk1/pp3ppp/3b4/2p1pPB1/7N/2PP3n/PP4PP/R2Q2RK b - - 0 18",
+    "line": [
+      "h3f2"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove",
+      "smotheredMate"
+    ],
+    "rating": 848
+  },
+  {
+    "id": "001wb",
+    "fen": "r3k2r/pb1p1ppp/1b4q1/1Q2P3/8/2NP1PP1/PP4P1/R1B2R1K b kq - 0 17",
+    "line": [
+      "g6h5"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 1117
+  },
+  {
+    "id": "002CP",
+    "fen": "r5k1/pp4pp/4p1q1/4p3/3n4/P3Q1P1/1PP4P/2KR1R2 b - - 5 24",
+    "line": [
+      "g6c2"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "queensideAttack"
+    ],
+    "rating": 925
+  },
+  {
+    "id": "002HE",
+    "fen": "1qr2rk1/1p1p1ppp/pB2p1n1/7n/2P1P3/1Q2NP1P/PP2BKPb/3R1R2 b - - 2 20",
+    "line": [
+      "b8g3"
+    ],
+    "themes": [
+      "master",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 1116
+  },
+  {
+    "id": "002Q2",
+    "fen": "7k/p4R1p/3p3B/2pN1n2/2PbB1b1/3P2P1/P3r3/5R1K b - - 0 28",
+    "line": [
+      "f5g3"
+    ],
+    "themes": [
+      "cornerMate",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 944
+  },
+  {
+    "id": "002vV",
+    "fen": "8/6k1/1R5p/5p1P/5P1K/6P1/8/r7 b - - 3 58",
+    "line": [
+      "a1h1"
+    ],
+    "themes": [
+      "endgame",
+      "master",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "rookEndgame"
+    ],
+    "rating": 565
+  },
+  {
+    "id": "003AX",
+    "fen": "2r2rk1/5ppp/bq2p3/p2pP1N1/Pb1p2P1/1P2P2P/2QN4/2R1K2R w K - 0 19",
+    "line": [
+      "c2h7"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 983
+  },
+  {
+    "id": "003YF",
+    "fen": "r4rk1/1pp2ppp/p2p4/2bPp3/2P1PB1q/P1N2B2/1P3P2/R2QK1R1 b Q - 0 15",
+    "line": [
+      "h4f2"
+    ],
+    "themes": [
+      "attackingF2F7",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 1061
+  },
+  {
+    "id": "004WZ",
+    "fen": "r6k/1b3pp1/p1q1pn1p/2p5/P1B5/1PN4Q/2P1RP1P/R5K1 b - - 0 26",
+    "line": [
+      "c6h1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 866
+  },
+  {
+    "id": "004iZ",
+    "fen": "r2r2k1/2q1bpp1/3p3p/1ppn4/1P1BP3/P5Q1/4RPPP/R5K1 w - - 0 21",
+    "line": [
+      "g3g7"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 499
+  },
+  {
+    "id": "004yJ",
+    "fen": "r4rk1/1bp2ppp/p1q1pn2/2P1N3/8/3B4/P1P1QPPP/R4RK1 b - - 1 16",
+    "line": [
+      "c6g2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 658
+  },
+  {
+    "id": "005Ep",
+    "fen": "5kr1/ppR3p1/3R3p/1n6/1r6/8/1P3PPP/2K5 w - - 5 32",
+    "line": [
+      "d6d8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove"
+    ],
+    "rating": 723
+  },
+  {
+    "id": "005x9",
+    "fen": "r1b1kb1Q/ppp4p/6pB/3P4/2pn4/8/PPP1qPPP/RNK4R b q - 3 13",
+    "line": [
+      "e2c2"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove",
+      "queensideAttack"
+    ],
+    "rating": 733
+  },
+  {
+    "id": "00656",
+    "fen": "7r/ppp2kp1/2nb1pp1/3p3r/3P2P1/2PQB3/PP3PP1/R3R1K1 b - - 0 18",
+    "line": [
+      "h5h1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 665
+  },
+  {
+    "id": "006GK",
+    "fen": "2kr1br1/ppBb1ppp/8/3P2Q1/6n1/5n2/PP3qPP/RN2R2K w - - 0 17",
+    "line": [
+      "g5d8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening",
+      "queensideAttack"
+    ],
+    "rating": 1020
+  },
+  {
+    "id": "007AH",
+    "fen": "3r1n2/1bp1bkpp/p1q2n2/1p6/3P4/P1N3B1/1PP1QPPP/R3R1K1 b - - 6 18",
+    "line": [
+      "c6g2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "master",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 626
+  },
+  {
+    "id": "007HB",
+    "fen": "rn2q1k1/pp3ppp/2pb4/3p1B2/2PN4/1Q6/PP3PPP/R1B4K b - - 0 15",
+    "line": [
+      "e8e1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 538
+  },
+  {
+    "id": "007QU",
+    "fen": "2rq1rk1/1b5p/p3p3/1p1pBpp1/2nP2N1/1RP1PP2/P1Q3PP/3R2K1 w - - 0 23",
+    "line": [
+      "g4h6"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 1144
+  },
+  {
+    "id": "007bH",
+    "fen": "r2q1rk1/2p3pn/2pbp2p/p2p1p2/P4PQ1/1P1PP3/1BPN2PP/4RR1K w - - 0 16",
+    "line": [
+      "g4g7"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 963
+  },
+  {
+    "id": "007c6",
+    "fen": "2kr3r/p2n2pp/2pB1bp1/5q2/2B5/8/PPP2PPP/3R1RK1 w - - 0 18",
+    "line": [
+      "c4a6"
+    ],
+    "themes": [
+      "bodenMate",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 721
+  },
+  {
+    "id": "007fJ",
+    "fen": "1Q6/5ppp/8/8/8/2pk3P/3p2P1/3K4 b - - 0 52",
+    "line": [
+      "c3c2"
+    ],
+    "themes": [
+      "advancedPawn",
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "queenEndgame"
+    ],
+    "rating": 577
+  },
+  {
+    "id": "007hv",
+    "fen": "6k1/5p1p/1p4p1/p1bN1p2/2Pq1P2/1PQ4P/1P4P1/7K b - - 2 32",
+    "line": [
+      "d4g1"
+    ],
+    "themes": [
+      "endgame",
+      "master",
+      "mate",
+      "mateIn1",
+      "oneMove"
+    ],
+    "rating": 1068
+  },
+  {
+    "id": "0082f",
+    "fen": "r4rk1/2q2ppp/3pp3/4Pb1N/1p6/1p4Q1/PPP3PP/1K1RR3 w - - 0 22",
+    "line": [
+      "g3g7"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 878
+  },
+  {
+    "id": "008LD",
+    "fen": "8/6pp/6k1/5pN1/5P2/5rPb/4R2P/6K1 b - - 1 35",
+    "line": [
+      "f3f1"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "operaMate"
+    ],
+    "rating": 403
+  },
+  {
+    "id": "008cl",
+    "fen": "r3k2r/ppp2p1p/2n1pp2/7q/2PN2P1/2BP2b1/PP2B1P1/R2Q1RK1 b kq - 0 16",
+    "line": [
+      "h5h2"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 876
+  },
+  {
+    "id": "008o6",
+    "fen": "Q4rk1/p1p3p1/6P1/8/3P4/7P/q3r3/B4RK1 w - - 2 35",
+    "line": [
+      "a8f8"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove"
+    ],
+    "rating": 468
+  },
+  {
+    "id": "008rw",
+    "fen": "rn2kb1r/pp2pp1p/2p2np1/4q3/8/2N4Q/PPPPBPPP/R1B1K2R w KQkq - 0 9",
+    "line": [
+      "h3c8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening"
+    ],
+    "rating": 895
+  },
+  {
+    "id": "009bn",
+    "fen": "2kr2r1/ppb2ppp/3qNn2/3p2B1/P7/2P2Q1P/1PB2PP1/R4RK1 b - - 0 18",
+    "line": [
+      "d6h2"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 578
+  },
+  {
+    "id": "009eX",
+    "fen": "2r3k1/7p/6q1/p1Np4/Qp2pr2/P4P2/1PR2P1K/6R1 b - - 1 36",
+    "line": [
+      "f4h4"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 922
+  },
+  {
+    "id": "009fH",
+    "fen": "rn2kb1r/pQ2pppp/2p2n2/8/3q2b1/8/PPP2PPP/RNB1KBNR b KQkq - 0 7",
+    "line": [
+      "d4d1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening"
+    ],
+    "rating": 750
+  },
+  {
+    "id": "00A9Q",
+    "fen": "2rq1rk1/1p3p1p/p1pn2p1/P1Np4/1P1PnP2/4P3/5PBP/R1Q3RK b - - 3 22",
+    "line": [
+      "e4f2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "master",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove",
+      "smotheredMate"
+    ],
+    "rating": 689
+  },
+  {
+    "id": "00AGs",
+    "fen": "rn5Q/4kp2/2p1p1r1/1q4p1/8/8/4NPPP/3R1K1R w - - 6 24",
+    "line": [
+      "h8d8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 898
+  },
+  {
+    "id": "00AfZ",
+    "fen": "2r3kq/Q7/8/1brpN3/5Pp1/4P1P1/6K1/1B6 w - - 0 44",
+    "line": [
+      "a7f7"
+    ],
+    "themes": [
+      "master",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 926
+  },
+  {
+    "id": "00B2k",
+    "fen": "r4rk1/pbp3pp/1p1pp3/6B1/2PPp2q/3BP2P/PP3P2/R2QK1R1 b Q - 0 16",
+    "line": [
+      "h4f2"
+    ],
+    "themes": [
+      "attackingF2F7",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 828
+  },
+  {
+    "id": "00Bm8",
+    "fen": "8/6kp/4b1q1/1p6/1PpPN2Q/2P1P3/r5P1/5RK1 b - - 0 34",
+    "line": [
+      "g6g2"
+    ],
+    "themes": [
+      "endgame",
+      "master",
+      "mate",
+      "mateIn1",
+      "oneMove"
+    ],
+    "rating": 1126
+  },
+  {
+    "id": "00Bn0",
+    "fen": "r1bqkb1r/pp1pnppp/2n5/1N2p3/5B2/8/PPP1PPPP/R2QKBNR w KQkq - 0 7",
+    "line": [
+      "b5d6"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening",
+      "smotheredMate"
+    ],
+    "rating": 1029
+  },
+  {
+    "id": "00C7m",
+    "fen": "8/5k2/1P4RK/6P1/1r6/8/8/8 b - - 2 58",
+    "line": [
+      "b4h4"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "rookEndgame"
+    ],
+    "rating": 745
+  },
+  {
+    "id": "00C8Y",
+    "fen": "rnb2rk1/pp3p1p/3p2Pb/4p1q1/3pQ3/5N2/PPP1PPP1/RN2KB1R b KQ - 2 12",
+    "line": [
+      "g5c1"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 930
+  },
+  {
+    "id": "00DAs",
+    "fen": "r6r/ppp1n1p1/3bBk1p/4nP2/3p4/8/PPPN1P1P/R1B1K2R w KQ - 2 16",
+    "line": [
+      "d2e4"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 649
+  },
+  {
+    "id": "00DPQ",
+    "fen": "2k4r/pp3pp1/4pn2/2np2p1/8/1B1P1Pq1/PPPN3R/R2Q3K b - - 7 20",
+    "line": [
+      "g3h2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 765
+  },
+  {
+    "id": "00DU5",
+    "fen": "r2q1rk1/1b3ppp/p2p1b2/1p1Pn3/1P2Q3/P1NB3P/1B3PP1/R4RK1 w - - 3 18",
+    "line": [
+      "e4h7"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 471
+  },
+  {
+    "id": "00DWo",
+    "fen": "b4b1r/3k1ppp/p2p4/1p2p3/3Pq3/N3B3/PP3PPP/R2Q1RK1 b - - 0 16",
+    "line": [
+      "e4g2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 1060
+  },
+  {
+    "id": "00Dlt",
+    "fen": "r3kb1r/p4pp1/b1p4p/n3pQ2/4N3/2Nq4/PP1P1PPP/R1B2RK1 b kq - 1 14",
+    "line": [
+      "d3f1"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening"
+    ],
+    "rating": 510
+  },
+  {
+    "id": "00EDa",
+    "fen": "r1bk3r/ppp1np1p/3P2pP/1N4q1/2BP1n2/8/PPP3P1/R1BQ2KR b - - 0 14",
+    "line": [
+      "g5g2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "opening"
+    ],
+    "rating": 838
+  },
+  {
+    "id": "00ERL",
+    "fen": "4r1k1/2Q4p/pp6/2p2n2/P2P1P1q/2P4P/2PB2b1/4R1K1 w - - 0 30",
+    "line": [
+      "e1e8"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 779
+  },
+  {
+    "id": "00EUB",
+    "fen": "3r1k1r/5p1p/b2q1p2/P3p3/Bp2P3/2N2P2/3Q2PP/1R2K2R b K - 0 24",
+    "line": [
+      "d6d2"
+    ],
+    "themes": [
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 578
+  },
+  {
+    "id": "00EWi",
+    "fen": "8/8/5pkp/1RP5/1P3PKP/r7/8/8 b - - 0 48",
+    "line": [
+      "f6f5"
+    ],
+    "themes": [
+      "endgame",
+      "mate",
+      "mateIn1",
+      "oneMove",
+      "rookEndgame"
+    ],
+    "rating": 885
+  },
+  {
+    "id": "00EdH",
+    "fen": "r4rk1/pb3ppp/1p2p3/3q4/3N4/2P4P/PPQ2PP1/R4RK1 b - - 2 18",
+    "line": [
+      "d5g2"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn1",
+      "middlegame",
+      "oneMove"
+    ],
+    "rating": 633
+  }
+]

@@ -1,0 +1,1036 @@
+[
+  {
+    "id": "00O9Z",
+    "fen": "5Q1R/5p1p/1b3qp1/p6k/P2P4/8/1P2rPPP/5RK1 b - - 8 32",
+    "line": [
+      "f6f2",
+      "f1f2",
+      "e2e1",
+      "f2f1",
+      "b6d4",
+      "g1h1",
+      "e1f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "endgame",
+      "fork",
+      "master",
+      "mate",
+      "mateIn4",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1615
+  },
+  {
+    "id": "01XIa",
+    "fen": "2r3k1/p4ppp/qp3b2/3Q4/5PN1/P5P1/1Pr4P/3RR1K1 w - - 3 28",
+    "line": [
+      "d5d8",
+      "c8d8",
+      "d1d8",
+      "f6d8",
+      "e1e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1770
+  },
+  {
+    "id": "05Ryc",
+    "fen": "k2rRn2/p1Q5/1p6/3q4/8/2N3B1/PPP2P1P/1K6 b - - 0 27",
+    "line": [
+      "d5h1",
+      "e8e1",
+      "h1e1",
+      "c3d1",
+      "d8d1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame"
+    ],
+    "rating": 1994
+  },
+  {
+    "id": "06iSh",
+    "fen": "3rr1k1/Qpp2pp1/2p4p/6N1/4q3/2P5/PP3PPP/R2R2K1 b - - 0 17",
+    "line": [
+      "d8d1",
+      "a1d1",
+      "e4e1",
+      "d1e1",
+      "e8e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1637
+  },
+  {
+    "id": "07H9P",
+    "fen": "2rr3k/1b4b1/p3Q3/8/1p2N3/8/PP1B1PPP/6K1 b - - 4 40",
+    "line": [
+      "c8c1",
+      "d2c1",
+      "d8d1"
+    ],
+    "themes": [
+      "backRankMate",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1837
+  },
+  {
+    "id": "07tSd",
+    "fen": "2r2rk1/p5pp/b3p3/2P1B3/3PQ3/6R1/P2q2PP/4R1K1 b - - 4 25",
+    "line": [
+      "d2f2",
+      "g1h1",
+      "f2f1",
+      "e1f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "master",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1702
+  },
+  {
+    "id": "09J8i",
+    "fen": "r2r2k1/pp3pp1/5Q1p/2P5/1Pbn4/2P1R3/P4PPP/RN4K1 b - - 0 19",
+    "line": [
+      "d4e2",
+      "e3e2",
+      "d8d1",
+      "e2e1",
+      "d1e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "clearance",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1755
+  },
+  {
+    "id": "0EFzB",
+    "fen": "2k2r1r/ppp3p1/3b1q1p/4P3/4Q3/2N5/PP4PP/R1B1R1K1 b - - 0 22",
+    "line": [
+      "f6f2",
+      "g1h1",
+      "f2f1",
+      "e1f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1619
+  },
+  {
+    "id": "0HVYz",
+    "fen": "5rk1/3b2pp/pq2p3/1p1Nb3/8/P3P2P/1P2B1P1/2rQ1RK1 w - - 0 24",
+    "line": [
+      "d5e7",
+      "g8h8",
+      "f1f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1709
+  },
+  {
+    "id": "0JBuB",
+    "fen": "6k1/1ppb2pp/p5r1/3N4/PP1P4/2P3r1/3pK3/R4R2 w - - 0 32",
+    "line": [
+      "d5e7",
+      "g8h8",
+      "f1f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "fork",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1682
+  },
+  {
+    "id": "0Mvwc",
+    "fen": "rn2Qbk1/ppp2ppp/8/8/2P3b1/3P1qP1/P2B1P1P/R3R1K1 w - - 2 19",
+    "line": [
+      "e8f8",
+      "g8f8",
+      "d2b4",
+      "c7c5",
+      "b4c5",
+      "f8g8",
+      "e1e8"
+    ],
+    "themes": [
+      "attraction",
+      "backRankMate",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1880
+  },
+  {
+    "id": "0NL4m",
+    "fen": "1r3rk1/1R3ppp/p1p5/3nP3/8/P4Q1B/2q2PPP/5RK1 w - - 1 21",
+    "line": [
+      "f3f7",
+      "f8f7",
+      "b7b8",
+      "f7f8",
+      "h3e6",
+      "g8h8",
+      "b8f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1829
+  },
+  {
+    "id": "0Nk4r",
+    "fen": "6k1/pQ4pp/1bp1P3/3b2q1/3n4/7P/P4PP1/4R1K1 w - - 0 31",
+    "line": [
+      "b7f7",
+      "g8h8",
+      "f7e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1813
+  },
+  {
+    "id": "0OcPH",
+    "fen": "4r1k1/1bq1bRpr/1p2Q3/1p1nP3/3Pp3/2P4P/PP6/R1B3K1 w - - 1 26",
+    "line": [
+      "f7e7",
+      "g8h8",
+      "e7e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "discoveredAttack",
+      "discoveredCheck",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "short"
+    ],
+    "rating": 1692
+  },
+  {
+    "id": "0PGoz",
+    "fen": "k1r5/pp1R1p2/8/4Q3/6p1/P1P5/KPP2q2/8 w - - 0 33",
+    "line": [
+      "e5c7",
+      "c8c7",
+      "d7d8",
+      "c7c8",
+      "d8c8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3",
+      "sacrifice"
+    ],
+    "rating": 1768
+  },
+  {
+    "id": "0QCkM",
+    "fen": "1R6/4kp1p/4p1p1/3B4/P7/1Pn2N2/1r3PPP/6K1 b - - 0 34",
+    "line": [
+      "b2b1",
+      "f3e1",
+      "b1e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1704
+  },
+  {
+    "id": "0RrTi",
+    "fen": "4rk1r/1pR1nppp/1p2p3/3pP3/1Q6/8/1B3PPP/1q2N1K1 w - - 10 22",
+    "line": [
+      "b4e7",
+      "e8e7",
+      "c7c8",
+      "e7e8",
+      "b2a3",
+      "b1b4",
+      "a3b4",
+      "f8g8",
+      "c8e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "mate",
+      "mateIn5",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1795
+  },
+  {
+    "id": "0SeQP",
+    "fen": "3r1rk1/7p/p4Rp1/3R1n2/P1P3q1/2Q5/1B3PPP/6K1 b - - 0 28",
+    "line": [
+      "g4d1",
+      "d5d1",
+      "d8d1",
+      "c3e1",
+      "d1e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice",
+      "xRayAttack"
+    ],
+    "rating": 1634
+  },
+  {
+    "id": "0W687",
+    "fen": "4rr1k/p1p3pp/5b2/1p1R1q2/8/1QP5/PB3PPP/5RK1 b - - 5 20",
+    "line": [
+      "f5f2",
+      "f1f2",
+      "e8e1",
+      "f2f1",
+      "f6d4",
+      "g1h1",
+      "e1f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "master",
+      "masterVsMaster",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1626
+  },
+  {
+    "id": "0WFad",
+    "fen": "4r2k/p6p/1pQ3p1/1P1P1pq1/4r3/1B6/6PP/2RR2K1 b - - 0 29",
+    "line": [
+      "g5e3",
+      "g1h1",
+      "e3e1",
+      "d1e1",
+      "e4e1",
+      "c1e1",
+      "e8e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "fork",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1713
+  },
+  {
+    "id": "0X4tF",
+    "fen": "1r6/R7/3pk3/3N4/4P1n1/2P5/P3n1PP/5R1K b - - 0 28",
+    "line": [
+      "g4f2",
+      "f1f2",
+      "b8b1",
+      "f2f1",
+      "b1f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3",
+      "sacrifice"
+    ],
+    "rating": 1723
+  },
+  {
+    "id": "0XFsZ",
+    "fen": "6k1/Q2p1p2/P5pb/4P2p/3N1q2/2P5/1r3PPP/5RK1 b - - 0 35",
+    "line": [
+      "f4f2",
+      "f1f2",
+      "b2b1",
+      "f2f1",
+      "h6e3",
+      "g1h1",
+      "b1f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "endgame",
+      "mate",
+      "mateIn4",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1794
+  },
+  {
+    "id": "0XhCA",
+    "fen": "5rk1/p6p/1p4p1/6q1/3QR3/2P5/PP1R2P1/K7 b - - 0 33",
+    "line": [
+      "f8f1",
+      "e4e1",
+      "f1e1",
+      "d2d1",
+      "g5c1",
+      "d1c1",
+      "e1c1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn4",
+      "veryLong",
+      "xRayAttack"
+    ],
+    "rating": 1630
+  },
+  {
+    "id": "0YDEO",
+    "fen": "k3rR2/pp2r3/3Q4/8/2pP4/2P5/4q1P1/5RK1 w - - 5 35",
+    "line": [
+      "d6d8",
+      "e8d8",
+      "f8d8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "sacrifice",
+      "short",
+      "xRayAttack"
+    ],
+    "rating": 1627
+  },
+  {
+    "id": "0cpfh",
+    "fen": "5rk1/1b3rpp/p7/3P4/P1BQp2q/4R3/1P4PP/4R1K1 b - - 2 24",
+    "line": [
+      "h4f2",
+      "g1h1",
+      "f2f1",
+      "c4f1",
+      "f7f1",
+      "e1f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1766
+  },
+  {
+    "id": "0e7en",
+    "fen": "4r3/2p2k2/p3q3/1pB2r2/6Q1/P4p2/1PPN4/3K1R2 b - - 2 36",
+    "line": [
+      "e6e2",
+      "d1c1",
+      "e2e1",
+      "f1e1",
+      "e8e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1618
+  },
+  {
+    "id": "0edka",
+    "fen": "r3r2k/pbp2p1p/1pn3pQ/6B1/8/2Pq4/PP3PPP/RN3RK1 b - - 3 20",
+    "line": [
+      "d3f1",
+      "g1f1",
+      "b7a6",
+      "c3c4",
+      "a6c4",
+      "f1g1",
+      "e8e1"
+    ],
+    "themes": [
+      "attraction",
+      "backRankMate",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1735
+  },
+  {
+    "id": "0gF7p",
+    "fen": "1B1b3k/1b3rpp/4Q1n1/8/2P5/1P6/2r3PP/5R1K w - - 0 28",
+    "line": [
+      "e6e8",
+      "g6f8",
+      "e8f8",
+      "f7f8",
+      "f1f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "fork",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "xRayAttack"
+    ],
+    "rating": 1695
+  },
+  {
+    "id": "0gS1Q",
+    "fen": "r3r1k1/ppQP1p1p/6p1/8/5P2/2N2R2/PPqb2PP/3R3K b - - 0 27",
+    "line": [
+      "c2d1",
+      "c3d1",
+      "e8e1",
+      "f3f1",
+      "e1f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "fork",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1600
+  },
+  {
+    "id": "0h0DJ",
+    "fen": "1r1r2k1/pR3p1p/2p3p1/4p1b1/N3P3/3B3Q/PPP2qPP/1K3R2 b - - 6 18",
+    "line": [
+      "f2f1",
+      "d3f1",
+      "d8d1"
+    ],
+    "themes": [
+      "backRankMate",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1697
+  },
+  {
+    "id": "0h9Vj",
+    "fen": "8/4Q1pk/4bp1p/8/8/P1Bq1P2/1P4PP/6K1 b - - 4 35",
+    "line": [
+      "d3e3",
+      "g1h1",
+      "e3c1",
+      "c3e1",
+      "c1e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3"
+    ],
+    "rating": 1723
+  },
+  {
+    "id": "0iNXs",
+    "fen": "6k1/6pp/2Q1pr2/p1P5/4p3/1P6/P3q1PP/3R3K w - - 0 28",
+    "line": [
+      "d1d8",
+      "f6f8",
+      "c6e6",
+      "g8h8",
+      "d8f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3"
+    ],
+    "rating": 1986
+  },
+  {
+    "id": "0kIdS",
+    "fen": "6k1/p4rpp/1qp5/8/8/1Q6/PPP2PPP/4R1K1 b - - 1 23",
+    "line": [
+      "b6f2",
+      "g1h1",
+      "f2e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "fork",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1803
+  },
+  {
+    "id": "0kRIT",
+    "fen": "3r2k1/1p3p2/5Q1B/8/3r4/8/Pq3PPP/R1R3K1 b - - 0 27",
+    "line": [
+      "b2c1",
+      "a1c1",
+      "d4d1",
+      "c1d1",
+      "d8d1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1946
+  },
+  {
+    "id": "0l7B6",
+    "fen": "2r2rk1/ppp3p1/7B/8/6Q1/2N5/Pq3RPP/2R3K1 b - - 0 23",
+    "line": [
+      "b2f2",
+      "g1h1",
+      "f2f1",
+      "c1f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame"
+    ],
+    "rating": 1732
+  },
+  {
+    "id": "0lHXi",
+    "fen": "7k/pp2n1p1/7p/4p2B/7N/1Q6/P2q1PPP/2rR2K1 b - - 4 27",
+    "line": [
+      "d2e1",
+      "d1e1",
+      "c1e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "sacrifice",
+      "short",
+      "xRayAttack"
+    ],
+    "rating": 1740
+  },
+  {
+    "id": "0lr3Y",
+    "fen": "5rk1/5ppp/3p4/1p1P1N2/p5Q1/3P3P/Pq2r1P1/5RK1 w - - 2 24",
+    "line": [
+      "f5h6",
+      "g8h8",
+      "h6f7",
+      "f8f7",
+      "g4c8",
+      "e2e8",
+      "c8e8",
+      "f7f8",
+      "f1f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "endgame",
+      "fork",
+      "mate",
+      "mateIn5",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1975
+  },
+  {
+    "id": "0nBCM",
+    "fen": "N6k/1p4pp/p3Q3/5p2/b7/7P/5qPK/3r4 w - - 0 39",
+    "line": [
+      "e6c8",
+      "d1d8",
+      "c8d8",
+      "a4e8",
+      "d8e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3"
+    ],
+    "rating": 1664
+  },
+  {
+    "id": "0nKMn",
+    "fen": "7k/p1pq2pp/3p4/3Qn3/6N1/P6P/8/5K2 w - - 1 38",
+    "line": [
+      "d5a8",
+      "d7c8",
+      "a8c8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn2",
+      "short"
+    ],
+    "rating": 1768
+  },
+  {
+    "id": "0oGoy",
+    "fen": "2k5/ppp2ppp/8/P7/1P2R3/2q2B2/2Pr2PP/4R1K1 w - - 5 24",
+    "line": [
+      "f3g4",
+      "f7f5",
+      "g4f5",
+      "c8b8",
+      "e4e8",
+      "d2d8",
+      "e8d8"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn4",
+      "veryLong"
+    ],
+    "rating": 1848
+  },
+  {
+    "id": "0oihZ",
+    "fen": "2r4k/pp2r1pp/1n3qp1/1Q6/3P4/P7/5PPP/2R1R1K1 w - - 0 31",
+    "line": [
+      "c1c8",
+      "b6c8",
+      "b5e8",
+      "e7e8",
+      "e1e8",
+      "f6f8",
+      "e8f8"
+    ],
+    "themes": [
+      "backRankMate",
+      "fork",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "sacrifice",
+      "veryLong",
+      "xRayAttack"
+    ],
+    "rating": 1659
+  },
+  {
+    "id": "0owU9",
+    "fen": "2r3k1/1p2R1pp/p1rQ1p2/1b1p1p2/3P2PN/8/PP5P/1K1R4 b - - 0 26",
+    "line": [
+      "b5d3",
+      "b1a1",
+      "c6c1",
+      "d1c1",
+      "c8c1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame"
+    ],
+    "rating": 1724
+  },
+  {
+    "id": "0p3r4",
+    "fen": "1kr5/ppr2pp1/3Q4/6Pp/5P2/4R2P/PPq5/K2R4 b - - 0 30",
+    "line": [
+      "c2d1",
+      "d6d1",
+      "c7c1",
+      "d1c1",
+      "c8c1"
+    ],
+    "themes": [
+      "backRankMate",
+      "clearance",
+      "endgame",
+      "fork",
+      "long",
+      "mate",
+      "mateIn3",
+      "sacrifice"
+    ],
+    "rating": 1818
+  },
+  {
+    "id": "0px1q",
+    "fen": "5r1k/6p1/3pB1p1/2pP4/2P5/2B1b2n/1P4PP/R6K b - - 8 37",
+    "line": [
+      "h3f2",
+      "h1g1",
+      "f2d1",
+      "g1h1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "discoveredAttack",
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3"
+    ],
+    "rating": 1683
+  },
+  {
+    "id": "0rGPl",
+    "fen": "r6k/2p1r1pp/1nQ5/p3p3/2B3b1/P4P1q/2P4P/3R1RK1 w - - 0 25",
+    "line": [
+      "c6a8",
+      "b6a8",
+      "d1d8",
+      "e7e8",
+      "d8e8"
+    ],
+    "themes": [
+      "backRankMate",
+      "fork",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1702
+  },
+  {
+    "id": "0sILd",
+    "fen": "8/5k1p/2Q3p1/3p2q1/4n3/2PN1P2/PP4PP/2R3K1 b - - 2 28",
+    "line": [
+      "g5e3",
+      "g1h1",
+      "e4f2",
+      "d3f2",
+      "e3c1",
+      "f2d1",
+      "c1d1"
+    ],
+    "themes": [
+      "backRankMate",
+      "deflection",
+      "endgame",
+      "fork",
+      "mate",
+      "mateIn4",
+      "veryLong"
+    ],
+    "rating": 1825
+  },
+  {
+    "id": "0sfZU",
+    "fen": "5r1k/1p4pp/p4q2/3R4/2Q5/8/P5PP/4R1K1 b - - 2 27",
+    "line": [
+      "f6f2",
+      "g1h1",
+      "f2e1",
+      "c4f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "endgame",
+      "fork",
+      "long",
+      "mate",
+      "mateIn3"
+    ],
+    "rating": 1782
+  },
+  {
+    "id": "0tjyJ",
+    "fen": "6rk/5Qpp/7r/2p5/8/P2P2qP/1P2P1B1/5R1K w - - 4 33",
+    "line": [
+      "f7g8",
+      "h8g8",
+      "g2d5",
+      "h6e6",
+      "d5e6",
+      "g8h8",
+      "f1f8"
+    ],
+    "themes": [
+      "attraction",
+      "backRankMate",
+      "endgame",
+      "mate",
+      "mateIn4",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1780
+  },
+  {
+    "id": "0uj1t",
+    "fen": "5rk1/p1NQ2pp/4N3/2b5/7q/4P3/PP4PP/3R2K1 b - - 0 23",
+    "line": [
+      "h4f2",
+      "g1h1",
+      "f2f1",
+      "d1f1",
+      "f8f1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "sacrifice"
+    ],
+    "rating": 1707
+  },
+  {
+    "id": "0vzFG",
+    "fen": "4rrk1/1pp2ppp/1b6/p1qP4/2P5/5B2/PPQ1RPPP/4R1K1 b - - 5 18",
+    "line": [
+      "c5f2",
+      "g1h1",
+      "f2e1",
+      "e2e1",
+      "e8e1"
+    ],
+    "themes": [
+      "backRankMate",
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "xRayAttack"
+    ],
+    "rating": 1904
+  }
+]

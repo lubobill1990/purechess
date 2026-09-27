@@ -1,0 +1,930 @@
+[
+  {
+    "id": "001kG",
+    "fen": "rnbq3r/1p3kpp/p4n2/2b5/2pNP3/2N5/PPP3PP/R1BQ1RK1 w - - 2 12",
+    "line": [
+      "d1h5",
+      "f7g8",
+      "h5c5"
+    ],
+    "themes": [
+      "advantage",
+      "opening",
+      "pin",
+      "short"
+    ],
+    "rating": 1983
+  },
+  {
+    "id": "002rd",
+    "fen": "r6k/q1p2p1p/1b2bPr1/p1ppP2Q/3P2p1/4B3/PP2NRPP/3R2K1 w - - 2 26",
+    "line": [
+      "e2f4",
+      "c5d4",
+      "f4g6",
+      "f7g6",
+      "h5h6"
+    ],
+    "themes": [
+      "crushing",
+      "kingsideAttack",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1795
+  },
+  {
+    "id": "003wQ",
+    "fen": "2r2rk1/6pp/3Q1q2/8/3N1B2/6P1/PP1K3P/5R2 b - - 0 24",
+    "line": [
+      "f6d6",
+      "f4d6",
+      "f8f1"
+    ],
+    "themes": [
+      "advantage",
+      "discoveredAttack",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1814
+  },
+  {
+    "id": "00734",
+    "fen": "r4bk1/2rqp2p/n1p3p1/3p1p2/3P1P1B/pP1BP3/P1Q2PRP/1KR5 w - - 1 27",
+    "line": [
+      "d3f5",
+      "e7e6",
+      "f5g6"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1692
+  },
+  {
+    "id": "00GiQ",
+    "fen": "5r2/5p1k/6pp/ppqp1P2/7Q/5N2/6PP/5N1K w - - 0 32",
+    "line": [
+      "f3g5",
+      "h7g7",
+      "f5f6",
+      "g7f6",
+      "g5e4"
+    ],
+    "themes": [
+      "attraction",
+      "crushing",
+      "discoveredCheck",
+      "doubleCheck",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1830
+  },
+  {
+    "id": "00Knu",
+    "fen": "r2q1rk1/p3bpp1/2pp2b1/4p1Q1/4n3/1B3N1P/PPP3P1/R1B2RK1 w - - 1 19",
+    "line": [
+      "g5g6",
+      "d8b6",
+      "g1h2"
+    ],
+    "themes": [
+      "advantage",
+      "defensiveMove",
+      "opening",
+      "pin",
+      "short"
+    ],
+    "rating": 1847
+  },
+  {
+    "id": "00NEO",
+    "fen": "4qr2/pR4pk/2b2p1p/4pPP1/3bB3/3P3Q/P1r4P/4BR1K w - - 1 25",
+    "line": [
+      "h3h6",
+      "h7g8",
+      "h6g7"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1874
+  },
+  {
+    "id": "00RtC",
+    "fen": "r4k2/ppp3p1/3p3r/2q5/1PNnP3/2Q2PBp/P4R1P/5RK1 b - - 0 25",
+    "line": [
+      "d4e2",
+      "g1h1",
+      "c5f2",
+      "c3g7",
+      "f8g7"
+    ],
+    "themes": [
+      "advantage",
+      "deflection",
+      "discoveredAttack",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1948
+  },
+  {
+    "id": "00Se9",
+    "fen": "5rk1/pp1n1r2/3p2N1/2pQ4/2P5/4P1P1/qP2KPP1/7R w - - 2 25",
+    "line": [
+      "g6e7",
+      "g8g7",
+      "d5g5"
+    ],
+    "themes": [
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1836
+  },
+  {
+    "id": "00Ueq",
+    "fen": "r1b3k1/pp4b1/n1pqprQ1/4p3/2P2PP1/P2B4/1P6/R1B1K2R w KQ - 2 20",
+    "line": [
+      "h1h8",
+      "g8h8",
+      "g6h7"
+    ],
+    "themes": [
+      "attraction",
+      "kingsideAttack",
+      "master",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pin",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1773
+  },
+  {
+    "id": "00XGg",
+    "fen": "2k4r/ppp2ppr/2n5/3b1N2/3p1bP1/5NP1/PPP1QPK1/R3R3 b - - 2 20",
+    "line": [
+      "h7h2",
+      "g2f1",
+      "h2h1",
+      "f3g1",
+      "h1g1",
+      "f1g1",
+      "h8h1"
+    ],
+    "themes": [
+      "attraction",
+      "mate",
+      "mateIn4",
+      "middlegame",
+      "operaMate",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1817
+  },
+  {
+    "id": "00XXM",
+    "fen": "3r2r1/Qpqkbp2/p1p1p2p/3nP3/8/2P1NP1N/PP6/1K1R3R w - - 4 26",
+    "line": [
+      "c3c4",
+      "b7b6",
+      "a7c7",
+      "d7c7",
+      "c4d5"
+    ],
+    "themes": [
+      "advantage",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1747
+  },
+  {
+    "id": "00XZR",
+    "fen": "8/2p5/p1n5/1pP1p2k/1P1p4/P2P3q/5P2/R4KR1 w - - 0 35",
+    "line": [
+      "f1e2",
+      "e5e4",
+      "g1h1",
+      "e4d3",
+      "e2d2"
+    ],
+    "themes": [
+      "crushing",
+      "defensiveMove",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1641
+  },
+  {
+    "id": "00Yqw",
+    "fen": "1Qbk1b1r/3r1pp1/p1BP3p/8/3q4/6P1/1PP3PP/1K5R w - - 1 34",
+    "line": [
+      "c6d7",
+      "d4c5",
+      "d7c8"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1880
+  },
+  {
+    "id": "00aG8",
+    "fen": "1r3k2/p4ppp/2r5/5N2/P2P4/8/2P2PPP/3Q2K1 b - - 4 23",
+    "line": [
+      "c6b6",
+      "g1f1",
+      "b6b1",
+      "d1b1",
+      "b8b1"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "long",
+      "pin",
+      "quietMove"
+    ],
+    "rating": 1606
+  },
+  {
+    "id": "00eWz",
+    "fen": "4r1k1/p5bp/1q2N1p1/2pPrp2/1pP5/6PP/P4QB1/1R3RK1 b - - 3 25",
+    "line": [
+      "e5e6",
+      "d5e6",
+      "g7d4"
+    ],
+    "themes": [
+      "advantage",
+      "clearance",
+      "master",
+      "middlegame",
+      "pin",
+      "sacrifice",
+      "short"
+    ],
+    "rating": 1652
+  },
+  {
+    "id": "00eak",
+    "fen": "4r1k1/5pp1/5n1p/P5r1/7q/1QP1p1PP/1P3P1K/R3RB2 b - - 1 27",
+    "line": [
+      "f6g4",
+      "h2g2",
+      "g4f2"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1929
+  },
+  {
+    "id": "00kDo",
+    "fen": "8/5ppk/P5qp/2p1p3/2B4Q/1P2PbP1/5P1P/6K1 b - - 0 37",
+    "line": [
+      "g6b1",
+      "c4f1",
+      "f3e2",
+      "h4h3",
+      "e2a6"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1868
+  },
+  {
+    "id": "00l7Y",
+    "fen": "r1bq4/p3p1bk/2p3p1/3pn2p/8/2NB3P/PPPBQ1P1/5RK1 w - - 2 18",
+    "line": [
+      "e2h5",
+      "h7g8",
+      "d3g6",
+      "e5g6",
+      "h5g6"
+    ],
+    "themes": [
+      "advantage",
+      "deflection",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1609
+  },
+  {
+    "id": "00oXF",
+    "fen": "3r1rk1/1p3p1p/p1q3p1/4Pb1P/2p2P2/P5R1/2Q1B1P1/3R2K1 w - - 2 26",
+    "line": [
+      "c2f5",
+      "d8d1",
+      "e2d1"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1651
+  },
+  {
+    "id": "00sKo",
+    "fen": "5rk1/R5bp/q2p4/3Ppn1p/4Q3/4B2P/5PP1/5RK1 b - - 0 24",
+    "line": [
+      "a6f1",
+      "g1f1",
+      "f5g3",
+      "f1e1",
+      "g3e4"
+    ],
+    "themes": [
+      "advantage",
+      "attraction",
+      "long",
+      "middlegame",
+      "pin",
+      "sacrifice"
+    ],
+    "rating": 1625
+  },
+  {
+    "id": "00sMq",
+    "fen": "5rk1/1r4p1/p3pnQp/3pN1p1/P1pPq3/2P2R1P/1P4P1/5R1K w - - 10 30",
+    "line": [
+      "f3f6",
+      "f8f6",
+      "f1f6",
+      "e4g6",
+      "f6g6"
+    ],
+    "themes": [
+      "advantage",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1926
+  },
+  {
+    "id": "00umX",
+    "fen": "2k3rr/ppp2p2/3B1p2/2pP1q1p/2P5/2N2B1b/PP1Q1PP1/R3R1K1 b - - 0 19",
+    "line": [
+      "f5f3",
+      "e1e8",
+      "c8d7"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1744
+  },
+  {
+    "id": "00yYi",
+    "fen": "2k3rr/ppp2p1p/2b5/4Nn2/3pPQ2/1P4Pq/P1PP1P1P/RN3RK1 b - - 0 18",
+    "line": [
+      "f5h4",
+      "f4h4",
+      "h3h4"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "quietMove",
+      "short"
+    ],
+    "rating": 1955
+  },
+  {
+    "id": "010WS",
+    "fen": "6k1/p2Q4/3p2p1/8/3qPn2/5P2/PP3RPP/6K1 b - - 3 37",
+    "line": [
+      "f4e2",
+      "g1h1",
+      "d4d1",
+      "f2f1",
+      "d1f1"
+    ],
+    "themes": [
+      "endgame",
+      "long",
+      "mate",
+      "mateIn3",
+      "pin"
+    ],
+    "rating": 1985
+  },
+  {
+    "id": "01273",
+    "fen": "8/p1B4p/1p3pk1/6p1/3PQ1P1/2P1nP1K/P3q2P/8 b - - 10 36",
+    "line": [
+      "g6h6",
+      "e4e3",
+      "e2e3"
+    ],
+    "themes": [
+      "crushing",
+      "defensiveMove",
+      "endgame",
+      "master",
+      "pin",
+      "short"
+    ],
+    "rating": 1893
+  },
+  {
+    "id": "013Kj",
+    "fen": "2r2rk1/pp3p2/4p3/3p2q1/3P4/P1N4Q/1PP5/1R4K1 w - - 0 31",
+    "line": [
+      "g1h1",
+      "g5g6",
+      "b1g1",
+      "g8g7",
+      "g1g6"
+    ],
+    "themes": [
+      "advantage",
+      "clearance",
+      "defensiveMove",
+      "endgame",
+      "long",
+      "master",
+      "pin"
+    ],
+    "rating": 1852
+  },
+  {
+    "id": "013zx",
+    "fen": "1r1q1rk1/1b2bppp/p7/1p2pP2/3pp1Q1/P2P2P1/BPP4P/R1B2RK1 w - - 0 17",
+    "line": [
+      "c1h6",
+      "e7f6",
+      "h6g7",
+      "f6g7",
+      "f5f6",
+      "d8f6",
+      "f1f6"
+    ],
+    "themes": [
+      "crushing",
+      "middlegame",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1801
+  },
+  {
+    "id": "0150p",
+    "fen": "8/pp4k1/2b2pr1/3R4/PP1Q4/8/7P/7K b - - 0 31",
+    "line": [
+      "g6g5",
+      "h2h4",
+      "g5d5",
+      "d4d5",
+      "c6d5"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1677
+  },
+  {
+    "id": "0193i",
+    "fen": "6rk/2p2p1p/1p3p2/rP1P4/q3Pp1N/7P/4QP1K/5R2 w - - 2 25",
+    "line": [
+      "e2b2",
+      "g8g6",
+      "h4g6",
+      "h7g6",
+      "b2f6"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1896
+  },
+  {
+    "id": "01Aty",
+    "fen": "2kr3r/1pp2p2/p2p3p/3P1bpB/2P2q2/1P6/P5PP/R2QR2K w - - 0 19",
+    "line": [
+      "e1f1",
+      "f4e5",
+      "f1f5",
+      "e5f5",
+      "h5g4",
+      "f5g4",
+      "d1g4"
+    ],
+    "themes": [
+      "advantage",
+      "middlegame",
+      "pin",
+      "sacrifice",
+      "veryLong"
+    ],
+    "rating": 1770
+  },
+  {
+    "id": "01FmQ",
+    "fen": "3r2k1/2B1P1pp/1Q3p2/2b5/P3n3/5N2/2q2PPP/5RK1 b - - 0 32",
+    "line": [
+      "c2f2",
+      "f1f2",
+      "d8d1",
+      "f3e1",
+      "d1e1"
+    ],
+    "themes": [
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "pin",
+      "sacrifice"
+    ],
+    "rating": 1748
+  },
+  {
+    "id": "01H66",
+    "fen": "4r3/6K1/8/4R1P1/1PpP4/P1P3k1/8/4b3 b - - 6 52",
+    "line": [
+      "e8e5",
+      "d4e5",
+      "e1c3",
+      "g7g6",
+      "c3e5",
+      "g6f5",
+      "c4c3",
+      "f5e5",
+      "c3c2",
+      "g5g6",
+      "c2c1q"
+    ],
+    "themes": [
+      "advancedPawn",
+      "crushing",
+      "endgame",
+      "pin",
+      "promotion",
+      "veryLong"
+    ],
+    "rating": 1816
+  },
+  {
+    "id": "01HQs",
+    "fen": "2k2b1r/ppp1ppp1/2n4p/8/3r2Nq/2NPB3/PPP2P2/R2QRBK1 b - - 0 14",
+    "line": [
+      "d4g4",
+      "f1g2",
+      "h4h3",
+      "d1g4",
+      "h3g4"
+    ],
+    "themes": [
+      "advantage",
+      "kingsideAttack",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1710
+  },
+  {
+    "id": "01Nky",
+    "fen": "r2r2k1/p3ppbp/b1p1n1p1/q6P/8/PBN1B1Q1/1PPR1PP1/4K2R b K - 0 18",
+    "line": [
+      "g7c3",
+      "b2c3",
+      "a5c3",
+      "e3d4",
+      "c3g3"
+    ],
+    "themes": [
+      "advantage",
+      "long",
+      "master",
+      "masterVsMaster",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1985
+  },
+  {
+    "id": "01Qia",
+    "fen": "1k4rr/pp3p2/b3p3/3p4/6R1/Q6P/PPq2PP1/4R1K1 w - - 0 28",
+    "line": [
+      "a3g3",
+      "e6e5",
+      "g4g8",
+      "h8g8",
+      "g3g8"
+    ],
+    "themes": [
+      "crushing",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1885
+  },
+  {
+    "id": "01RxX",
+    "fen": "7r/2k2ppp/p1n1p3/8/PpR5/3r4/1P2NPPP/4R1K1 w - - 0 22",
+    "line": [
+      "e1c1",
+      "d3d6",
+      "e2d4",
+      "d6d4",
+      "c4d4"
+    ],
+    "themes": [
+      "advantage",
+      "endgame",
+      "long",
+      "pin",
+      "quietMove"
+    ],
+    "rating": 1722
+  },
+  {
+    "id": "01UyQ",
+    "fen": "4rR2/3NP1kp/2p3p1/5p2/8/2rp3P/5PP1/4R1K1 b - - 3 34",
+    "line": [
+      "d3d2",
+      "e1d1",
+      "c3c1",
+      "g1h2",
+      "c1d1"
+    ],
+    "themes": [
+      "advancedPawn",
+      "crushing",
+      "endgame",
+      "long",
+      "pin"
+    ],
+    "rating": 1683
+  },
+  {
+    "id": "01Vce",
+    "fen": "2r4r/6b1/8/1b1pPQ2/2p2P1k/4P3/PP1B3q/2K5 w - - 8 34",
+    "line": [
+      "d2e1",
+      "h2g3",
+      "f5g5",
+      "h4h3",
+      "g5g3"
+    ],
+    "themes": [
+      "long",
+      "mate",
+      "mateIn3",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1922
+  },
+  {
+    "id": "01aXt",
+    "fen": "2rqr3/6k1/1pb1p1pp/p2pPp2/2pP1B1P/P1P2NQ1/1P1R1PP1/6K1 w - - 1 39",
+    "line": [
+      "h4h5",
+      "g6g5",
+      "f3g5",
+      "e8g8",
+      "g5e6"
+    ],
+    "themes": [
+      "advantage",
+      "discoveredCheck",
+      "doubleCheck",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1975
+  },
+  {
+    "id": "01bS3",
+    "fen": "3r1rk1/2p2ppp/N1n1p1bq/1p5n/3P4/P1B2P2/1P2B1PP/2RQR2K b - - 0 20",
+    "line": [
+      "h5g3",
+      "h1g1",
+      "h6e3"
+    ],
+    "themes": [
+      "kingsideAttack",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1624
+  },
+  {
+    "id": "01g9c",
+    "fen": "r4rk1/ppR3pp/8/3pn1B1/8/3B1N1b/PP2NKPb/3QR3 b - - 0 19",
+    "line": [
+      "e5g4",
+      "f2f1",
+      "f8f3"
+    ],
+    "themes": [
+      "deflection",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pillsburysMate",
+      "pin",
+      "short"
+    ],
+    "rating": 1919
+  },
+  {
+    "id": "01iJG",
+    "fen": "r2q1k1r/4ppbp/1p1p1np1/3P4/2b5/5N2/1P1N1PPP/R1B1QRK1 w - - 0 17",
+    "line": [
+      "a1a8",
+      "d8a8",
+      "d2c4"
+    ],
+    "themes": [
+      "advantage",
+      "intermezzo",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1799
+  },
+  {
+    "id": "01lcr",
+    "fen": "2r3k1/5p1p/4pQpP/Bb1p4/p2P4/q2BPP2/1rPK2P1/3R3R b - - 0 25",
+    "line": [
+      "a3d3",
+      "d2e1",
+      "d3e3"
+    ],
+    "themes": [
+      "deflection",
+      "mate",
+      "mateIn2",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1729
+  },
+  {
+    "id": "01nLm",
+    "fen": "8/4p1k1/5pp1/4pb1p/2B1N2P/p4Q2/2qNK3/8 b - - 1 40",
+    "line": [
+      "f5g4",
+      "f3g4",
+      "h5g4"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "master",
+      "pin",
+      "short"
+    ],
+    "rating": 1766
+  },
+  {
+    "id": "01p79",
+    "fen": "6k1/p1q3b1/2p3QR/3p4/5r2/4PK2/Pr6/6R1 w - - 0 29",
+    "line": [
+      "e3f4",
+      "b2f2",
+      "f3f2",
+      "c7f4",
+      "f2e2"
+    ],
+    "themes": [
+      "crushing",
+      "defensiveMove",
+      "long",
+      "middlegame",
+      "pin"
+    ],
+    "rating": 1774
+  },
+  {
+    "id": "01phf",
+    "fen": "5k1r/p1p1qppp/8/1r6/1b1p2b1/1P4P1/PBPPPPBP/R2QK2R b KQ - 2 14",
+    "line": [
+      "g4e2",
+      "d1e2",
+      "b5e5",
+      "e2e5",
+      "e7e5"
+    ],
+    "themes": [
+      "advantage",
+      "long",
+      "middlegame",
+      "pin",
+      "sacrifice"
+    ],
+    "rating": 1853
+  },
+  {
+    "id": "01vf9",
+    "fen": "8/1pp2Rpk/3p1b1p/1q1P4/4P3/3P4/5Q1P/1r3B1K w - - 2 33",
+    "line": [
+      "f2f6",
+      "b1f1",
+      "f6f1"
+    ],
+    "themes": [
+      "crushing",
+      "endgame",
+      "master",
+      "pin",
+      "short"
+    ],
+    "rating": 1736
+  },
+  {
+    "id": "01w4t",
+    "fen": "5rk1/pp4p1/1n2pq2/2p4Q/2P4R/1Pr5/P5PP/4R1K1 w - - 2 30",
+    "line": [
+      "h5h7",
+      "g8f7",
+      "e1f1"
+    ],
+    "themes": [
+      "advantage",
+      "middlegame",
+      "pin",
+      "short"
+    ],
+    "rating": 1705
+  },
+  {
+    "id": "01xUb",
+    "fen": "r1b1k2r/4qpbp/p1n1pnp1/1p6/Q7/2N2N2/PP1B1PPP/2KR1B1R w kq - 0 15",
+    "line": [
+      "f1b5",
+      "e8g8",
+      "b5c6"
+    ],
+    "themes": [
+      "advantage",
+      "opening",
+      "pin",
+      "short"
+    ],
+    "rating": 1980
+  }
+]

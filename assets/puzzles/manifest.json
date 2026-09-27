@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "source": "https://database.lichess.org/lichess_db_puzzle.csv.zst",
+  "license": "CC0-1.0",
+  "sourceVersion": "Wed, 09 Sep 2026 17:40:14 GMT",
+  "rowsExamined": 91715,
+  "fenConvention": "after-setup",
+  "total": 1050,
+  "packs": [
+    {
+      "file": "mateIn1_under1200.json",
+      "theme": "mateIn1",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "cdac4d600c0f57c7cb9b27a7413f042772e513e400037873e9ed6710e88d1594"
+    },
+    {
+      "file": "mateIn1_1200-1600.json",
+      "theme": "mateIn1",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "e69302c82b49c9002460f54e18fe1f15585f037cce38cd436d22515b990d4277"
+    },
+    {
+      "file": "mateIn1_1600-2000.json",
+      "theme": "mateIn1",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "f69af5e58bb01f4b8ae2eaf9d705c2e49a90fb714f59717a74482433e2abc884"
+    },
+    {
+      "file": "mateIn2_under1200.json",
+      "theme": "mateIn2",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "3a36f068ce0e705c2d943b2d10dd9e4eb65998c217b531a4c583274e9bf928bd"
+    },
+    {
+      "file": "mateIn2_1200-1600.json",
+      "theme": "mateIn2",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "4b42a46959f6b1d9d62e3468fdb08c8c5bd7114fc523791d6e59b9be75805289"
+    },
+    {
+      "file": "mateIn2_1600-2000.json",
+      "theme": "mateIn2",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "c9de82113e84784705ec70a39363ca792c38d16bedb909e9840100453e5c7e0d"
+    },
+    {
+      "file": "fork_under1200.json",
+      "theme": "fork",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "2ab34ffd4d53920c7ea628770679dee7e95c6a6ee17e9c20d487748c77da5cca"
+    },
+    {
+      "file": "fork_1200-1600.json",
+      "theme": "fork",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "5d8ef97eff3ce2ba0fd5daabfc62f1b923a59efe0c2ad17bc34ffb5af46fdefe"
+    },
+    {
+      "file": "fork_1600-2000.json",
+      "theme": "fork",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "fa95796aa8b4fa4e7fae4fe816383983a73a29d17ffeb995d9fb4f76a7d939e7"
+    },
+    {
+      "file": "pin_under1200.json",
+      "theme": "pin",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "17cba7e8aef83cb221f92ea66b759631af85173d4e3e4e073e3f453e3b1aa6b5"
+    },
+    {
+      "file": "pin_1200-1600.json",
+      "theme": "pin",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "29d33e5b0cc5addb3a4d012e212fd0302f29bdc8c5253aebf3e4023a28065912"
+    },
+    {
+      "file": "pin_1600-2000.json",
+      "theme": "pin",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "474f5c57bd2d5d8abb6152e927dbb2a9cf554a7988bac33fc30a8e0c28767894"
+    },
+    {
+      "file": "skewer_under1200.json",
+      "theme": "skewer",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "80b393323dc3fc4a277f346b658a59d1838fd5a38c79373033b3112e39aa98c9"
+    },
+    {
+      "file": "skewer_1200-1600.json",
+      "theme": "skewer",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "01f4b07d39f305ce6fd583e447ca2cc457fb6e08a86e3a43569d13bce1237437"
+    },
+    {
+      "file": "skewer_1600-2000.json",
+      "theme": "skewer",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "2b0643f176dfc21cb38cbdfa916edc257ee5c0d8e9794b8519201a6a62f6af5b"
+    },
+    {
+      "file": "hangingPiece_under1200.json",
+      "theme": "hangingPiece",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "dba9753bb0ff290d9c1af30eaf536aa7dcf1254a19e15c8e3bba8306de987bb4"
+    },
+    {
+      "file": "hangingPiece_1200-1600.json",
+      "theme": "hangingPiece",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "bfa9fae19aef0323c5c60a5511e46fef6075ae2400927cb36853c44c41a69bd1"
+    },
+    {
+      "file": "hangingPiece_1600-2000.json",
+      "theme": "hangingPiece",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "d91e65b2b1e0a2b4b378c163c77ac87994862a159b86164fbc22efc7703e8464"
+    },
+    {
+      "file": "backRankMate_under1200.json",
+      "theme": "backRankMate",
+      "band": "under1200",
+      "count": 50,
+      "sha256": "d02adb346de6b0d884288138418fb36fcea3e3f4a521bd6df34794feb43e6db9"
+    },
+    {
+      "file": "backRankMate_1200-1600.json",
+      "theme": "backRankMate",
+      "band": "1200-1600",
+      "count": 50,
+      "sha256": "647f3ead25417d632e61726d15a49a907bedbbe37e03510b9990d702fbd17c97"
+    },
+    {
+      "file": "backRankMate_1600-2000.json",
+      "theme": "backRankMate",
+      "band": "1600-2000",
+      "count": 50,
+      "sha256": "74ff5a195a85474dc1a8cfd7478b9b86fb23abfdb411e2074ca88a011b794e9f"
+    }
+  ]
+}

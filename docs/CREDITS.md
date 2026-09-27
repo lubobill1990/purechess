@@ -1,5 +1,55 @@
 # 素材来源与许可
 
+## Lichess 战术题（M3b）
+
+- 来源：[Lichess 开放数据库](https://database.lichess.org/#puzzles)，下载地址：
+  <https://database.lichess.org/lichess_db_puzzle.csv.zst>。
+- 许可：**[CC0 1.0 公共领域贡献](https://creativecommons.org/publicdomain/zero/1.0/)**。
+  题目、rating 和主题标签来自 Lichess；中文分类与提示由本项目编写。
+- 提取日期：2026-09-28；本次 HTTP `Last-Modified`：
+  `Wed, 09 Sep 2026 17:40:14 GMT`。版本与每个分包的 SHA-256 见
+  `assets/puzzles/manifest.json`。
+- 共 **1,050 道唯一题目 / 21 个分包**。mateIn1、mateIn2、fork、pin、
+  skewer、hangingPiece、backRankMate 各 150 题；每个主题的
+  `<1200`、`1200–1599`、`1600–1999` 三段各 50 题。多标签题只分配到
+  一个分包，JSON 中仍保留全部原始标签，因此按标签计数可能超过分包计数。
+- `fen` 已应用 CSV 第一手（对手铺垫着），`line` 是从解题方开始的
+  UCI 主线，不再包含铺垫着。保留原始 `id`、`themes`、`rating`；
+  可用 `https://lichess.org/training/<id>` 回溯单题。
+
+使用 `uv` 重建资产（不需要全局 Python 或手动装解压工具）：
+
+```powershell
+uv run scripts\fetch_lichess_puzzles.py
+# 可选：使用已下载的完整 CSV.zst；默认每个分层抽取 50 题
+uv run scripts\fetch_lichess_puzzles.py --input D:\datasets\lichess_db_puzzle.csv.zst
+uv run scripts\test_fetch_lichess_puzzles.py
+$env:NO_PROXY='localhost,127.0.0.1'
+flutter test test\features\puzzle
+```
+
+脚本固定 `python-chess` / `zstandard` 依赖，边下载边解压 CSV，达到所有
+分层配额就关闭流，不保存数 GB 的整库；本次扫描 91,715 行。无效 FEN、
+非法主线、错误的将杀标签、配额不足或网络失败都会显式失败，不发布不完整
+抽样。相同来源与参数重跑产生相同 JSON；上游更新后可能产生新抽样，
+应将 manifest 和分包作为同一次资产更新一起提交。分包校验使用 SHA-256；
+Python 与项目 Dart core 分别逐题复核局面和主线合法性。将杀标签末着必须
+将杀，mateIn1 / mateIn2 分别要求 1 / 3 半回合。非将杀战术标签沿用
+Lichess 的分析结果；合法性测试不声称重新证明其评分或最佳着唯一性。
+
+应用入口为 `AppRouter.puzzles`（`/puzzles`），首页接入口由首页维护者处理。
+三级页面为集合 → 题目列表 → 做题；复用 ChessBoard / PuzzleSession，
+对手自动应着。普通题按最佳主线判定；按 Lichess 规则，mateIn1 的其他
+合法将杀着也接受。两级提示先给主题思路，再仅高亮起点格；黑方题自动翻转。
+结果区固定高度，保存失败可重试或确认放弃，不能显示为已保存。
+
+本地 prefs：`daily_YYYYMMDD` 保存设备本地日期对应的 10 个不重复题目 ID，
+同日重开不换题；`puzzle_progress_v1` 一次写入累计完成、错题与每日完成记录。
+每日完成独立计数，不把历史做对自动当作今天完成；午夜后新开每日题单使用
+新日期，已打开的题单仍记在原日期。做错加入错题本，做对移出；写入成功才
+更新页面状态。`puzzle_result` 遥测只发送 `correct`、`attempts`、
+`duration_ms`、`rating`，遵循现有隐私开关，不发送 FEN、着法或题目 ID。
+
 ## Cburnett 棋子 SVG
 
 作者：**Colin M. L. Burnett（Cburnett）**。本项目包含白、黑双方的兵、马、
