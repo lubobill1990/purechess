@@ -27,6 +27,21 @@ jobs:
           cache: true
 
       - run: flutter pub get
+
+      # The stockfish pod downloads its NNUE weights in a build script phase,
+      # which Xcode's user-script sandboxing blocks on hosted runners
+      # ("Could not find incbin file"). Prefetch them into the pub-cache copy
+      # so the phase's existence check short-circuits.
+      - name: Prefetch Stockfish NNUE weights
+        run: |
+          DEST=$(find ~/.pub-cache -type d -path '*stockfish-*/ios/Stockfish/src' | head -1)
+          test -n "$DEST"
+          for n in nn-c288c895ea92.nnue nn-37f18f62d772.nnue; do
+            [ -e "$DEST/$n" ] || curl --retry 5 --retry-all-errors --location \
+              -o "$DEST/$n" "https://tests.stockfishchess.org/api/nn/$n"
+          done
+          ls -la "$DEST"/*.nnue
+
       # Goldens are Windows-rasterized baselines; they only run locally / on
       # the opt-in Windows CI job.
       - run: flutter test --exclude-tags golden

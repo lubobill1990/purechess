@@ -30,9 +30,21 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # See testflight.yml: sandbox blocks the stockfish pod's NNUE download
+      # script phase; prefetch into pub-cache so incbin finds the weights.
+      - name: Prefetch Stockfish NNUE weights
+        run: |
+          DEST=$(find ~/.pub-cache -type d -path '*stockfish-*/ios/Stockfish/src' | head -1)
+          test -n "$DEST"
+          for n in nn-c288c895ea92.nnue nn-37f18f62d772.nnue; do
+            [ -e "$DEST/$n" ] || curl --retry 5 --retry-all-errors --location \
+              -o "$DEST/$n" "https://tests.stockfishchess.org/api/nn/$n"
+          done
+          ls -la "$DEST"/*.nnue
       - run: flutter build ios --no-codesign
       - uses: actions/upload-artifact@v4
         with:
           name: ios-app-nocodesign
           path: build/ios/iphoneos/Runner.app
           if-no-files-found: error
+          retention-days: 3
