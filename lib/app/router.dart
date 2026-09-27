@@ -5,6 +5,7 @@ import '../features/game/game_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/library/records_screen.dart';
 import '../features/settings/settings.dart';
+import '../features/tutorial/tutorial_screen.dart';
 import 'telemetry/analytics.dart';
 
 class AppRouter {
@@ -12,6 +13,8 @@ class AppRouter {
   static const game = '/game';
   static const records = '/records';
   static const settings = '/settings';
+  static const tutorial = '/tutorial';
+  static const dailyPuzzle = tutorialDailyRoute;
 
   static Map<String, WidgetBuilder> routes({
     required SharedPreferences prefs,
@@ -21,5 +24,7 @@ class AppRouter {
     game: (_) => GameScreen(analytics: analytics),
     records: (_) => const RecordsScreen(),
     settings: (_) => SettingsScreen(prefs: prefs, analytics: analytics),
+    tutorial: (_) => TutorialScreen(prefs: prefs, analytics: analytics),
+    dailyPuzzle: (_) => TutorialDailyScreen(analytics: analytics),
   };
 }
