@@ -184,7 +184,7 @@ is explicitly skipped; ordinary tests inject fake transports/native clients.
 $env:NO_PROXY = 'localhost,127.0.0.1'
 flutter pub get
 flutter analyze
-flutter test
+flutter test --exclude-tags golden
 dart run tool\perft.dart
 ```
 
@@ -199,3 +199,57 @@ startpos/position 3 through depth 5, KiwiPete/positions 4-6 through depth 4.
 Every depth also has an exact `expect` assertion in `test/core/perft_test.dart`.
 The remaining core tests cover special moves, outcomes, SAN ambiguity, FEN/PGN
 round trips, variation editing, puzzles and deterministic make/undo invariants.
+
+## Golden 截图回归（Windows）
+
+沿用 pureweiqi 的文件级 `@Tags(['golden'])`、`dart_test.yaml` tag 声明、
+固定画布、显式字体加载和 Windows 基线目录。测试位于
+`test\goldens\screens_golden_test.dart`，覆盖首页（学习中／已毕业）、新对局
+表单、AI／双人中局、谜题做题、教程列表、设置页；浅色与深色各一套，
+共 **16 张 PNG**，提交在 `test\goldens\windows\`。
+
+固定 1024×1366 逻辑像素、DPR 1、字号缩放 1、Windows 目标平台、日期、
+本地进度和推荐难度；禁用动画与统计，使用内存偏好设置、棋谱库和 AI 替身。
+对局从固定 FEN 执行两步固定着法，覆盖中局棋子与最后一步高亮；谜题固定为
+仓库题库中的 `0030b`，并断言完整 FEN。截图前预加载全部 SVG 棋子，且检查
+页面已就绪、主题、关键文案、按钮状态及局面，不把加载中／错误页当作基线。
+遥测仅使用测试创建并清理的临时目录，不访问用户数据，不启动真实引擎。
+
+### 字体与平台边界
+
+仓库原先没有中文字体，pureweiqi 的文楷子集仅覆盖少量标题字，因此测试内置
+完整 **Noto Sans SC**（`test\goldens\fonts\NotoSansSC.ttf`），不新增应用
+依赖或打包资产。来源为 [Google Fonts / Noto Sans SC](https://github.com/google/fonts/tree/main/ofl/notosanssc)，
+按 SIL Open Font License 1.1 再分发，原版权声明与完整许可见同目录 `OFL.txt`。
+字体原文件未修改，SHA-256：
+`a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da`。
+
+测试加载 Material Icons、Windows Georgia／Consolas，并显式添加中文回退。
+首页局部主题会覆盖外层回退，因此仅在测试中将 Noto Sans SC 同时注册为
+`Segoe UI` 和 `Songti SC`，避免 Ahem／缺字方框；不更改业务 UI 的字体设置。
+浅色复用 `MyApp` 的配色参数，深色由相同种子色构造；首页仍使用自身的明暗
+主题。除首页外，当前应用尚未接入系统深色主题，这里的深色是测试注入，
+不代表新增了产品主题切换功能。这些是 widget 回归基线，不替代真机验收。
+
+基线生成环境：**Windows 11（10.0.26200）、Flutter 3.47.2 / Dart 3.13.2**。
+系统字体和渲染器版本会影响逐像素比较。不要在 macOS／Linux 上覆盖 Windows
+基线；测试会明确报错，而不是静默跳过。默认 Ubuntu CI 执行
+`flutter test --exclude-tags golden`；golden 比较在相同 Windows 环境本地执行。
+不增加像素容差，也不自动更新基线掩盖差异。
+
+### 本地比较与更新
+
+```powershell
+flutter pub get
+$env:NO_PROXY = 'localhost,127.0.0.1'
+flutter test --tags golden                         # 与已提交基线比较
+flutter test --tags golden --update-goldens         # 仅在确认 UI 变更后更新
+flutter test --tags golden                         # 再次比较，确认稳定
+flutter analyze
+flutter test --exclude-tags golden                 # 常规测试，与默认 CI 一致
+flutter test                                      # Windows 全量，包含 golden
+```
+
+提交前逐张检查 PNG，测试代码与对应基线一起提交。失败差异图位于
+`test\goldens\failures\`，已通过该目录的 `.gitignore` 排除；先检查真实 UI、
+字体或 Flutter 版本变化，再决定是否更新，不能只因测试失败就重录。
