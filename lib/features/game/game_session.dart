@@ -43,19 +43,26 @@ class GameOutcome {
 /// Local play auto-adjudicates claimable draws; the core remains reusable for
 /// analysis. Undo removes the abandoned continuation rather than saving a RAV.
 class GameSession {
-  GameSession({String initialFen = Fen.initial, DateTime? startedAt})
-    : startedAt = startedAt ?? DateTime.now(),
-      _board = Board.fromFen(initialFen),
-      _record = GameRecord(initialFen: initialFen) {
+  GameSession({
+    String initialFen = Fen.initial,
+    DateTime? startedAt,
+    Color? humanColor,
+  }) : startedAt = startedAt ?? DateTime.now(),
+       _board = Board.fromFen(initialFen),
+       _record = GameRecord(initialFen: initialFen) {
     _node = _record.root;
     final date = this.startedAt;
     _record.tags.addAll({
-      'Event': '面对面对弈',
+      'Event': humanColor == null ? '面对面对弈' : '人机对弈',
       'Site': 'Local',
       'Date': '${date.year}.${_two(date.month)}.${_two(date.day)}',
       'Round': '-',
-      'White': '白方',
-      'Black': '黑方',
+      'White': humanColor == null
+          ? '白方'
+          : (humanColor == Color.white ? '我' : 'AI'),
+      'Black': humanColor == null
+          ? '黑方'
+          : (humanColor == Color.black ? '我' : 'AI'),
     });
     _adjudicate();
   }
@@ -102,8 +109,9 @@ class GameSession {
     _adjudicate();
   }
 
-  void resign(Color actor) {
-    _requireTurn(actor);
+  void resign(Color actor, {bool requireTurn = true}) {
+    if (requireTurn) _requireTurn(actor);
+    if (!canPlay) throw StateError('The game is not accepting actions');
     _finish(GameOutcome(GameEndReason.resignation, winner: actor.opponent));
     _revision++;
   }

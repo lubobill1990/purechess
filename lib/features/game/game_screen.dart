@@ -10,6 +10,7 @@ import '../../widgets/board/piece_image.dart';
 import '../library/records_repository.dart';
 import '../library/records_screen.dart';
 import 'game_session.dart';
+import 'new_game_screen.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -72,6 +73,18 @@ class _GameScreenState extends State<GameScreen> {
           title: Text(title),
           content: Text(content),
           actions: [
+            IconButton(
+              tooltip: '人机对弈',
+              onPressed: _saving
+                  ? null
+                  : () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => NewGameScreen(analytics: _analytics),
+                      ),
+                    ),
+              icon: const Icon(Icons.smart_toy_outlined),
+            ),
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('取消'),
