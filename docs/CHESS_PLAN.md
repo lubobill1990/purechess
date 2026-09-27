@@ -22,7 +22,8 @@
   最新维护版，如 stockfish_chess_engine 等）；不可用则回退：官方源码 +
   FFI/isolate 集成（照 pureweiqi 的 katago_ffi.cpp 模式）。
 - **难度**：UCI `UCI_LimitStrength`+`UCI_Elo`（约1320-3190）映射 10 档，
-  低档位辅以 `Skill Level`。无大模型下载：NNUE 小网随包（几 MB）。
+  低档位辅以 `Skill Level`。无需用户下载模型：NNUE 在构建期获取并随包；
+  新版含大/小网，包体不能假定只有几 MB，发布前按平台实测。
 - **格式**：FEN（局面）+ PGN（对局/变化树），全部自研解析往返。
 - **战术题**：Lichess puzzle 数据库（CC0）。抽取子集（≥1000 题）按主题
   （fork/pin/skewer/mateIn1/mateIn2/背排杀…）与难度（rating 段）分级打包。
@@ -113,10 +114,78 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
   合法点提示、最后一手/将军高亮、翻转视角、升变弹窗）；双人对弈
   （面对面布局吸收 pureweiqi 经验：顶部操作条旋转 180°）；终局判定展示；
   PGN 保存到本地棋谱库。
-- **M2b Stockfish 集成**［task/engine］：评估并接入 stockfish 包或 FFI；
+- **M2b Stockfish 集成**［已实现；task/engine］：评估并接入 stockfish 包或 FFI；
   StockfishService（启动/UCI 握手/难度设置/go movetime 或 depth/
   bestmove 解析/eval 解析）；错误透传与崩溃哨兵接线（吸收 pureweiqi：
   引擎故障必须 UI 可见，绝不无声吞掉）。10 档难度常量表。
+  - **选型实证（2026-09-28）**：
+
+    | pub.dev 包 | 最新版本 / 发布时间（UTC） | 声明的平台 | 结论 |
+    | --- | --- | --- | --- |
+    | [stockfish](https://pub.dev/packages/stockfish) | 1.8.1 / 2026-02-03 05:58 | Android、iOS | 选用并精确锁版。虽然 pubspec 写 SDK `>=2.17.0 <3.0.0`，实际 Dart 3.13.2 的 `flutter pub get` 成功；不能只看上界误判不兼容。桌面没有实现，采用独立 UCI 子进程。 |
+    | [stockfish_chess_engine](https://pub.dev/packages/stockfish_chess_engine) | 0.8.2 / 2025-02-20 17:58 | Android、iOS、Linux、macOS、Windows | 未选用。Dart 3 解析及 Windows Debug 原生构建通过，但绝对路径网络配置后首次搜索让 flutter_tester 直接退出（code 1）。源码 `src/Stockfish/src/engine.cpp` 的桌面 `EvalFile` 回调误调 `load_small_network`，随后大网 `verify` 失败会 `exit(EXIT_FAILURE)`。两个下载网络 SHA-256 均与名称匹配，非空文件/下载损坏问题。没有修改 pub cache 或用切换应用全局 CWD 的方式绕过。 |
+
+    发布时间以 pub.dev API 的 `latest.published` 为准：
+    <https://pub.dev/api/packages/stockfish>、
+    <https://pub.dev/api/packages/stockfish_chess_engine>。
+    **最终组合不是“两个包都不可用”**：移动端用维护版包，桌面因平台缺口/
+    已证实的包缺陷使用官方子进程。GPLv3 与发行义务见 `docs/CREDITS.md`。
+  - **实现**：`lib/engine/uci_protocol.dart` 为纯 Dart 命令/握手/
+    id/option/info/cp/mate/bound/PV/bestmove 解析；`stockfish_transport.dart`
+    为可注入传输协议与桌面 Process 实现；`mobile_stockfish_transport.dart`
+    包装 Android/iOS 包，监听 ready/error/disposed 与 stdout。包的 ready
+    仅代表 worker 启动，服务还必须等待 `uciok` 与 `readyok`。
+  - **生命周期**：stopped → starting → ready ↔ analyzing；另有
+    stopping/failed/disposed。并发启动共用 Future，重叠搜索显式拒绝，
+    stop/dispose 取消等待并完成清理；超时销毁当前会话防止晚到的 bestmove
+    串入下一次分析。移动端没有强杀 API，无法确认停止时禁止不安全重启。
+    桌面优先 stop/quit，超时只杀自己启动的子进程并等待退出。
+  - **错误/遥测**：Future 抛 `StockfishException`，`status` 提供可监听的
+    状态和 `error.message`，`lastError` 保留 UI 可展示信息；底层 cause
+    仅在本地日志。设置页新增「AI 状态/检查 AI」，启动、分析失败与空闲时
+    异常退出均实际显示，不只是留一个未来 UI 接口；所有用户文案统一 AI。
+    `chess_engine_start` / `chess_engine_analyze` 哨兵在危险阶段前落盘，
+    正常返回/可处理失败后清除；启动成功清零 crashStreak。
+    `engine_start` 只发送白名单 `success`、`duration_ms`。
+  - **难度常量**：
+
+    | 档 | Skill Level | UCI_LimitStrength | UCI_Elo | movetime(ms) |
+    | --- | --- | --- | --- | --- |
+    | 1 / 2 / 3 / 4 / 5 | 0 / 2 / 4 / 6 / 8 | false | 不使用 | 100 / 150 / 250 / 400 / 600 |
+    | 6 / 7 / 8 / 9 / 10 | 20 | true | 1600 / 1900 / 2200 / 2500 / 2800 | 800 / 1000 / 1200 / 1600 / 2000 |
+
+    每次搜索重设模式，避免从高档切低档仍被 Elo 限制；握手校验实际引擎
+    支持的选项范围，不能静默 clamp。档位是产品参数，不保证人的实际 Elo。
+  - **分析契约**：`analyzePosition(fen, difficulty: 5, depth: n)` 自动启动，
+    depth 指定时替代 movetime。返回不可变 `bestLine`（合法 UCI 主变化）、
+    `bestMove`、`depth`、`score` 和互斥 `cp`/`mate`；评分从 FEN **行棋方**
+    视角，mate 为有符号的将杀步数，不强转 cp。只采用 MultiPV=1 的完整
+    exact 分数/PV，忽略界限分数与局部更新；低强度 bestMove 可能不同于
+    最强 PV 首手，两者分别暴露。终局无着返回 null bestMove、空 PV，
+    将杀 mate=0、逼和 cp=0；其他缺分/缺着/非法 PV 都明确报错。
+    入参复用 core FEN 并额外拒绝非行棋方被将、不可能子数、无王车的易位
+    权及无双步兵的吃过路兵目标，避免把已知不安全局面送进原生层。
+  - **桌面资产**：探测可执行文件旁及父目录、当前目录的
+    `engine_assets/stockfish[.exe]`；支持构建期
+    `--dart-define=STOCKFISH_EXECUTABLE=<绝对路径>` 或注入传输路径。
+    子进程以自身目录工作，不开 shell、不修改应用 CWD、不静默联网下载。
+    `engine_assets/` 整体忽略，桌面分发时另行打包正确 CPU 二进制与许可。
+  - **真实冒烟**：官方 Stockfish 19（sf_19，2026-09-05 发布）
+    Windows x86-64 universal；下载归档 SHA-256 已对照官方 release digest
+    验证，记录在 CREDITS。本机 10/10 档返回 cp 和合法 bestmove/PV，
+    初始一轮深度为 13–22；另通过 mate-in-one（mate=1）、停止后重启
+    与第二次握手/搜索，总计约 13 秒。评分/深度受硬件与随机降强影响。
+    复现命令见 README；默认单测显式跳过 opt-in 真实引擎用例。
+    **移动端真机/签名构建、Linux/macOS 真机未在 Windows 上验证**；
+    Android/iOS 已接包并以 fake native client 验证 adapter；上架前必须
+    在平台流水线/真机验证 FFI 加载、NNUE 构建下载及 GPL 发行方案。
+  - **本机验收**：`flutter analyze` 零 issue；
+    `flutter test test\engine --coverage` 109 项通过、1 项 opt-in 冒烟跳过；
+    `uci_protocol.dart` 行覆盖 **95/95（100%）**；
+    `flutter test` 全量 **446 项通过、1 项 opt-in 跳过**；
+    单独启用真实引擎冒烟 **1/1 通过**（包含十档搜索、mate、重启）；
+    `flutter build windows --debug` 通过。所有 Flutter 测试均设置
+    `NO_PROXY=localhost,127.0.0.1`。
 - **M2c CI+发版管线**［task/ci，我=维护者自做或 copilot］：ci.yml
   （ubuntu test + macos iOS no-codesign）与 testflight.yml（云签名四件套
   secrets 同 pureweiqi，bundle com.weavejam.purechess，

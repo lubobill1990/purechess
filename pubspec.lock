@@ -429,6 +429,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.12.2"
+  stockfish:
+    dependency: "direct main"
+    description:
+      name: stockfish
+      sha256: b27956fa6c21f8637db62411c564d1ba1d0b0e9e27ee928f42a85367da891fa0
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.8.1"
   stream_channel:
     dependency: transitive
     description:

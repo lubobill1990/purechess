@@ -72,6 +72,74 @@ Solutions are exact UCI main lines, including the promotion choice; alternate
 engine-equivalent moves are not implicitly accepted. Wrong legal moves fail an
 attempt without changing the board; illegal moves throw without consuming it.
 
+## AI / Stockfish (M2b)
+
+`StockfishService` uses the pinned `stockfish` 1.8.1 package on Android/iOS and
+a shell-free Stockfish subprocess on Windows/Linux/macOS. The pure Dart UCI
+parser/command builders live in `lib/engine/uci_protocol.dart`. Package
+evaluation, caveats and licensing are recorded in `docs/CHESS_PLAN.md` and
+`docs/CREDITS.md`.
+
+```dart
+final ai = StockfishService(prefs: prefs);
+try {
+  final result = await ai.analyzePosition(Fen.initial, difficulty: 5);
+  // Exactly one of result.cp / result.mate is non-null.
+  // Both are relative to the side to move; mate is signed moves, not cp.
+  final moves = result.bestLine; // Immutable, legal UCI principal variation.
+  final playedMove = result.bestMove; // May differ from PV[0] at low strength.
+} on StockfishException catch (error) {
+  // Display error.message; error.cause is diagnostic/local-only.
+} finally {
+  await ai.dispose();
+}
+```
+
+`analyzePosition` starts the engine if necessary. `depth: n` replaces the
+difficulty's default movetime. One service owns one engine: concurrent starts
+share a future, concurrent searches are rejected, and `stop()` cancels pending
+work before another session may begin. A timeout destroys the old session so
+late bestmoves cannot satisfy a later request. An unconfirmed native shutdown
+blocks restart. Invalid positions/options, malformed replies, missing scores,
+illegal PVs, EOF and transport errors throw `StockfishException`; they are never
+converted to a successful zero evaluation. Mate/stalemate with no legal move
+return an empty line, null bestMove, and mate 0/cp 0 respectively.
+
+Observe `service.status` (`ValueListenable<StockfishStatus>`) for lifecycle
+changes and persistent `error.message`. Settings now exposes **AI 状态 / 检查 AI**
+and displays startup/search failures and unexpected idle exits. It creates its
+service lazily and does not load the native engine until the button is pressed.
+M3 game integration should own a shared service and await disposal when done;
+mobile packages support only one native instance.
+
+The startup and search critical sections write crash phases and clear them on
+normal completion/failure. `engine_start` only reports `success` and
+`duration_ms`; no FEN, moves, native paths or error text are uploaded.
+
+### Desktop setup and real-engine smoke
+
+Download an official binary for the host CPU and place it at
+`engine_assets\stockfish.exe` (Windows) or `engine_assets/stockfish` (Linux/macOS).
+Alternatively pass an absolute path to `ProcessStockfishTransport(executablePath: ...)`
+via `transportFactory`, or build with `--dart-define=STOCKFISH_EXECUTABLE=<absolute path>`.
+The default locator searches `engine_assets` beside/above the app executable
+and under the current directory. The child uses its own executable directory;
+the app never changes its global working directory or silently downloads code.
+On Unix ensure the binary is executable. Desktop packaging must supply the
+binary and GPL notices; mobile release builds need the package's build-time
+NNUE downloads and platform verification. Web is not supported by this transport.
+
+```powershell
+$env:NO_PROXY = 'localhost,127.0.0.1'
+$env:STOCKFISH_EXECUTABLE = (Resolve-Path engine_assets\stockfish.exe).Path
+flutter test test\engine\stockfish_native_test.dart --reporter expanded
+Remove-Item Env:\STOCKFISH_EXECUTABLE
+```
+
+The opt-in smoke checks all ten levels, legal moves/PVs, a mate-in-one score,
+and stop/restart with a second handshake. Without that environment variable it
+is explicitly skipped; ordinary tests inject fake transports/native clients.
+
 ## Validation (PowerShell)
 
 ```powershell
