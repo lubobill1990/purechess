@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/play_feedback.dart';
 import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
@@ -18,11 +20,13 @@ class GameScreen extends StatefulWidget {
     this.session,
     this.openRepository = RecordsRepository.open,
     this.analytics,
+    this.prefs,
   });
 
   final GameSession? session;
   final Future<RecordsRepository> Function() openRepository;
   final Analytics? analytics;
+  final SharedPreferences? prefs;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -193,88 +197,109 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ],
         ),
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = math.min(constraints.maxWidth, 640.0);
-              final boardSize = math.max(
-                0.0,
-                math.min(width - 24, constraints.maxHeight - 240),
-              );
-              return Center(
-                child: SizedBox(
-                  width: width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RotatedBox(
-                        key: const ValueKey('black-player-bar'),
-                        quarterTurns: 2,
-                        child: _playerBar(chess.Color.black),
-                      ),
-                      SizedBox(
-                        width: boardSize,
-                        height: boardSize,
-                        child: ChessBoard(
-                          key: ObjectKey(_session),
-                          board: board,
-                          flipped: _flipped,
-                          enabled: _session.canPlay && !_saving,
-                          onMove: (move) => _change(() => _session.play(move)),
+        body: PlayFeedback(
+          session: _session,
+          board: board,
+          source: 'local',
+          prefs: widget.prefs,
+          analytics: widget.analytics,
+          result: !_session.finished
+              ? FeedbackResult.playing
+              : _session.outcome!.winner == null
+              ? FeedbackResult.draw
+              : FeedbackResult.win,
+          celebration: _session.outcome?.winner == null
+              ? null
+              : '${colorName(_session.outcome!.winner!)}获胜',
+          child: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = math.min(constraints.maxWidth, 640.0);
+                final boardSize = math.max(
+                  0.0,
+                  math.min(width - 24, constraints.maxHeight - 240),
+                );
+                return Center(
+                  child: SizedBox(
+                    width: width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RotatedBox(
+                          key: const ValueKey('black-player-bar'),
+                          quarterTurns: 2,
+                          child: _playerBar(chess.Color.black),
                         ),
-                      ),
-                      _playerBar(chess.Color.white),
-                      SizedBox(
-                        key: const ValueKey('game-result-area'),
-                        height: 72,
-                        child: Center(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Semantics(
-                              liveRegion: true,
-                              child: Text(
-                                _saveMessage == null
-                                    ? status
-                                    : '$status\n$_saveMessage',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.titleMedium,
+                        SizedBox(
+                          width: boardSize,
+                          height: boardSize,
+                          child: ChessBoard(
+                            key: ObjectKey(_session),
+                            board: board,
+                            flipped: _flipped,
+                            enabled: _session.canPlay && !_saving,
+                            onMove: (move) =>
+                                _change(() => _session.play(move)),
+                          ),
+                        ),
+                        _playerBar(chess.Color.white),
+                        SizedBox(
+                          key: const ValueKey('game-result-area'),
+                          height: 72,
+                          child: Center(
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Semantics(
+                                liveRegion: true,
+                                child: Text(
+                                  _saveMessage == null
+                                      ? status
+                                      : '$status\n$_saveMessage',
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 56,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FilledButton.icon(
-                              onPressed: _saving || !_dirty ? null : _save,
-                              icon: const Icon(Icons.save_outlined),
-                              label: Text(_saving ? '正在保存…' : '保存棋谱'),
-                            ),
-                            const SizedBox(width: 12),
-                            TextButton(
-                              onPressed: _saving
-                                  ? null
-                                  : () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute<void>(
-                                        builder: (_) => RecordsScreen(
-                                          openRepository: widget.openRepository,
+                        SizedBox(
+                          height: 56,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FilledButton.icon(
+                                onPressed: _saving || !_dirty ? null : _save,
+                                icon: const Icon(Icons.save_outlined),
+                                label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                              ),
+                              const SizedBox(width: 12),
+                              TextButton(
+                                onPressed: _saving
+                                    ? null
+                                    : () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute<void>(
+                                          builder: (_) => RecordsScreen(
+                                            openRepository:
+                                                widget.openRepository,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                              child: const Text('我的棋谱'),
-                            ),
-                          ],
+                                child: const Text('我的棋谱'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

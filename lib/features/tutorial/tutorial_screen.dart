@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/play_feedback.dart';
 import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import '../../core/board.dart';
@@ -145,6 +146,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                                   MaterialPageRoute(
                                     builder: (_) => TutorialPlayScreen(
                                       controller: controller,
+                                      analytics: widget.analytics,
                                     ),
                                   ),
                                 );
@@ -159,8 +161,13 @@ class _TutorialScreenState extends State<TutorialScreen> {
 }
 
 class TutorialPlayScreen extends StatelessWidget {
-  const TutorialPlayScreen({super.key, required this.controller});
+  const TutorialPlayScreen({
+    super.key,
+    required this.controller,
+    this.analytics,
+  });
   final TutorialController controller;
+  final Analytics? analytics;
 
   Future<void> _resign(BuildContext context) async {
     final accepted = await showDialog<bool>(
@@ -196,58 +203,73 @@ class TutorialPlayScreen extends StatelessWidget {
               '${c.index! + 1} / ${c.catalog.levels.length} · ${c.level.title}',
             ),
           ),
-          body: _LessonLayout(
+          body: PlayFeedback(
+            session: (c, c.index),
             board: c.board,
-            enabled: c.canPlay,
-            hint: c.hint,
-            onMove: c.play,
-            status: c.saving
-                ? '正在保存进度'
-                : c.solved
-                ? (c.level.graduation ? c.outcome : '完成目标')
-                : c.thinking
-                ? 'AI 正在走棋，请稍候'
+            source: 'tutorial',
+            prefs: c.prefs,
+            analytics: analytics,
+            result: c.solved
+                ? FeedbackResult.completed
                 : c.failed
-                ? '再试一次'
-                : '你执白 · 点选棋子，再点目标格',
-            explanation: c.explanation,
-            notice: c.level.graduation ? c.aiNotice : null,
-            actions: [
-              if (!c.level.graduation && !c.solved && !c.failed)
-                OutlinedButton(
-                  onPressed: c.revealHint,
-                  child: const Text('提示'),
-                ),
-              if (!c.solved)
-                OutlinedButton(
-                  onPressed: c.saving || c.thinking
-                      ? null
-                      : () => c.start(c.index!),
-                  child: const Text('重试'),
-                ),
-              if (c.level.graduation && !c.solved)
-                OutlinedButton(
-                  onPressed: c.canPlay && c.board.plyCount > 0
-                      ? () => _resign(context)
-                      : null,
-                  child: const Text('认输结束'),
-                ),
-              if (c.solved && !c.saved)
-                FilledButton(
-                  onPressed: c.saving ? null : c.saveCompletion,
-                  child: const Text('重新保存'),
-                ),
-              if (c.solved && c.saved)
-                FilledButton(
-                  onPressed: c.level.graduation
-                      ? () => Navigator.pushReplacementNamed(
-                          context,
-                          tutorialDailyRoute,
-                        )
-                      : () => c.start(c.index! + 1),
-                  child: Text(c.level.graduation ? '去每日战术题' : '下一关'),
-                ),
-            ],
+                ? FeedbackResult.incorrect
+                : FeedbackResult.playing,
+            celebration: c.solved && c.saved
+                ? (c.level.graduation ? '教程毕业！' : '本关完成！')
+                : null,
+            child: _LessonLayout(
+              board: c.board,
+              enabled: c.canPlay,
+              hint: c.hint,
+              onMove: c.play,
+              status: c.saving
+                  ? '正在保存进度'
+                  : c.solved
+                  ? (c.level.graduation ? c.outcome : '完成目标')
+                  : c.thinking
+                  ? 'AI 正在走棋，请稍候'
+                  : c.failed
+                  ? '再试一次'
+                  : '你执白 · 点选棋子，再点目标格',
+              explanation: c.explanation,
+              notice: c.level.graduation ? c.aiNotice : null,
+              actions: [
+                if (!c.level.graduation && !c.solved && !c.failed)
+                  OutlinedButton(
+                    onPressed: c.revealHint,
+                    child: const Text('提示'),
+                  ),
+                if (!c.solved)
+                  OutlinedButton(
+                    onPressed: c.saving || c.thinking
+                        ? null
+                        : () => c.start(c.index!),
+                    child: const Text('重试'),
+                  ),
+                if (c.level.graduation && !c.solved)
+                  OutlinedButton(
+                    onPressed: c.canPlay && c.board.plyCount > 0
+                        ? () => _resign(context)
+                        : null,
+                    child: const Text('认输结束'),
+                  ),
+                if (c.solved && !c.saved)
+                  FilledButton(
+                    onPressed: c.saving ? null : c.saveCompletion,
+                    child: const Text('重新保存'),
+                  ),
+                if (c.solved && c.saved)
+                  FilledButton(
+                    onPressed: c.level.graduation
+                        ? () => Navigator.pushReplacementNamed(
+                            context,
+                            tutorialDailyRoute,
+                          )
+                        : () => c.start(c.index! + 1),
+                    child: Text(c.level.graduation ? '去每日战术题' : '下一关'),
+                  ),
+              ],
+            ),
           ),
         ),
       );
@@ -258,8 +280,9 @@ class TutorialPlayScreen extends StatelessWidget {
 /// A working hand-off until the separate daily-puzzle feature owns this route.
 /// These are authored tutorial exercises, not the full daily ten-puzzle set.
 class TutorialDailyScreen extends StatefulWidget {
-  const TutorialDailyScreen({super.key, this.analytics});
+  const TutorialDailyScreen({super.key, this.analytics, this.prefs});
   final Analytics? analytics;
+  final SharedPreferences? prefs;
 
   @override
   State<TutorialDailyScreen> createState() => _TutorialDailyScreenState();
@@ -323,32 +346,47 @@ class _TutorialDailyScreenState extends State<TutorialDailyScreen> {
           ? _LoadError(message: _error!, retry: _load)
           : session == null
           ? const Center(child: CircularProgressIndicator())
-          : _LessonLayout(
+          : PlayFeedback(
+              session: session,
               board: session.board,
-              enabled: session.status == PuzzleStatus.playing,
-              hint: _hint ? session.hint() : null,
-              onMove: _play,
-              status: session.status == PuzzleStatus.solved
-                  ? '答对了 · 今天的入门练习已完成'
-                  : session.status == PuzzleStatus.failed
-                  ? '还不是将杀 · 重试一下'
-                  : '白方走 · 一步将杀',
-              explanation:
-                  '从教程的两道一步杀中按日期轮换一道，练习先找将军，再检查对方能否应将。'
-                  '这是每天一题的入门练习，适合刚完成教程后巩固规则。',
-              actions: [
-                OutlinedButton(
-                  onPressed: () => setState(() => _hint = true),
-                  child: const Text('提示'),
-                ),
-                FilledButton(
-                  onPressed: () => setState(() {
-                    session.reset();
-                    _hint = false;
-                  }),
-                  child: const Text('再练一次'),
-                ),
-              ],
+              source: 'daily_intro',
+              prefs: widget.prefs,
+              analytics: widget.analytics,
+              result: switch (session.status) {
+                PuzzleStatus.playing => FeedbackResult.playing,
+                PuzzleStatus.solved => FeedbackResult.correct,
+                PuzzleStatus.failed => FeedbackResult.incorrect,
+              },
+              celebration: session.status == PuzzleStatus.solved
+                  ? '入门练习完成！'
+                  : null,
+              child: _LessonLayout(
+                board: session.board,
+                enabled: session.status == PuzzleStatus.playing,
+                hint: _hint ? session.hint() : null,
+                onMove: _play,
+                status: session.status == PuzzleStatus.solved
+                    ? '答对了 · 今天的入门练习已完成'
+                    : session.status == PuzzleStatus.failed
+                    ? '还不是将杀 · 重试一下'
+                    : '白方走 · 一步将杀',
+                explanation:
+                    '从教程的两道一步杀中按日期轮换一道，练习先找将军，再检查对方能否应将。'
+                    '这是每天一题的入门练习，适合刚完成教程后巩固规则。',
+                actions: [
+                  OutlinedButton(
+                    onPressed: () => setState(() => _hint = true),
+                    child: const Text('提示'),
+                  ),
+                  FilledButton(
+                    onPressed: () => setState(() {
+                      session.reset();
+                      _hint = false;
+                    }),
+                    child: const Text('再练一次'),
+                  ),
+                ],
+              ),
             ),
     );
   }
