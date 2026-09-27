@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import '../lib/core/board.dart';
-import '../lib/core/fen.dart';
+import 'package:purechess/core/board.dart';
+import 'package:purechess/core/fen.dart';
 
 /// Chess Programming Wiki standard perft suite.
 const perftCases = [
@@ -46,11 +46,15 @@ void main() {
       final nodes = board.perft(depth);
       timer.stop();
       if (nodes != entry.counts[depth - 1] || board.toFen() != entry.fen) {
-        throw StateError('${entry.name} d$depth: $nodes; expected '
-            '${entry.counts[depth - 1]}; FEN ${board.toFen()}');
+        throw StateError(
+          '${entry.name} d$depth: $nodes; expected '
+          '${entry.counts[depth - 1]}; FEN ${board.toFen()}',
+        );
       }
-      stdout.writeln('${entry.name} d$depth: $nodes '
-          '(${timer.elapsedMilliseconds} ms)');
+      stdout.writeln(
+        '${entry.name} d$depth: $nodes '
+        '(${timer.elapsedMilliseconds} ms)',
+      );
     }
   }
   stdout.writeln('Total: ${total.elapsedMilliseconds} ms');

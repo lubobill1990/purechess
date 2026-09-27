@@ -35,10 +35,7 @@ class Board {
       _ep = position.enPassant,
       _halfmove = position.halfmoveClock,
       _fullmove = position.fullmoveNumber,
-      _kings = [
-        position.squares.indexOf(6),
-        position.squares.indexOf(-6),
-      ] {
+      _kings = [position.squares.indexOf(6), position.squares.indexOf(-6)] {
     final key = zobristHash;
     _keys.add(key);
     _repetitions[key] = 1;
@@ -179,8 +176,7 @@ class Board {
     }
     final base = sign == 1 ? 0 : 112;
     final shift = sign == 1 ? 0 : 2;
-    if (_squares[base + 4] == sign * 6 &&
-        !_attacked(base + 4, -sign)) {
+    if (_squares[base + 4] == sign * 6 && !_attacked(base + 4, -sign)) {
       if ((_rights & (1 << shift)) != 0 &&
           _squares[base + 7] == sign * 4 &&
           _squares[base + 5] == 0 &&
@@ -275,8 +271,17 @@ class Board {
         : -1;
     final rookTo = castle ? (move.from + move.to) ~/ 2 : -1;
     final undo = _Undo(
-      move, piece, captureSquare, captured, rookFrom, rookTo,
-      _rights, _ep, _halfmove, _fullmove, _kings[_turn.index],
+      move,
+      piece,
+      captureSquare,
+      captured,
+      rookFrom,
+      rookTo,
+      _rights,
+      _ep,
+      _halfmove,
+      _fullmove,
+      _kings[_turn.index],
     );
     _squares[move.from] = 0;
     _squares[captureSquare] = 0;
@@ -364,7 +369,8 @@ class Board {
       if (type != 1) {
         text = 'PNBRQK'[type - 1];
         final others = legal.where(
-          (other) => other.from != move.from &&
+          (other) =>
+              other.from != move.from &&
               other.to == move.to &&
               _squares[other.from].abs() == type,
         );
@@ -511,9 +517,17 @@ class _Undo {
   final int kingSquare;
 
   const _Undo(
-    this.move, this.piece, this.captureSquare, this.captured,
-    this.rookFrom, this.rookTo, this.rights, this.ep,
-    this.halfmove, this.fullmove, this.kingSquare,
+    this.move,
+    this.piece,
+    this.captureSquare,
+    this.captured,
+    this.rookFrom,
+    this.rookTo,
+    this.rights,
+    this.ep,
+    this.halfmove,
+    this.fullmove,
+    this.kingSquare,
   );
 }
 

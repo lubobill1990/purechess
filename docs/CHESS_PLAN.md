@@ -49,7 +49,7 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
 ## 里程碑与批次（worktree 并行规则同 pureweiqi 二期）
 
 ### 批 1（并行）
-- **M1 core 规则引擎**［主树，分支 main 直接做］（其他一切的地基）
+- **M1 core 规则引擎**［已完成；主树 main］（其他一切的地基）
   - 走子生成含全部特例；Zobrist 局面哈希（三次重复）；终局判定
     （将杀/逼和/不足子力/50步/三次重复）。
   - FEN 解析/生成往返；PGN 解析（标签对/着法 SAN/注释/变化/结果）与
@@ -60,6 +60,23 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
     d1-d4 (48/2039/97862/4085603)；及 CPW 标准 position 3-6 至少 d4。
     另：SAN 歧义、升变四子、易位被将/穿将非法、吃过路兵暴露将非法等
     专项测试。测试目标 ≥120 项。
+  - 实现：`lib/core/{board,move,game_tree,fen,pgn,puzzle}.dart`，0x88
+    棋盘；core 无 Flutter / 第三方棋规依赖。接口及行为约定见 README。
+  - 验收入口：`flutter test test\core`；六组标准 perft 共 26 个深度逐项
+    `expect` 精确相等（position 3 同样覆盖到 d5）；`dart run tool\perft.dart`
+    可独立于 Flutter 运行并输出逐深度耗时。
+  - PGN 保留标签、注释、NAG、嵌套变化与结果，导出规范化空白/着数；
+    变化提升后仍保留前置注释。FEN 只保存局面，不虚构重复历史。
+  - Zobrist 使用跨平台精确的 64 位 BigInt；仅有**合法**吃过路兵时将
+    目标列计入重复哈希。50 步/三次重复作为可申和状态暴露，不阻止分析
+    继续走子；将杀/逼和优先。不足子力不等同于“无法强制将杀”。
+  - PuzzleSession：FEN + UCI 主线、提示、自动应着、正误/重试；
+    `fromLichess` 单独处理 CSV 第一手是对手铺垫着的约定。
+  - 本机验收（2026-09-28）：`flutter analyze` 零 issue；
+    `flutter test` 310/310 通过（core 309 + 原有 widget 1）。
+    独立 Dart perft 26/26 精确相等，全部深度合计 1.152 秒；
+    startpos d5 329ms、KiwiPete d4 277ms、position 3 d5 60ms、
+    position 4/5/6 d4 分别 30/145/232ms（计时受机器/JIT 状态影响）。
 - **M4a 遥测移植**［worktree task/telemetry］：从 F:\weiqi 移植
   analytics/app_logger/crash_guard（可直接读 F:\weiqi 源码），事件名改
   chess 语境（game_start/puzzle_result/engine_start/abnormal_exit 等），
