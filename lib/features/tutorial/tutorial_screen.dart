@@ -95,67 +95,88 @@ class _TutorialScreenState extends State<TutorialScreen> {
             builder: (context, _) {
               final controller = _controller!;
               final levels = controller.catalog.levels;
-              return ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  Text(
-                    '从认识棋子，到下完第一局',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '每关只学一件事 · 已完成 ${controller.completed} / ${levels.length}',
-                  ),
-                  const SizedBox(height: 12),
-                  LinearProgressIndicator(
-                    value: controller.completed / levels.length,
-                    semanticsLabel: '教程完成进度',
-                  ),
-                  const SizedBox(height: 16),
-                  if (controller.completed == levels.length)
-                    FilledButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, tutorialDailyRoute),
-                      child: const Text('去每日战术题'),
-                    ),
-                  for (var i = 0; i < levels.length; i++)
-                    Card(
-                      child: ListTile(
-                        key: ValueKey('tutorial-level-$i'),
-                        enabled: i <= controller.completed,
-                        leading: CircleAvatar(child: Text('${i + 1}')),
-                        title: Text(levels[i].title),
-                        subtitle: Text(
-                          i < controller.completed
-                              ? '已完成 · 可以重温'
-                              : i == controller.completed
-                              ? '从这里继续'
-                              : '完成前一关后解锁',
-                        ),
-                        trailing: Icon(
-                          i < controller.completed
-                              ? Icons.check_circle_outline
-                              : i == controller.completed
-                              ? Icons.play_arrow
-                              : Icons.lock_outline,
-                        ),
-                        onTap: i > controller.completed
-                            ? null
-                            : () {
-                                controller.start(i);
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TutorialPlayScreen(
-                                      controller: controller,
-                                      analytics: widget.analytics,
-                                    ),
-                                  ),
-                                );
-                              },
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Text(
+                        '从认识棋子，到下完第一局',
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
-                    ),
-                ],
+                      const SizedBox(height: 8),
+                      Text(
+                        '每关只学一件事 · 已完成 ${controller.completed} / ${levels.length}',
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: controller.completed / levels.length,
+                        semanticsLabel: '教程完成进度',
+                      ),
+                      const SizedBox(height: 16),
+                      if (controller.completed == levels.length)
+                        FilledButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, tutorialDailyRoute),
+                          child: const Text('去每日战术题'),
+                        ),
+                      for (var i = 0; i < levels.length; i++)
+                        Card(
+                          child: ListTile(
+                            key: ValueKey('tutorial-level-$i'),
+                            enabled: i <= controller.completed,
+                            leading: CircleAvatar(
+                              backgroundColor: i <= controller.completed
+                                  ? Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                  : Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHighest,
+                              foregroundColor: i <= controller.completed
+                                  ? Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer
+                                  : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                              child: Text('${i + 1}'),
+                            ),
+                            title: Text(levels[i].title),
+                            subtitle: Text(
+                              i < controller.completed
+                                  ? '已完成 · 可以重温'
+                                  : i == controller.completed
+                                  ? '从这里继续'
+                                  : '完成前一关后解锁',
+                            ),
+                            trailing: Icon(
+                              i < controller.completed
+                                  ? Icons.check_circle_outline
+                                  : i == controller.completed
+                                  ? Icons.play_arrow
+                                  : Icons.lock_outline,
+                            ),
+                            onTap: i > controller.completed
+                                ? null
+                                : () {
+                                    controller.start(i);
+                                    Navigator.push<void>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => TutorialPlayScreen(
+                                          controller: controller,
+                                          analytics: widget.analytics,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -500,16 +521,8 @@ class _LessonLayout extends StatelessWidget {
                                       '${chess.squareName(square)}',
                                   child: Container(
                                     margin: const EdgeInsets.all(3),
-                                    decoration: BoxDecoration(
-                                      shape: square == hint!.to
-                                          ? BoxShape.circle
-                                          : BoxShape.rectangle,
-                                      border: Border.all(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        width: 3,
-                                      ),
+                                    decoration: boardHintDecoration(
+                                      circle: square == hint!.to,
                                     ),
                                   ),
                                 ),

@@ -456,13 +456,8 @@ class _PuzzleSolveScreenState extends State<PuzzleSolveScreen> {
                   label: '提示起点 ${chess.squareName(square)}',
                   child: Container(
                     key: const ValueKey('puzzle-hint-square'),
-                    decoration: BoxDecoration(
-                      color: const Color(0x55E3AF40),
-                      border: Border.all(
-                        color: const Color(0xFFE3AF40),
-                        width: 3,
-                      ),
-                    ),
+                    margin: const EdgeInsets.all(3),
+                    decoration: boardHintDecoration(),
                   ),
                 ),
               ),

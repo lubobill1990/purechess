@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/router.dart';
 import 'app/notifications.dart';
-import 'app/sound.dart';
+import 'app/app_theme.dart';
 import 'app/telemetry/analytics.dart';
 import 'app/telemetry/app_logger.dart';
 import 'app/telemetry/crash_guard.dart';
@@ -128,12 +128,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: '纯弈国象',
-      theme: quietControlsTheme(
-        ThemeData(
-          colorScheme: .fromSeed(seedColor: const Color(0xFF233648)),
-          scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-        ),
-      ),
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
+      themeMode: ThemeMode.system,
       routes: AppRouter.routes(
         prefs: widget.prefs,
         analytics: _analytics,

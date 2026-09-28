@@ -130,6 +130,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/icon/icon.png',
+                      width: 64,
+                      height: 64,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   if (!progress.graduated && widget.canResumeGame)
                     TextButton.icon(
                       onPressed: () =>
@@ -297,7 +307,7 @@ class _LearningCard extends StatelessWidget {
     return Card(
       child: InkWell(
         enableFeedback: false,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -306,7 +316,19 @@ class _LearningCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(icon, color: theme.colorScheme.primary),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Icon(
+                        icon,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(eyebrow, style: theme.textTheme.labelLarge),

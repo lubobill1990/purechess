@@ -205,7 +205,7 @@ class _BadgeTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final earned = date != null;
-    final ink = earned ? colors.onPrimaryContainer : colors.outline;
+    final ink = earned ? colors.onPrimaryContainer : colors.onSurfaceVariant;
     final dateText = date == null
         ? null
         : '${date!.substring(0, 4)}-${date!.substring(4, 6)}-${date!.substring(6)}';

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:purechess/app/app_theme.dart';
 import 'package:purechess/features/library/classic_library.dart';
 import 'package:purechess/features/library/classic_library_screen.dart';
 import 'package:purechess/features/library/classic_reader_screen.dart';
@@ -31,6 +32,8 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildLightTheme(),
+        darkTheme: buildDarkTheme(),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)
               .copyWith(textScaler: TextScaler.linear(scale)),

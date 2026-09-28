@@ -219,6 +219,7 @@ class _ChessBoardState extends State<ChessBoard> {
               onPanCancel: _cancelDrag,
               child: CustomPaint(
                 painter: BoardPainter(
+                  dark: Theme.of(context).brightness == Brightness.dark,
                   flipped: widget.flipped,
                   selected: _selected,
                   targets: targets,
@@ -293,11 +294,18 @@ class BoardPainter extends CustomPainter {
     required this.targets,
     required this.lastMove,
     required this.checkedKing,
+    this.dark = false,
   });
 
-  static const lightSquare = Color(0xFFE5EAF0);
-  static const darkSquare = Color(0xFF72869B);
-  static const ink = Color(0xFF233648);
+  static const lightSquare = Color(0xFFE8D5AD);
+  static const darkSquare = Color(0xFF88613D);
+  static const nightLightSquare = Color(0xFFBCA27C);
+  static const nightDarkSquare = Color(0xFF67492E);
+  static const ink = Color(0xFF352412);
+  static const ivory = Color(0xFFFFEDC7);
+  static const lastMoveTint = Color(0x66EBC05F);
+  static const checkTint = Color(0xDDCE5964);
+  final bool dark;
   final bool flipped;
   final int? selected;
   final Set<int> targets;
@@ -313,18 +321,24 @@ class BoardPainter extends CustomPainter {
         final square = flipped ? row * 16 + 7 - col : (7 - row) * 16 + col;
         final rect = Rect.fromLTWH(col * cell, row * cell, cell, cell);
         final light = (row + col).isEven;
-        canvas.drawRect(rect, paint..color = light ? lightSquare : darkSquare);
+        canvas.drawRect(
+          rect,
+          paint
+            ..color = light
+                ? (dark ? nightLightSquare : lightSquare)
+                : (dark ? nightDarkSquare : darkSquare),
+        );
         if (lastMove?.from == square || lastMove?.to == square) {
-          canvas.drawRect(rect, paint..color = const Color(0x80E7BC54));
+          canvas.drawRect(rect, paint..color = lastMoveTint);
         }
         if (checkedKing == square) {
-          canvas.drawRect(rect, paint..color = const Color(0xDDCE5964));
+          canvas.drawRect(rect, paint..color = checkTint);
         }
         if (selected == square) {
           canvas.drawRect(
             rect.deflate(2),
             Paint()
-              ..color = ink
+              ..color = light ? ink : ivory
               ..style = PaintingStyle.stroke
               ..strokeWidth = 3,
           );
@@ -333,13 +347,13 @@ class BoardPainter extends CustomPainter {
           canvas.drawCircle(
             rect.center,
             cell * .14,
-            paint..color = const Color(0xA0233648),
+            paint..color = light ? ink : ivory,
           );
           canvas.drawCircle(
             rect.center,
             cell * .43,
             Paint()
-              ..color = const Color(0xA0233648)
+              ..color = light ? ink : ivory
               ..style = PaintingStyle.stroke
               ..strokeWidth = 2,
           );
@@ -381,7 +395,7 @@ class BoardPainter extends CustomPainter {
           fontFamily: 'monospace',
           fontSize: cell * .19,
           fontWeight: FontWeight.w600,
-          color: light ? ink : Colors.white,
+          color: light ? ink : ivory,
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -391,4 +405,18 @@ class BoardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BoardPainter oldDelegate) => true;
+}
+
+/// A two-tone outline remains visible over both wood squares and pieces.
+ShapeDecoration boardHintDecoration({bool circle = false}) {
+  OutlinedBorder border(Color color, double width) => circle
+      ? CircleBorder(
+          side: BorderSide(color: color, width: width),
+        )
+      : RoundedRectangleBorder(
+          side: BorderSide(color: color, width: width),
+        );
+  return ShapeDecoration(
+    shape: border(BoardPainter.ink, 1.5) + border(BoardPainter.ivory, 3),
+  );
 }

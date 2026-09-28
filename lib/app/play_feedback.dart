@@ -238,6 +238,8 @@ class CelebrationBadge extends StatelessWidget {
               Transform.scale(scale: scale, child: child),
           child: Material(
             elevation: 4,
+            shadowColor: colors.shadow.withValues(alpha: .25),
+            surfaceTintColor: Colors.transparent,
             color: colors.primaryContainer,
             borderRadius: BorderRadius.circular(16),
             child: Padding(

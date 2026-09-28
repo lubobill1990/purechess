@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:purechess/app/app_theme.dart';
 import 'package:purechess/app/router.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/features/home/home_screen.dart';
@@ -22,6 +23,8 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildLightTheme(),
+        darkTheme: buildDarkTheme(),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context)
               .copyWith(textScaler: TextScaler.linear(scale)),
