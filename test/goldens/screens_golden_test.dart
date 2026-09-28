@@ -10,6 +10,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/core/move.dart' as chess;
+import 'package:purechess/features/achievements/achievements.dart';
+import 'package:purechess/features/achievements/achievements_screen.dart';
 import 'package:purechess/features/game/ai_difficulty.dart';
 import 'package:purechess/features/game/ai_game_screen.dart';
 import 'package:purechess/features/game/game_screen.dart';
@@ -95,6 +97,7 @@ void main() {
     for (final scene in [
       'home_learning',
       'home_graduated',
+      'achievements',
       'new_game',
       'game_ai',
       'game_human',
@@ -115,6 +118,19 @@ void main() {
           AiDifficulty.preferenceKey: 3,
           Analytics.privacyAcceptedKey: true,
           Analytics.enabledKey: false,
+          if (scene == 'achievements')
+            AchievementData.preferenceKey: AchievementData(
+              lastActiveDay: '20260928',
+              streak: 7,
+              bestStreak: 7,
+              counters: {'gamesFinished': 12, 'winsVsAi': 3},
+              earned: {
+                'first_day': '20260922',
+                'streak_7': '20260928',
+                'first_win': '20260924',
+                'games_10': '20260927',
+              },
+            ).encode(),
         });
         final prefs = await SharedPreferences.getInstance();
         final telemetry = Directory.systemTemp.createTempSync('chess-golden-');
@@ -128,6 +144,8 @@ void main() {
         FakeGameEngine? engine;
         late Widget screen;
         switch (scene) {
+          case 'achievements':
+            screen = AchievementsScreen(prefs: prefs, now: () => _now);
           case 'home_learning':
           case 'home_graduated':
             screen = HomeScreen(prefs: prefs, now: () => _now);

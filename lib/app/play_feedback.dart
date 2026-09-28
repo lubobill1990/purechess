@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/board.dart';
+import '../features/achievements/achievements.dart';
 import 'sound.dart';
 import 'telemetry/analytics.dart';
+import 'telemetry/crash_guard.dart';
 
 enum FeedbackResult { playing, correct, incorrect, win, loss, draw, completed }
 
@@ -42,6 +44,10 @@ class _PlayFeedbackState extends State<PlayFeedback> {
   String? _title;
   bool _celebrated = false;
   int _event = 0;
+  StreamSubscription<AchievementBadge>? _achievements;
+  final List<AchievementBadge> _badgeQueue = [];
+  bool _showingAchievement = false;
+  (String, FeedbackResult)? _pendingResult;
 
   bool get _current {
     final lifecycle = WidgetsBinding.instance.lifecycleState;
@@ -56,6 +62,76 @@ class _PlayFeedbackState extends State<PlayFeedback> {
     _sound = SoundService(prefs: widget.prefs);
     // Opening an already-completed position must not replay its celebration.
     _celebrated = widget.result != FeedbackResult.playing;
+    unawaited(_listenForAchievements());
+  }
+
+  Future<void> _listenForAchievements() async {
+    SharedPreferences prefs;
+    try {
+      prefs = widget.prefs ?? await SharedPreferences.getInstance();
+    } catch (error, stack) {
+      reportHandledError('achievement_feedback', error, stack);
+      return;
+    }
+    if (!mounted) return;
+    _achievements = Achievements.of(prefs).earned.listen((badge) {
+      // Completion also rebuilds PlayFeedback. Let its ordinary result badge
+      // take the first slot before showing the earned badges one at a time.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_current) return;
+        _badgeQueue.add(badge);
+        if (_title == null) setState(_showNextAchievement);
+      });
+      WidgetsBinding.instance.ensureVisualUpdate();
+    });
+  }
+
+  void _showNextAchievement() {
+    if (!_current) return;
+    if (_badgeQueue.isNotEmpty) {
+      final badge = _badgeQueue.removeAt(0);
+      _showingAchievement = true;
+      _title = '获得奖章 · ${badge.title}';
+    } else if (_pendingResult != null) {
+      final (title, result) = _pendingResult!;
+      _pendingResult = null;
+      _title = title;
+      _event++;
+      _scheduleResultTelemetry(result);
+      _startDismiss();
+      return;
+    } else {
+      return;
+    }
+    _event++;
+    _startDismiss();
+  }
+
+  void _logResult(FeedbackResult result) {
+    (widget.analytics ?? Analytics.instance).event('celebrate_shown', {
+      'source': widget.source,
+      'result': result.name,
+    });
+  }
+
+  void _scheduleResultTelemetry(FeedbackResult result) {
+    final event = _event;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_current || event != _event || _title == null) return;
+      _logResult(result);
+    });
+  }
+
+  void _startDismiss() {
+    _dismiss?.cancel();
+    _dismiss = Timer(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      setState(() {
+        _title = null;
+        _showingAchievement = false;
+        _showNextAchievement();
+      });
+    });
   }
 
   @override
@@ -65,11 +141,15 @@ class _PlayFeedbackState extends State<PlayFeedback> {
     if (changedSession ||
         (oldWidget.result != FeedbackResult.playing &&
             widget.result == FeedbackResult.playing)) {
-      _dismiss?.cancel();
-      _title = null;
+      if (!_showingAchievement) {
+        _dismiss?.cancel();
+        _title = null;
+      }
       _celebrated = false;
+      _pendingResult = null;
       _sound.stop();
       _event++;
+      if (_title == null && _badgeQueue.isNotEmpty) _showNextAchievement();
     }
     if (changedSession) return;
     final sounds = List.of(soundsForBoards(oldWidget.board, widget.board));
@@ -99,25 +179,22 @@ class _PlayFeedbackState extends State<PlayFeedback> {
     if (widget.celebration != null && !_celebrated) {
       _celebrated = true;
       if (!_current) return;
+      // An earned badge already on screen must not be covered by a new result.
+      if (_showingAchievement) {
+        _pendingResult = (widget.celebration!, widget.result);
+        return;
+      }
       _title = widget.celebration;
-      final event = ++_event;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!_current || event != _event || _title == null) return;
-        (widget.analytics ?? Analytics.instance).event('celebrate_shown', {
-          'source': widget.source,
-          'result': widget.result.name,
-        });
-      });
-      _dismiss?.cancel();
-      _dismiss = Timer(const Duration(seconds: 3), () {
-        if (mounted) setState(() => _title = null);
-      });
+      _event++;
+      _scheduleResultTelemetry(widget.result);
+      _startDismiss();
     }
   }
 
   @override
   void dispose() {
     _dismiss?.cancel();
+    unawaited(_achievements?.cancel());
     _sound.dispose();
     super.dispose();
   }

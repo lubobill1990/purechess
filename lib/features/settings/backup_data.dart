@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
 import '../../core/pgn.dart';
+import '../achievements/achievements.dart';
 import '../game/ai_difficulty.dart';
 import '../library/classic_library.dart';
 import '../puzzle/puzzle_repository.dart';
@@ -20,6 +21,7 @@ class BackupData {
   static const maxEntries = 10000;
   static final dailyPattern = RegExp(r'^daily_\d{8}$');
   static const preferenceKeys = {
+    AchievementData.preferenceKey,
     TutorialController.progressKey,
     PuzzleRepository.progressKey,
     AiDifficulty.preferenceKey,
@@ -272,7 +274,10 @@ class BackupData {
       final key = entry.key;
       final value = entry.value;
       var valid = false;
-      if (key == TutorialController.progressKey) {
+      if (key == AchievementData.preferenceKey) {
+        AchievementData.decode(value);
+        valid = true;
+      } else if (key == TutorialController.progressKey) {
         valid = value is int && value >= 0;
       } else if (key == AiDifficulty.preferenceKey) {
         valid = value is int && value >= 1 && value <= 10;
@@ -321,7 +326,12 @@ class BackupData {
     for (final entry in local.entries) {
       final other = incoming[entry.key];
       if (other == null) continue;
-      if (entry.key == TutorialController.progressKey) {
+      if (entry.key == AchievementData.preferenceKey) {
+        merged[entry.key] = AchievementData.merge(
+          AchievementData.decode(entry.value),
+          AchievementData.decode(other),
+        ).encode();
+      } else if (entry.key == TutorialController.progressKey) {
         merged[entry.key] = max(entry.value as int, other as int);
       } else if (dailyPattern.hasMatch(entry.key)) {
         final a = (jsonDecode(entry.value as String) as List).toSet();

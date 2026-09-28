@@ -9,6 +9,7 @@ import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
 import '../../core/puzzle.dart';
 import '../../widgets/board/chess_board.dart';
+import '../achievements/achievements.dart';
 import 'puzzle_attempt.dart';
 import 'puzzle_catalog.dart';
 import 'puzzle_repository.dart';
@@ -377,6 +378,22 @@ class _PuzzleSolveScreenState extends State<PuzzleSolveScreen> {
         correct: _attempt.status == PuzzleStatus.solved,
         day: widget.day,
       );
+      if (_attempt.status == PuzzleStatus.solved) {
+        final achievements = Achievements.of(widget.repository.prefs);
+        await achievements.record(
+          const ActivityEvent.puzzleSolved(),
+          analytics: widget.analytics,
+        );
+        final dailyComplete =
+            widget.day != null &&
+            widget.repository.completed(widget.day).length == 10;
+        if (dailyComplete) {
+          await achievements.record(
+            const ActivityEvent.dailyCompleted(),
+            analytics: widget.analytics,
+          );
+        }
+      }
     } catch (error, stack) {
       reportHandledError('puzzle_progress', error, stack);
       if (mounted) _saveError = '进度保存失败，请重试保存';

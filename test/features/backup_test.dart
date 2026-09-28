@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/core/pgn.dart';
+import 'package:purechess/features/achievements/achievements.dart';
 import 'package:purechess/features/library/records_repository.dart';
 import 'package:purechess/features/settings/backup_data.dart';
 import 'package:purechess/features/settings/backup_service.dart';
@@ -103,6 +104,43 @@ void main() {
   String path(Directory dir, String name) =>
       '${dir.path}${Platform.pathSeparator}$name';
   File record(String name) => File(path(records, name));
+
+  test(
+    'achievement export/import persists merged counts and earliest dates',
+    () async {
+      await prefs.setString(
+        'achievements',
+        AchievementData(
+          lastActiveDay: '20260928',
+          streak: 7,
+          bestStreak: 30,
+          counters: {'gamesFinished': 10},
+          earned: {'first_day': '20260101'},
+        ).encode(),
+      );
+      final bytes = await service.exportBytes();
+      final backup = BackupData.decode(bytes);
+      expect(backup.preferences.keys, contains('achievements'));
+      await prefs.setString(
+        'achievements',
+        AchievementData(
+          lastActiveDay: '20260929',
+          streak: 2,
+          bestStreak: 2,
+          counters: {'gamesFinished': 20},
+          earned: {'first_day': '20260201', 'games_10': '20260929'},
+        ).encode(),
+      );
+      await service.restore(backup);
+      await prefs.reload();
+      final data = AchievementData.decode(prefs.get('achievements'));
+      expect(data.lastActiveDay, '20260929');
+      expect(data.streak, 7);
+      expect(data.bestStreak, 30);
+      expect(data.counters['gamesFinished'], 20);
+      expect(data.earned, {'first_day': '20260101', 'games_10': '20260929'});
+    },
+  );
 
   setUp(() async {
     temp = await Directory.systemTemp.createTemp('purechess-backup-test-');

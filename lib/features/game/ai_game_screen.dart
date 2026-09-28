@@ -112,7 +112,7 @@ class _AiGameScreenState extends State<AiGameScreen> {
       false;
 
   Future<void> _leave() async {
-    if (_saving || _game.ratingSaving) return;
+    if (_saving || _game.ratingSaving || _game.achievementSaving) return;
     if (await _confirm('离开对局', '本局尚未保存，放弃本局并离开？', '放弃并离开') && mounted) {
       Navigator.pop(context);
     }
@@ -194,7 +194,8 @@ class _AiGameScreenState extends State<AiGameScreen> {
                       '${hint.promotion != null ? ' · 升变 ${board.san(hint)}' : ''}'
                 : '轮到你走棋${board.inCheck ? ' · 将军，请应将' : ''}',
         };
-    final locked = _saving || _reviewing || _game.ratingSaving;
+    final locked =
+        _saving || _reviewing || _game.ratingSaving || _game.achievementSaving;
     return PopScope(
       canPop: !_dirty && !locked,
       onPopInvokedWithResult: (didPop, result) {
@@ -282,6 +283,15 @@ class _AiGameScreenState extends State<AiGameScreen> {
                                     Text(status, textAlign: TextAlign.center),
                                     if (_saveMessage != null)
                                       Text(_saveMessage!),
+                                    if (_game.achievementError != null) ...[
+                                      Text(_game.achievementError!),
+                                      TextButton(
+                                        onPressed: _game.achievementSaving
+                                            ? null
+                                            : _game.saveAchievement,
+                                        child: const Text('重试保存成就'),
+                                      ),
+                                    ],
                                     if (_game.error != null) ...[
                                       Text(
                                         _game.error!,

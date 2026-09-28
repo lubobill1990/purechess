@@ -8,6 +8,7 @@ import '../../app/telemetry/crash_guard.dart';
 import '../../core/board.dart';
 import '../../core/move.dart';
 import '../../core/puzzle.dart';
+import '../achievements/achievements.dart';
 import 'tutorial_engine.dart';
 import 'tutorial_level.dart';
 
@@ -193,6 +194,9 @@ class TutorialController extends ChangeNotifier {
         }
         completed = next;
       }
+      await Achievements.of(
+        prefs,
+      ).record(const ActivityEvent.tutorialLevelDone(), analytics: _analytics);
       saved = true;
     } catch (error, stack) {
       reportHandledError('tutorial_progress', error, stack);

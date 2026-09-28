@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../features/achievements/achievements_screen.dart';
 import '../features/game/game_screen.dart';
 import '../features/game/new_game_screen.dart';
 import '../features/home/home_screen.dart';
@@ -24,6 +25,7 @@ class AppRouter {
   static const daily = '/puzzles/daily';
   static const library = '/library';
   static const reading = '/library/reading';
+  static const achievements = '/achievements';
 
   static Map<String, WidgetBuilder> routes({
     required SharedPreferences prefs,
@@ -33,6 +35,7 @@ class AppRouter {
     int? recommendedDifficulty,
     bool canResumeGame = false,
   }) => {
+    achievements: (_) => AchievementsScreen(prefs: prefs),
     home: (_) => HomeScreen(
       prefs: prefs,
       recommendedDifficulty: recommendedDifficulty,

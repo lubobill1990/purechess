@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
 import '../../widgets/board/chess_board.dart';
 import '../../widgets/board/piece_image.dart';
+import '../achievements/achievements.dart';
 import '../library/records_repository.dart';
 import '../library/records_screen.dart';
 import 'game_session.dart';
@@ -38,6 +40,9 @@ class _GameScreenState extends State<GameScreen> {
   bool _saving = false;
   int _savedRevision = -1;
   String? _saveMessage;
+  bool _achievementRecorded = false;
+  bool _achievementSaving = false;
+  String? _achievementError;
 
   Analytics get _analytics => widget.analytics ?? Analytics.instance;
   bool get _dirty =>
@@ -48,6 +53,7 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _session = widget.session ?? GameSession();
+    _achievementRecorded = _session.finished;
     _startEvent();
   }
 
@@ -60,6 +66,7 @@ class _GameScreenState extends State<GameScreen> {
       _saveMessage = null;
     });
     if (!wasFinished && _session.finished) {
+      unawaited(_recordAchievement());
       _analytics.event('game_end', {
         'mode': 'local',
         'duration_ms': DateTime.now()
@@ -67,6 +74,29 @@ class _GameScreenState extends State<GameScreen> {
             .inMilliseconds,
         'move_count': _session.moveCount,
       });
+    }
+  }
+
+  Future<void> _recordAchievement() async {
+    if (_achievementRecorded || _achievementSaving) return;
+    final session = _session;
+    _achievementSaving = true;
+    try {
+      final prefs = widget.prefs ?? await SharedPreferences.getInstance();
+      await Achievements.of(prefs).record(
+        const ActivityEvent.gameFinished(won: false, versusAi: false),
+        analytics: _analytics,
+      );
+      if (identical(session, _session)) {
+        _achievementRecorded = true;
+        _achievementError = null;
+      }
+    } catch (error, stack) {
+      reportHandledError('local_game_achievement', error, stack);
+      if (identical(session, _session)) _achievementError = '成就未保存，请重试';
+    } finally {
+      _achievementSaving = false;
+      if (mounted) setState(() {});
     }
   }
 
@@ -118,12 +148,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _newGame() async {
+    if (_achievementSaving) return;
     if (_dirty && !await _confirm('开始新对局', '本局尚未保存。放弃本局并重新开始？', '重新开始')) {
       return;
     }
     if (!mounted) return;
     setState(() {
       _session = GameSession();
+      _achievementRecorded = false;
+      _achievementError = null;
       _savedRevision = -1;
       _saveMessage = null;
     });
@@ -131,7 +164,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _leave() async {
-    if (_saving) return;
+    if (_saving || _achievementSaving) return;
     final confirmed = await _confirm(
       '离开对局',
       '本局尚未保存。可取消返回并保存棋谱，或放弃本局离开。',
@@ -253,14 +286,25 @@ class _GameScreenState extends State<GameScreen> {
                               ),
                               child: Semantics(
                                 liveRegion: true,
-                                child: Text(
-                                  _saveMessage == null
-                                      ? status
-                                      : '$status\n$_saveMessage',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      _saveMessage == null
+                                          ? status
+                                          : '$status\n$_saveMessage',
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
+                                    ),
+                                    if (_achievementError != null)
+                                      TextButton(
+                                        onPressed: _achievementSaving
+                                            ? null
+                                            : _recordAchievement,
+                                        child: Text('$_achievementError保存'),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ),
