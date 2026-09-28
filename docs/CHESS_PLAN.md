@@ -315,10 +315,30 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
      恒 false 的 M3d stub），首页「继续对局」直接恢复 AiGameScreen；
      Stockfish 无状态，走 FEN/着法重建即可。存盘损坏时静默丢弃并
      reportHandledError，不得阻塞开局。
-- **M5c 打卡奖章（task/badges，等围棋通用设计文档到齐后启动）**：
-  本地统计 + 连续活跃 streak + 里程碑成就（教程毕业、各难度首胜、
-  题目里程碑），庆祝动效复用批 4 徽章叠层；无社交排行，遥测仅发
-  奖章类别不发内容，语义与围棋/象棋同构。
+- **M5c 打卡奖章（task/badges，通用设计已定稿，三 app 同构；完整版
+  见 weavejam/pureweiqi docs/PRODUCT_PLAN_3.md）**：
+  - 打卡定义：当日完成任意有效学习行为（每日一练完成 / 一盘对局到
+    终局含认输 / 做对一题 / 完成一关教程）记为活跃日。
+  - 数据：单 JSON prefs 键 `achievements` =
+    `{lastActiveDay:"YYYYMMDD", streak, bestStreak,
+    counters:{gamesFinished, winsVsAi, winStreak, bestWinStreak,
+    dailyCompleted}, earned:{badgeId:"获得日期"}}`。streak 三分支
+    （同日不变/昨日+1/更早重置 1）；日期本地时区、now 可注入便于
+    测试；题目/教程累计不重复存，判定时读现有进度键；`achievements`
+    键必须加入备份导出/导入白名单。
+  - 奖章 id 跨 app 固定：first_day / streak_7 / streak_30 / streak_100 /
+    streak_365 / tutorial_grad / first_win / win_streak_3 / games_10 /
+    games_100 / daily_7 / daily_30 / puzzles_10 / puzzles_50 /
+    puzzles_200（题目类条件与围棋 tsumego_* 同构）。文案按国象气质
+    中文本地化（如「首胜」「三连胜」「战术百炼」）。
+  - 统一入口 `record(ActivityEvent)`：gameFinished(won) /
+    puzzleSolved / tutorialLevelDone / dailyCompleted；内部更新→判定→
+    逐个触发庆祝（复用批 4 徽章叠层）。
+  - UI：`/achievements` 奖章墙 = 顶部统计卡（当前 streak + 今日是否
+    已打卡 + 最佳 + 累计对局/胜局/题数）+ 网格（已获得彩色带日期 /
+    未获得灰显带条件文案）；首页加「成就」入口。
+  - 埋点仅 `badge_earned {badge:id}`（进 analytics 白名单）。
+    不做排行/社交。
 - PM 补充（chess 特有，随 M5 实现）：双人对弈同享断点续弈；终局
   「再来一局」沿用本局配置一键开局。
 
