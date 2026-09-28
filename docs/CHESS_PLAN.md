@@ -387,3 +387,8 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
 11. 并行分支合并冲突必须手工逐块解，绝不能 sed 删标记了事（批 3
     router.dart 重复路由事故）；纯追加型（pubspec 依赖、遥测白名单、
     并列测试）两边都留。
+12. stockfish pub 包 quit 后同进程无法重启（C++ main 静态状态残留，
+    二次启动 UCI 选项残缺 → 真机「AI 启动失败」）。native 引擎必须
+    进程级常驻：会话 stop 只发 `stop` 中断搜索，永不 quit
+    （mobile_stockfish_transport 常驻实现）。真机级问题用局域网 Mac
+    模拟器跑 integration_test/engine_smoke_test.dart 复现定位。
