@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
@@ -254,7 +255,8 @@ class GameController extends ChangeNotifier {
     achievementError = null;
     _notify();
     try {
-      await Achievements.of(rating.prefs).record(
+      final prefs = rating.prefs ?? await SharedPreferences.getInstance();
+      await Achievements.of(prefs).record(
         ActivityEvent.gameFinished(
           won: session.outcome!.winner == config.humanColor,
         ),
