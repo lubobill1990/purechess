@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>纯弈国际象棋</string>
+	<string>纯弈国象</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- Local notifications use UNUserNotificationCenter authorization, not a
