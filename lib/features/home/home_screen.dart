@@ -125,6 +125,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (!progress.graduated && widget.canResumeGame)
+                    TextButton.icon(
+                      onPressed: () =>
+                          _open(AppRouter.newGame, arguments: {'resume': true}),
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('继续对局'),
+                    ),
                   Text(
                     progress.graduated ? '每天，读懂一步。' : '从第一步，到看懂一盘棋。',
                     style: theme.textTheme.headlineLarge,
@@ -215,6 +222,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     spacing: 8,
                     runSpacing: 4,
                     children: [
+                      TextButton.icon(
+                        onPressed: () => _open(AppRouter.newGame),
+                        icon: const Icon(Icons.smart_toy_outlined),
+                        label: const Text('人机对弈'),
+                      ),
                       TextButton.icon(
                         onPressed: () => _open(AppRouter.game),
                         icon: const Icon(Icons.people_outline),

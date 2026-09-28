@@ -34,12 +34,42 @@ pureweiqi local-files pattern, without adding a state-management dependency:
 flushed temporary files followed by rename; existing records are not overwritten.
 I/O failures remain visible and retryable. The initial library lists saved PGNs
 and opens selectable PGN text; graphical replay belongs to a later milestone.
-Leaving/restarting an unsaved game asks for confirmation. There is no implicit
-autosave or crash-resume in this milestone.
+Leaving/restarting an unsaved game asks for confirmation. Autosave and resume
+are now available for both local and AI games (see below); they are separate
+from explicitly saving a PGN to the records library.
 
 Named routes live in `lib/app/router.dart`: `/`, `/game`, `/records`, `/settings`.
 Game start/end use the existing allowlisted analytics parameters; no moves,
 FEN, PGN or file paths are sent to analytics.
+
+## 对局连续性（M5a + M5b）
+
+新对局表单使用 `newGame.color` / `newGame.level` 记住执子颜色和手动难度。
+尚未手动选择难度时，每次进入跟随自适应推荐；手动选档后保持用户选择，
+“推荐第 N 档”仍独立更新。偏好读取失败使用默认值，写入失败显示提示，
+两者均记录 handled error，不阻塞开局。
+
+AI 和双人对弈共用一个 `game.unfinished` 存盘槽（JSON v1）：保存 PGN、
+对局模式、AI 颜色/难度、开始时间、已用提示次数及双人待回应的提和状态。
+开始新局会替换原断点；每步落子、悔棋、提示/提和状态变更以及
+`paused` / `hidden` / `detached` 和页面销毁时保存。写入串行执行，
+避免较早的异步保存覆盖后来的清盘。此断点不纳入 ZIP 备份。
+
+首页检测有效存盘后显示 **继续对局**（未完成教程也可访问）。
+首页次级入口 **人机对弈** 始终可新建 AI 局，不再从双人确认弹窗叠加开局。
+离开未保存的对局可选 **稍后继续** 或 **放弃并离开**；终局、认输、
+同意和棋和主动放弃清除断点。双人局终局后悔棋会重新生成未完成断点。
+恢复重放完整 PGN 主线，保留悔棋和重复局面判定；轮到 AI 时从恢复的
+当前局面自动续走。损坏、非法或版本不符的断点记录 handled error 后
+静默丢弃，不弹错误对话框；存储写入失败也记录 handled error。
+离开 AI 对局时先冻结会话、完成存盘并等待 AI 关闭，再返回首页，
+避免立即续弈时新旧 AI 实例重叠；退出期间迟到的结果不会改写断点。
+系统强杀前未完成的偏好写入不能保证落盘，通常可恢复到最近一次成功保存。
+
+终局 **再来一局** 直接开局：AI 沿用本局执子颜色和难度（不采用新推荐、
+不回表单），双人继续双人模式。结果区高度保持不变。
+成功恢复仅发送 `game_resume`，字段限于 `mode` / `difficulty` /
+`move_count`，不重复发送 `game_start`，不发送 PGN、局面或提示内容。
 
 ## Daily tactics reminders
 
@@ -271,7 +301,8 @@ round trips, variation editing, puzzles and deterministic make/undo invariants.
 固定画布、显式字体加载和 Windows 基线目录。测试位于
 `test\goldens\screens_golden_test.dart`，覆盖首页（学习中／已毕业）、新对局
 表单、AI／双人中局、谜题做题、教程列表、设置页；浅色与深色各一套，
-共 **16 张 PNG**，提交在 `test\goldens\windows\`。
+另覆盖首页续弈入口及 AI／双人终局“再来一局”，浅深色共
+**22 张 PNG**，提交在 `test\goldens\windows\`。
 
 固定 1024×1366 逻辑像素、DPR 1、字号缩放 1、Windows 目标平台、日期、
 本地进度和推荐难度；禁用动画与统计，使用内存偏好设置、棋谱库和 AI 替身。

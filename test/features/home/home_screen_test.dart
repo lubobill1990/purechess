@@ -96,6 +96,18 @@ void main() {
     },
   );
 
+  for (final resume in [false, true]) {
+    testWidgets('AI entry can start a fresh game with resume=$resume', (
+      tester,
+    ) async {
+      await launch(tester, resume: resume);
+      await tester.tap(find.text('人机对弈'));
+      await tester.pumpAndSettle();
+      expect(find.text('对局测试页'), findsOneWidget);
+      expect(find.text('null'), findsOneWidget);
+    });
+  }
+
   testWidgets(
     'game return reloads the committed difficulty preference contract',
     (tester) async {

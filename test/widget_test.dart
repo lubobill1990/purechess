@@ -1,9 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/main.dart';
+import 'package:purechess/core/move.dart' as chess;
+import 'package:purechess/features/game/ai_difficulty.dart';
+import 'package:purechess/features/game/ai_game_screen.dart';
+import 'package:purechess/features/game/game_persistence.dart';
+import 'package:purechess/features/game/game_session.dart';
+import 'package:purechess/widgets/board/chess_board.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
@@ -62,6 +69,117 @@ void main() {
       expect(find.text('隐私告知'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'startup resume restores AI config and position from preferences',
+    (tester) async {
+      await analytics.savePrivacyChoice(false, prefs);
+      final session = GameSession()
+        ..play(chess.Move.fromUci('e2e4'))
+        ..play(chess.Move.fromUci('e7e5'));
+      final store = GameStore(prefs);
+      await store.save(session, config: AiGameConfig(difficulty: 6));
+      store.dispose();
+      await launch(tester);
+      await tester.tap(find.text('继续对局'));
+      await tester.pumpAndSettle();
+      final game = tester.widget<AiGameScreen>(find.byType(AiGameScreen));
+      expect(game.resumed, isTrue);
+      expect(game.config.difficulty, 6);
+      expect(game.session!.board.toFen(), session.board.toFen());
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('稍后继续'));
+      await tester.pumpAndSettle();
+      expect(find.text('继续对局'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'local game can leave, resume, abandon and rematch without shifts',
+    (tester) async {
+      await analytics.savePrivacyChoice(false, prefs);
+      await launch(tester);
+      await tester.tap(find.text('双人对弈'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('square-e2')));
+      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.pumpAndSettle();
+      final fen = tester
+          .widget<ChessBoard>(find.byType(ChessBoard))
+          .board
+          .toFen();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('稍后继续'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('继续对局'));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<ChessBoard>(find.byType(ChessBoard)).board.toFen(),
+        fen,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('放弃并离开'));
+      await tester.pumpAndSettle();
+      expect(find.text('继续对局'), findsNothing);
+      expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+      await tester.tap(find.text('双人对弈'));
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(find.byType(ChessBoard));
+      await tester.tap(find.byKey(const ValueKey('white-resign')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('确认认输'));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(find.byType(ChessBoard)), rect);
+      expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+      await tester.tap(find.text('再来一局'));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<ChessBoard>(find.byType(ChessBoard)).board.plyCount,
+        0,
+      );
+    },
+  );
+
+  testWidgets('corrupt startup save falls back to new game', (tester) async {
+    await analytics.savePrivacyChoice(false, prefs);
+    await prefs.setInt('tutorial_progress', 18);
+    await prefs.setString(GameStore.preferenceKey, '{"version":99}');
+    await launch(tester);
+    expect(find.text('继续对局'), findsNothing);
+    expect(find.text('新对局'), findsOneWidget);
+    expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+  });
+
+  for (final ai in [true, false]) {
+    testWidgets('resume emits one safe event without a new start (AI: $ai)', (
+      tester,
+    ) async {
+      await prefs.setBool(Analytics.privacyAcceptedKey, true);
+      final store = GameStore(prefs);
+      await store.save(
+        GameSession()
+          ..play(chess.Move.fromUci('e2e4'))
+          ..play(chess.Move.fromUci('e7e5')),
+        config: ai ? AiGameConfig(difficulty: 4) : null,
+      );
+      store.dispose();
+      await launch(tester);
+      await tester.tap(find.text('继续对局'));
+      await tester.pumpAndSettle();
+      await tester.pump();
+      final events = File('${dir.path}/pending_events.jsonl')
+          .readAsLinesSync()
+          .map((line) => jsonDecode(line) as Map<String, dynamic>);
+      final resumes = events.where((event) => event['name'] == 'game_resume');
+      expect(resumes, hasLength(1));
+      expect(resumes.single['params']['mode'], ai ? 'ai' : 'local');
+      expect(resumes.single['params']['move_count'], 2);
+      expect(events.where((event) => event['name'] == 'game_start'), isEmpty);
+    });
+  }
 
   testWidgets('accept persists choice and opens local game from home', (
     tester,

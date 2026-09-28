@@ -13,6 +13,7 @@ import 'app/telemetry/crash_guard.dart';
 import 'features/settings/privacy.dart';
 import 'features/library/records_repository.dart';
 import 'features/settings/backup_service.dart';
+import 'features/game/game_persistence.dart';
 
 void main() {
   runGuarded(() async {
@@ -56,6 +57,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   late final DailyReminderService _reminders;
+  late final GameStore _gameStore;
   bool _navigationReady = false;
   bool _dailyOpen = false;
   Analytics get _analytics => widget.analytics ?? Analytics.instance;
@@ -63,6 +65,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    _gameStore = GameStore(widget.prefs);
     _reminders = DailyReminderService(
       widget.prefs,
       analytics: _analytics,
@@ -116,6 +119,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _reminders.removeListener(_handleReminder);
     _reminders.dispose();
+    _gameStore.dispose();
     super.dispose();
   }
 
@@ -134,6 +138,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         prefs: widget.prefs,
         analytics: _analytics,
         reminders: _reminders,
+        gameStore: _gameStore,
+        canResumeGame: _gameStore.canResume,
       ),
     );
   }

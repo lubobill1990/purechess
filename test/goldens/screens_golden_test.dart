@@ -95,9 +95,12 @@ void main() {
     for (final scene in [
       'home_learning',
       'home_graduated',
+      'home_resume',
       'new_game',
       'game_ai',
       'game_human',
+      'game_ai_finished',
+      'game_human_finished',
       'puzzle',
       'tutorial',
       'settings',
@@ -130,21 +133,30 @@ void main() {
         switch (scene) {
           case 'home_learning':
           case 'home_graduated':
-            screen = HomeScreen(prefs: prefs, now: () => _now);
+          case 'home_resume':
+            screen = HomeScreen(
+              prefs: prefs,
+              now: () => _now,
+              canResumeGame: scene == 'home_resume',
+            );
           case 'new_game':
             screen = NewGameScreen(prefs: prefs, analytics: analytics);
           case 'game_ai':
           case 'game_human':
+          case 'game_ai_finished':
+          case 'game_human_finished':
+            final ai = scene.startsWith('game_ai');
             final session =
                 GameSession(
                     initialFen: _initialFen,
                     startedAt: _now,
-                    humanColor: scene == 'game_ai' ? chess.Color.white : null,
+                    humanColor: ai ? chess.Color.white : null,
                   )
                   ..play(chess.Move.fromUci('c1g5'))
                   ..play(chess.Move.fromUci('h7h6'));
             expect(session.board.toFen(), _midgameFen);
-            if (scene == 'game_ai') {
+            if (scene.endsWith('_finished')) session.resign(chess.Color.white);
+            if (ai) {
               engine = FakeGameEngine();
               screen = AiGameScreen(
                 config: AiGameConfig(difficulty: 3),
@@ -233,6 +245,9 @@ void main() {
             expect(find.text('今日 2 / 10 题'), findsOneWidget);
             expect(find.text('新对局'), findsOneWidget);
             expect(find.text('读一盘名局'), findsOneWidget);
+          case 'home_resume':
+            expect(find.text('继续对局'), findsOneWidget);
+            expect(find.text('继续教程第 5 关'), findsOneWidget);
           case 'new_game':
             expect(find.text('难度 · 3 / 10'), findsOneWidget);
             expect(find.text('白棋 · 先走'), findsOneWidget);
@@ -244,15 +259,23 @@ void main() {
             );
           case 'game_ai':
           case 'game_human':
+          case 'game_ai_finished':
+          case 'game_human_finished':
             final board = tester.widget<ChessBoard>(find.byType(ChessBoard));
             expect(board.board.toFen(), _midgameFen);
-            expect(board.enabled, isTrue);
+            expect(board.enabled, !scene.endsWith('_finished'));
             expect(board.board.lastMove, chess.Move.fromUci('h7h6'));
             expect(find.text('保存棋谱'), findsOneWidget);
+            if (scene.endsWith('_finished')) {
+              expect(find.text('再来一局'), findsOneWidget);
+              expect(find.text('黑方胜 · 对方认输'), findsOneWidget);
+            }
             if (engine != null) {
               expect(engine.starts, 0);
               expect(engine.requests, isEmpty);
-              expect(find.text('轮到你走棋'), findsOneWidget);
+              if (!scene.endsWith('_finished')) {
+                expect(find.text('轮到你走棋'), findsOneWidget);
+              }
             }
           case 'puzzle':
             final board = tester.widget<ChessBoard>(find.byType(ChessBoard));

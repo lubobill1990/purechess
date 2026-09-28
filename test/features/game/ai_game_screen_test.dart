@@ -8,6 +8,7 @@ import 'package:purechess/engine/stockfish_service.dart';
 import 'package:purechess/features/game/ai_difficulty.dart';
 import 'package:purechess/features/game/ai_game_screen.dart';
 import 'package:purechess/features/game/game_session.dart';
+import 'package:purechess/features/game/game_persistence.dart';
 import 'package:purechess/features/game/new_game_screen.dart';
 import 'package:purechess/features/game/review_screen.dart';
 import 'package:purechess/widgets/board/chess_board.dart';
@@ -15,6 +16,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../support/memory_records_repository.dart';
 import 'fake_game_engine.dart';
+
+class SlowClosingEngine extends FakeGameEngine {
+  final closing = Completer<void>();
+
+  @override
+  Future<void> dispose() async {
+    await closing.future;
+    await super.dispose();
+  }
+}
 
 void main() {
   late SharedPreferences prefs;
@@ -69,6 +80,198 @@ void main() {
     await tester.pumpAndSettle();
     expect(session.moveCount, 0);
     expect(find.textContaining('建议'), findsNothing);
+  });
+
+  testWidgets(
+    'autosaves each side, hints and undo; resignation clears the slot',
+    (tester) async {
+      await launch(tester);
+      await tester.tap(find.text('提示'));
+      await tester.pumpAndSettle();
+      SavedGame saved() =>
+          SavedGame.decode(prefs.getString(GameStore.preferenceKey)!);
+      expect(saved().session.hintsUsed, 1);
+      final gate = Completer<PositionAnalysis>();
+      engine.replies.add((_) => gate.future);
+      await tester.tap(find.byKey(const ValueKey('square-e2')));
+      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.pumpAndSettle();
+      expect(saved().session.moveCount, 1);
+      gate.complete(FakeGameEngine.result('e7e5'));
+      await tester.pumpAndSettle();
+      expect(saved().session.moveCount, 2);
+      await tester.tap(find.text('悔棋'));
+      await tester.pumpAndSettle();
+      expect(saved().session.moveCount, 0);
+      expect(saved().session.hintsUsed, 1);
+      await tester.tap(find.text('认输'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('确认认输'));
+      await tester.pumpAndSettle();
+      expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    },
+  );
+
+  testWidgets('resumed AI turn searches the restored FEN and continues once', (
+    tester,
+  ) async {
+    session.play(chess.Move.fromUci('e2e4'));
+    session.hintsUsed = 2;
+    final store = GameStore(prefs);
+    addTearDown(store.dispose);
+    await store.save(session, config: AiGameConfig(difficulty: 7));
+    final saved = store.restore()!;
+    final fen = saved.session.board.toFen();
+    engine.replies.add((_) async => FakeGameEngine.result('e7e5'));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AiGameScreen(
+          config: saved.config!,
+          session: saved.session,
+          rating: AiDifficulty(prefs),
+          engine: engine,
+          gameStore: store,
+          resumed: true,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(engine.requests.single.fen, fen);
+    expect(engine.requests.single.difficulty, 7);
+    expect(saved.session.moveCount, 2);
+    expect(store.restore()!.session.hintsUsed, 2);
+    expect(store.restore()!.session.board.toFen(), saved.session.board.toFen());
+    expect(tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled, isTrue);
+  });
+
+  testWidgets('AI screen lifecycle persists metadata not changed by a move', (
+    tester,
+  ) async {
+    await launch(tester);
+    session.hintsUsed = 4;
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    await tester.pump();
+    expect(
+      SavedGame.decode(prefs.getString(GameStore.preferenceKey)!)
+          .session
+          .hintsUsed,
+      4,
+    );
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+  });
+
+  testWidgets('late AI result after discard cannot recreate the save', (
+    tester,
+  ) async {
+    await launch(tester);
+    final gate = Completer<PositionAnalysis>();
+    engine.replies.add((_) => gate.future);
+    await tester.tap(find.byKey(const ValueKey('square-e2')));
+    await tester.tap(find.byKey(const ValueKey('square-e4')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('新对局'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('重新开始'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NewGameScreen), findsOneWidget);
+    gate.complete(FakeGameEngine.result('e7e5'));
+    await tester.pumpAndSettle();
+    expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
+  });
+
+  for (final exit in ['resume', 'abandon', 'saved', 'empty']) {
+    testWidgets('$exit waits for AI shutdown before returning home', (
+      tester,
+    ) async {
+      final slow = SlowClosingEngine();
+      final reply = Completer<PositionAnalysis>();
+      slow.replies.add((_) => reply.future);
+      final navigator = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: navigator,
+          home: const Scaffold(body: Text('测试首页')),
+        ),
+      );
+      unawaited(
+        navigator.currentState!.push(
+          MaterialPageRoute<void>(
+            builder: (_) => AiGameScreen(
+              config: AiGameConfig(),
+              rating: AiDifficulty(prefs),
+              engine: slow,
+              session: session,
+              openRepository: () async => repository,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      if (exit != 'empty') {
+        await move(tester);
+        if (exit == 'saved') {
+          await tester.tap(find.text('保存棋谱'));
+          await tester.pumpAndSettle();
+        }
+      }
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      if (exit == 'resume' || exit == 'abandon') {
+        await tester.tap(find.text(exit == 'resume' ? '稍后继续' : '放弃并离开'));
+        await tester.pumpAndSettle();
+      }
+      expect(find.byType(AiGameScreen), findsOneWidget);
+      expect(find.text('测试首页'), findsNothing);
+      expect(
+        tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled,
+        isFalse,
+      );
+      reply.complete(FakeGameEngine.result('e7e5'));
+      await tester.pumpAndSettle();
+      expect(session.moveCount, exit == 'empty' ? 0 : 1);
+      slow.closing.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('测试首页'), findsOneWidget);
+      expect(slow.disposals, 1);
+      expect(prefs.containsKey(GameStore.preferenceKey), exit != 'abandon');
+      if (exit != 'abandon') {
+        expect(
+          SavedGame.decode(prefs.getString(GameStore.preferenceKey)!)
+              .session
+              .moveCount,
+          session.moveCount,
+        );
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('rematch preserves current config rather than adaptive level', (
+    tester,
+  ) async {
+    await launch(tester);
+    final boardRect = tester.getRect(find.byType(ChessBoard));
+    await tester.tap(find.text('认输'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('确认认输'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.byType(ChessBoard)), boardRect);
+    expect(AiDifficulty(prefs).recommended, 4);
+    await tester.tap(find.text('再来一局'));
+    await tester.pumpAndSettle();
+    expect(find.byType(NewGameScreen), findsNothing);
+    final next = tester.widget<AiGameScreen>(find.byType(AiGameScreen));
+    expect(next.config.difficulty, 5);
+    expect(next.config.humanColor, chess.Color.white);
+    expect(
+      tester.widget<ChessBoard>(find.byType(ChessBoard)).board.plyCount,
+      0,
+    );
+    expect(engine.disposals, 1);
   });
 
   testWidgets(

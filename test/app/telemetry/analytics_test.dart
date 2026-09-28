@@ -117,6 +117,27 @@ void main() {
     expect(pending(), isEmpty);
   });
 
+  test('game resume allowlist excludes board content and color', () async {
+    final client = createClient(configured: false);
+    await client.prepare(prefs);
+    client.event('game_resume', {
+      'mode': 'ai',
+      'difficulty': 6,
+      'move_count': 12,
+      'player_color': 'white',
+      'pgn': 'private game',
+      'fen': 'private position',
+      'hints': 'private metadata',
+    });
+    final event = pending().last;
+    expect(event['name'], 'game_resume');
+    expect(event['params']['mode'], 'ai');
+    expect(event['params']['difficulty'], 6);
+    expect(event['params']['move_count'], 12);
+    expect(event['params'].containsKey('player_color'), isFalse);
+    expect(pendingFile().readAsStringSync(), isNot(contains('private')));
+  });
+
   test(
     'celebration schema keeps only source and result across replay',
     () async {

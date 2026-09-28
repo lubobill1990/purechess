@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/game/game_screen.dart';
+import '../features/game/ai_difficulty.dart';
+import '../features/game/ai_game_screen.dart';
+import '../features/game/game_persistence.dart';
 import '../features/game/new_game_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/library/classic_library_screen.dart';
@@ -32,14 +35,54 @@ class AppRouter {
     WidgetBuilder? dailyBuilder,
     int? recommendedDifficulty,
     bool canResumeGame = false,
+    GameStore? gameStore,
   }) => {
-    home: (_) => HomeScreen(
-      prefs: prefs,
-      recommendedDifficulty: recommendedDifficulty,
-      canResumeGame: canResumeGame,
-    ),
-    game: (_) => GameScreen(analytics: analytics, prefs: prefs),
-    newGame: (_) => NewGameScreen(prefs: prefs, analytics: analytics),
+    home: (_) => gameStore == null
+        ? HomeScreen(
+            prefs: prefs,
+            recommendedDifficulty: recommendedDifficulty,
+            canResumeGame: canResumeGame,
+          )
+        : ListenableBuilder(
+            listenable: gameStore,
+            builder: (_, _) => HomeScreen(
+              prefs: prefs,
+              recommendedDifficulty: recommendedDifficulty,
+              canResumeGame: gameStore.canResume,
+            ),
+          ),
+    game: (_) =>
+        GameScreen(analytics: analytics, prefs: prefs, gameStore: gameStore),
+    newGame: (context) {
+      final arguments = ModalRoute.of(context)?.settings.arguments;
+      final saved = arguments is Map && arguments['resume'] == true
+          ? gameStore?.restore()
+          : null;
+      if (saved != null) {
+        final config = saved.config;
+        return config == null
+            ? GameScreen(
+                session: saved.session,
+                prefs: prefs,
+                analytics: analytics,
+                gameStore: gameStore,
+                resumed: true,
+              )
+            : AiGameScreen(
+                config: config,
+                session: saved.session,
+                rating: AiDifficulty(prefs),
+                analytics: analytics,
+                gameStore: gameStore,
+                resumed: true,
+              );
+      }
+      return NewGameScreen(
+        prefs: prefs,
+        analytics: analytics,
+        gameStore: gameStore,
+      );
+    },
     records: (_) => const RecordsScreen(),
     puzzles: (_) => PuzzleScreen(prefs: prefs, analytics: analytics),
     settings: (_) => SettingsScreen(

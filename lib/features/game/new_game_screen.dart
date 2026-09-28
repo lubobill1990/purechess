@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,12 +8,14 @@ import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
 import 'ai_difficulty.dart';
 import 'ai_game_screen.dart';
+import 'game_persistence.dart';
 
 class NewGameScreen extends StatefulWidget {
-  const NewGameScreen({super.key, this.prefs, this.analytics});
+  const NewGameScreen({super.key, this.prefs, this.analytics, this.gameStore});
 
   final SharedPreferences? prefs;
   final Analytics? analytics;
+  final GameStore? gameStore;
 
   @override
   State<NewGameScreen> createState() => _NewGameScreenState();
@@ -22,6 +26,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
   chess.Color _color = chess.Color.white;
   int _level = 1;
   String? _error;
+  Future<void> _writes = Future.value();
 
   @override
   void initState() {
@@ -32,20 +37,70 @@ class _NewGameScreenState extends State<NewGameScreen> {
   Future<void> _load() async {
     setState(() => _error = null);
     try {
-      final rating = AiDifficulty(
-        widget.prefs ?? await SharedPreferences.getInstance(),
-      );
-      final level = rating.recommended;
+      final prefs = widget.prefs ?? await SharedPreferences.getInstance();
+      final rating = AiDifficulty(prefs);
+      var color = chess.Color.white;
+      var level = rating.recommended;
+      try {
+        final saved = prefs.getString('newGame.color');
+        if (saved != null) color = chess.Color.values.byName(saved);
+      } catch (error, stack) {
+        reportHandledError('game_preferences', error, stack);
+      }
+      try {
+        final saved = prefs.getInt('newGame.level');
+        if (saved != null) {
+          level = RangeError.checkValueInInterval(saved, 1, 10, 'level');
+        }
+      } catch (error, stack) {
+        reportHandledError('game_preferences', error, stack);
+      }
       if (mounted) {
         setState(() {
           _rating = rating;
+          _color = color;
           _level = level;
         });
       }
     } catch (error, stack) {
       reportHandledError('game_preferences', error, stack);
-      if (mounted) setState(() => _error = '无法读取推荐难度，请重试');
+      if (mounted) {
+        setState(() {
+          _rating = AiDifficulty(null);
+          _color = chess.Color.white;
+          _level = 1;
+          _error = '偏好读取失败，已使用默认设置，可直接开局。';
+        });
+      }
     }
+  }
+
+  void _persist(String key, Object value) {
+    _writes = _writes.then((_) async {
+      try {
+        final prefs = _rating?.prefs ?? await SharedPreferences.getInstance();
+        final ok = value is int
+            ? await prefs.setInt(key, value)
+            : await prefs.setString(key, value as String);
+        if (!ok) throw StateError('Could not save new game preference');
+      } catch (error, stack) {
+        reportHandledError('game_preferences', error, stack);
+        // Failed platform writes still update the preferences cache.
+        try {
+          await _rating?.prefs?.reload();
+        } catch (reloadError, reloadStack) {
+          reportHandledError(
+            'game_preferences_reload',
+            reloadError,
+            reloadStack,
+          );
+        }
+        if (mounted) {
+          setState(() => _error = '偏好未保存，不影响本次开局。');
+        }
+      }
+    });
+    unawaited(_writes);
   }
 
   @override
@@ -80,8 +135,12 @@ class _NewGameScreenState extends State<NewGameScreen> {
                     ),
                   ],
                   selected: {_color},
-                  onSelectionChanged: (value) =>
-                      setState(() => _color = value.single),
+                  onSelectionChanged: _rating == null
+                      ? null
+                      : (value) {
+                          setState(() => _color = value.single);
+                          _persist('newGame.color', _color.name);
+                        },
                 ),
                 const SizedBox(height: 28),
                 Text(
@@ -97,7 +156,10 @@ class _NewGameScreenState extends State<NewGameScreen> {
                   label: '第 $_level 档',
                   onChanged: _rating == null
                       ? null
-                      : (value) => setState(() => _level = value.round()),
+                      : (value) {
+                          setState(() => _level = value.round());
+                          _persist('newGame.level', _level);
+                        },
                 ),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -139,6 +201,7 @@ class _NewGameScreenState extends State<NewGameScreen> {
                       ),
                       rating: _rating!,
                       analytics: widget.analytics,
+                      gameStore: widget.gameStore,
                     ),
                   ),
                 ),
