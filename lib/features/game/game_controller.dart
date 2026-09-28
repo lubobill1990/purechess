@@ -6,6 +6,7 @@ import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart';
 import '../../engine/stockfish_service.dart';
+import '../achievements/achievements.dart';
 import 'ai_difficulty.dart';
 import 'game_session.dart';
 
@@ -21,6 +22,7 @@ class GameController extends ChangeNotifier {
     this.resumed = false,
   }) : session = session ?? GameSession(humanColor: config.humanColor),
        analytics = analytics ?? Analytics.instance {
+    _achievementRecorded = this.session.finished;
     engine.status.addListener(_engineChanged);
   }
 
@@ -39,6 +41,7 @@ class GameController extends ChangeNotifier {
   bool _started = false;
   bool _ended = false;
   bool _disposed = false;
+  bool _achievementRecorded = false;
   int _generation = 0;
 
   bool get busy =>
@@ -105,6 +108,7 @@ class GameController extends ChangeNotifier {
               .inMilliseconds,
         });
       }
+      await saveAchievement();
       await saveRating();
     } else if (session.turn != config.humanColor) {
       await _search(forHint: false);
@@ -237,6 +241,31 @@ class GameController extends ChangeNotifier {
       ratingError = '推荐难度未保存，请重试';
     } finally {
       ratingSaving = false;
+      _notify();
+    }
+  }
+
+  String? achievementError;
+  bool achievementSaving = false;
+
+  Future<void> saveAchievement() async {
+    if (!session.finished || _achievementRecorded || achievementSaving) return;
+    achievementSaving = true;
+    achievementError = null;
+    _notify();
+    try {
+      await Achievements.of(rating.prefs).record(
+        ActivityEvent.gameFinished(
+          won: session.outcome!.winner == config.humanColor,
+        ),
+        analytics: analytics,
+      );
+      _achievementRecorded = true;
+    } catch (cause, stack) {
+      reportHandledError('game_achievement', cause, stack);
+      achievementError = '成就未保存，请重试';
+    } finally {
+      achievementSaving = false;
       _notify();
     }
   }

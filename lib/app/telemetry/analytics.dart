@@ -44,6 +44,7 @@ class Analytics {
     'game_end': {'mode', 'difficulty', 'duration_ms', 'move_count'},
     'puzzle_result': {'correct', 'attempts', 'duration_ms', 'rating'},
     'celebrate_shown': {'source', 'result'},
+    'badge_earned': {'badge'},
     'daily_reminder_toggle': {'on'},
     'engine_start': {'duration_ms', 'success'},
     'backup_export': {'ok'},

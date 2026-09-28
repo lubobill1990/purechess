@@ -8,6 +8,7 @@ import 'package:purechess/app/play_feedback.dart';
 import 'package:purechess/app/sound.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/core/move.dart' as chess;
+import 'package:purechess/features/achievements/achievements.dart';
 import 'package:purechess/features/game/ai_difficulty.dart';
 import 'package:purechess/features/game/ai_game_screen.dart';
 import 'package:purechess/features/game/game_screen.dart';
@@ -66,6 +67,9 @@ void main() {
           .map((line) => jsonDecode(line) as Map<String, dynamic>)
           .where((event) => event['name'] == 'celebrate_shown')
           .toList();
+
+  AchievementData achievements() =>
+      AchievementData.decode(prefs.get('achievements'));
 
   Future<void> open(
     WidgetTester tester,
@@ -204,7 +208,13 @@ void main() {
     await tester.tap(find.byTooltip('翻转棋盘'));
     await tester.pumpAndSettle();
     expect(celebrations(), hasLength(1));
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(seconds: 3));
+    expect(find.text('获得奖章 · 落子启程'), findsOneWidget);
+    expect(achievements().counters['gamesFinished'], 1);
+    expect(achievements().counters['winsVsAi'], 1);
+    await tester.pump(const Duration(seconds: 3));
+    expect(find.text('获得奖章 · 首胜'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
     expect(find.byType(CelebrationBadge), findsNothing);
   });
 
@@ -230,7 +240,9 @@ void main() {
     await move(tester, 'g2g4');
     expect(session.finished, isTrue);
     expect(sounds.length, 1 + soundPulses[ChessSound.checkmate]!.length);
-    expect(find.byType(CelebrationBadge), findsNothing);
+    expect(find.text('获得奖章 · 落子启程'), findsOneWidget);
+    expect(achievements().counters['gamesFinished'], 1);
+    expect(achievements().counters['winsVsAi'], 0);
     expect(celebrations(), isEmpty);
   });
 
@@ -242,7 +254,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('black-accept-draw')));
     await tester.pumpAndSettle();
-    expect(find.byType(CelebrationBadge), findsNothing);
+    expect(find.text('获得奖章 · 落子启程'), findsOneWidget);
+    expect(achievements().counters['gamesFinished'], 1);
+    expect(achievements().counters['winsVsAi'], 0);
     expect(celebrations(), isEmpty);
     final ended = GameSession(initialFen: '7k/6Q1/6K1/8/8/8/8/8 b - - 1 1');
     await tester.pumpWidget(
@@ -258,6 +272,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CelebrationBadge), findsNothing);
     expect(celebrations(), isEmpty);
+    expect(achievements().counters['gamesFinished'], 1);
   });
 
   testWidgets(
@@ -296,6 +311,8 @@ void main() {
       expect(tester.getRect(find.byType(ChessBoard)), rect);
       expect(celebrations(), hasLength(1));
       expect(celebrations().single['params']['source'], 'puzzle');
+      expect(achievements().earned, contains('first_day'));
+      expect(AchievementProgress.read(prefs).puzzles, 1);
     },
   );
 
@@ -335,7 +352,8 @@ void main() {
       expect(celebrations(), hasLength(1));
       await tester.tap(find.text('下一关'));
       await tester.pumpAndSettle();
-      expect(find.byType(CelebrationBadge), findsNothing);
+      expect(find.text('获得奖章 · 落子启程'), findsOneWidget);
+      expect(achievements().earned, isNot(contains('tutorial_grad')));
     },
   );
 
@@ -368,6 +386,8 @@ void main() {
       expect(find.text('每日练习完成！'), findsOneWidget);
       expect(celebrations(), hasLength(1));
       expect(celebrations().single['params']['source'], 'daily');
+      expect(achievements().counters['dailyCompleted'], 1);
+      expect(achievements().earned, contains('puzzles_10'));
     },
   );
 
@@ -396,6 +416,7 @@ void main() {
       expect(find.text('教程毕业！'), findsOneWidget);
       expect(celebrations(), hasLength(1));
       expect(celebrations().single['params']['result'], 'completed');
+      expect(achievements().earned, contains('tutorial_grad'));
     },
   );
 
@@ -419,7 +440,9 @@ void main() {
       expect(celebrations().single['params']['source'], 'daily_intro');
       await tester.tap(find.text('再练一次'));
       await tester.pumpAndSettle();
-      expect(find.byType(CelebrationBadge), findsNothing);
+      expect(find.text('获得奖章 · 落子启程'), findsOneWidget);
+      expect(achievements().earned.keys, ['first_day']);
+      expect(achievements().counters['dailyCompleted'], 0);
     },
   );
 

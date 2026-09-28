@@ -176,6 +176,26 @@ void main() {
     },
   );
 
+  test('badge schema retains only badge ID across replay', () async {
+    final first = createClient();
+    await first.prepare(prefs);
+    first.event('badge_earned', {
+      'badge': 'first_win',
+      'fen': 'private position',
+      'date': 'private date',
+      'streak': 7,
+      'title': 'private title',
+    });
+    expect(pending().last['params']['badge'], 'first_win');
+    expect(pending().last['params'].keys, isNot(contains('streak')));
+    expect(pendingFile().readAsStringSync(), isNot(contains('private')));
+    first.dispose();
+    final second = createClient();
+    await second.prepare(prefs);
+    expect(pending()[1]['params']['badge'], 'first_win');
+    expect(pending()[1]['params']['deferred'], 1);
+  });
+
   test('placeholder GA configuration never contacts the network', () async {
     final client = createClient(configured: false);
     await client.init(prefs);

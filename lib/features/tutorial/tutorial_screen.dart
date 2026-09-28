@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../../core/move.dart' as chess;
 import '../../core/puzzle.dart';
 import '../../engine/stockfish_service.dart';
 import '../../widgets/board/chess_board.dart';
+import '../achievements/achievements.dart';
 import 'tutorial_controller.dart';
 import 'tutorial_engine.dart';
 import 'tutorial_level.dart';
@@ -335,6 +337,28 @@ class _TutorialDailyScreenState extends State<TutorialDailyScreen> {
       'attempts': _attempts,
       'duration_ms': _watch.elapsedMilliseconds,
     });
+    if (_session!.status == PuzzleStatus.solved) {
+      unawaited(_recordAchievement());
+    }
+  }
+
+  Future<void> _recordAchievement() async {
+    try {
+      final prefs = widget.prefs ?? await SharedPreferences.getInstance();
+      await Achievements.of(
+        prefs,
+      ).record(const ActivityEvent.puzzleSolved(), analytics: widget.analytics);
+    } catch (error, stack) {
+      reportHandledError('daily_intro_achievement', error, stack);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('成就保存失败'),
+            action: SnackBarAction(label: '重试', onPressed: _recordAchievement),
+          ),
+        );
+      }
+    }
   }
 
   @override

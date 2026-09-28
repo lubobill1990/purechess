@@ -108,6 +108,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         title: const Text('纯弈国象'),
         actions: [
           IconButton(
+            tooltip: '成就',
+            onPressed: () => _open(AppRouter.achievements),
+            icon: const Icon(Icons.workspace_premium_outlined),
+          ),
+          IconButton(
             tooltip: '设置',
             onPressed: () => _open(AppRouter.settings),
             icon: const Icon(Icons.settings_outlined),

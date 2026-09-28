@@ -339,6 +339,30 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
     未获得灰显带条件文案）；首页加「成就」入口。
   - 埋点仅 `badge_earned {badge:id}`（进 analytics 白名单）。
     不做排行/社交。
+  - **已实现（task/badges）**：`features/achievements` 提供统一
+    `record(ActivityEvent)`、15 枚奖章与 `/achievements` 奖章墙；
+    首页右上角「成就」进入。奖章墙沿用学习页主题，显示本地日期、
+    今日打卡、当前/最佳连续天数、对局/AI 胜局/不同战术题累计。
+    午夜与回到前台重新计算当前连续天数；断签不撤销历史奖章。
+  - 接线覆盖 AI 和面对面终局（含认输、和棋）、战术题保存成功、
+    教程保存成功及现有入门每日题。双人局只累计对局，不增加 AI 胜局，
+    也不中断 AI 连胜；AI 和棋或落败中断连胜。载入已终局对局不重计。
+    教程毕业按实际资源 **19 关（含毕业局）** 判定，不沿用首页旧的
+    18 关默认值；测试核对真实目录。
+  - 每日计数从 `puzzle_progress_v1.dailySolved` 与对应 `daily_*`
+    十题清单核验后取累计完成天数，与已有计数取大；同日重做、保存重试、
+    重启不重复计数。入门每日题只算活跃行为，不冒充完整每日十题。
+    战术题累计读取既有 `solved` 去重集合，不另存题目/教程计数。
+  - 写入串行化，持久化成功才发奖与发送 `badge_earned`。损坏奖章 JSON
+    重置并 `reportHandledError`；写入失败沿用页面提示/重试。
+    复用 `PlayFeedback` 徽章叠层，多枚逐个展示，不占用棋盘或结果区空间；
+    奖章展示不额外发送 `celebrate_shown`。
+  - 备份导入合并：最近活跃日期取晚，streak / bestStreak / 所有 counters
+    逐项取大，earned 取并集且重复奖章保留较早日期；导入本身不重播庆祝。
+  - 本机验收：`flutter analyze` 零 issue；
+    `NO_PROXY=localhost,127.0.0.1` 下 `flutter test --exclude-tags golden`
+    **1984 通过、1 项既有 opt-in 原生 AI 冒烟跳过**。Windows golden
+    **18 项通过**，更新首页明暗基线并新增奖章墙明暗基线，已检查截图。
 - PM 补充（chess 特有，随 M5 实现）：双人对弈同享断点续弈；终局
   「再来一局」沿用本局配置一键开局。
 
