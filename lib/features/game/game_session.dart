@@ -68,7 +68,41 @@ class GameSession {
   }
 
   static String _two(int value) => value.toString().padLeft(2, '0');
+
+  factory GameSession.restore({
+    required String pgn,
+    required DateTime startedAt,
+    int hintsUsed = 0,
+    Color? drawOffer,
+  }) => GameSession._restore(Pgn.parse(pgn), startedAt, hintsUsed, drawOffer);
+
+  GameSession._restore(
+    this._record,
+    this.startedAt,
+    this.hintsUsed,
+    Color? drawOffer,
+  ) : _board = Board.fromFen(_record.initialFen) {
+    if (_record.result != '*' || hintsUsed < 0) {
+      throw const FormatException('Invalid unfinished session');
+    }
+    _node = _record.root;
+    for (final node in _record.mainLine.skip(1)) {
+      if (_board.status != GameStatus.playing) {
+        throw const FormatException('Moves after a terminal position');
+      }
+      _board.play(node.move!);
+      _node = node;
+    }
+    _revision = moveCount;
+    _adjudicate();
+    if (finished || (drawOffer != null && drawOffer != turn)) {
+      throw const FormatException('Session cannot be resumed');
+    }
+    _drawOffer = drawOffer;
+  }
+
   final DateTime startedAt;
+  int hintsUsed = 0;
   final Board _board;
   final GameRecord _record;
   late GameNode _node;

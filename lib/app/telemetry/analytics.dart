@@ -40,6 +40,7 @@ class Analytics {
   static const _eventParams = <String, Set<String>>{
     'app_open': {},
     'game_start': {'mode', 'difficulty', 'player_color'},
+    'game_resume': {'mode', 'difficulty', 'move_count'},
     'game_end': {'mode', 'difficulty', 'duration_ms', 'move_count'},
     'puzzle_result': {'correct', 'attempts', 'duration_ms', 'rating'},
     'celebrate_shown': {'source', 'result'},

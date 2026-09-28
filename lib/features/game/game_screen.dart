@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import '../../widgets/board/piece_image.dart';
 import '../library/records_repository.dart';
 import '../library/records_screen.dart';
 import 'game_session.dart';
-import 'new_game_screen.dart';
+import 'game_persistence.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -21,12 +22,16 @@ class GameScreen extends StatefulWidget {
     this.openRepository = RecordsRepository.open,
     this.analytics,
     this.prefs,
+    this.gameStore,
+    this.resumed = false,
   });
 
   final GameSession? session;
   final Future<RecordsRepository> Function() openRepository;
   final Analytics? analytics;
   final SharedPreferences? prefs;
+  final GameStore? gameStore;
+  final bool resumed;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -34,6 +39,8 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late GameSession _session;
+  late GamePersistence _persistence;
+  GameStore? _ownedStore;
   bool _flipped = false;
   bool _saving = false;
   int _savedRevision = -1;
@@ -48,7 +55,32 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _session = widget.session ?? GameSession();
-    _startEvent();
+    if (widget.gameStore == null && widget.prefs != null) {
+      _ownedStore = GameStore(widget.prefs!);
+    }
+    _attachPersistence();
+    if (widget.resumed) {
+      _analytics.event('game_resume', {
+        'mode': 'local',
+        'move_count': _session.moveCount,
+      });
+    } else {
+      _startEvent();
+    }
+  }
+
+  void _attachPersistence() {
+    _persistence = GamePersistence(
+      store: widget.gameStore ?? _ownedStore,
+      session: () => _session,
+    );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_persistence.close());
+    _ownedStore?.dispose();
+    super.dispose();
   }
 
   void _startEvent() => _analytics.event('game_start', {'mode': 'local'});
@@ -59,6 +91,7 @@ class _GameScreenState extends State<GameScreen> {
       action();
       _saveMessage = null;
     });
+    _persistence.save();
     if (!wasFinished && _session.finished) {
       _analytics.event('game_end', {
         'mode': 'local',
@@ -70,25 +103,27 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  Future<bool> _confirm(String title, String content, String action) async =>
+  Future<bool> _confirm(
+    String title,
+    String content,
+    String action, {
+    bool allowResume = false,
+  }) async =>
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(title),
           content: Text(content),
           actions: [
-            IconButton(
-              tooltip: '人机对弈',
-              onPressed: _saving
-                  ? null
-                  : () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => NewGameScreen(analytics: _analytics),
-                      ),
-                    ),
-              icon: const Icon(Icons.smart_toy_outlined),
-            ),
+            if (allowResume && _persistence.store != null)
+              TextButton(
+                onPressed: () async {
+                  await _persistence.close();
+                  if (context.mounted) Navigator.pop(context, false);
+                  if (mounted) Navigator.pop(this.context);
+                },
+                child: const Text('稍后继续'),
+              ),
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('取消'),
@@ -118,15 +153,19 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _newGame() async {
-    if (_dirty && !await _confirm('开始新对局', '本局尚未保存。放弃本局并重新开始？', '重新开始')) {
+    if (!_session.finished &&
+        _dirty &&
+        !await _confirm('开始新对局', '本局尚未保存。放弃本局并重新开始？', '重新开始')) {
       return;
     }
+    await _persistence.close(abandon: true);
     if (!mounted) return;
     setState(() {
       _session = GameSession();
       _savedRevision = -1;
       _saveMessage = null;
     });
+    _attachPersistence();
     _startEvent();
   }
 
@@ -134,10 +173,14 @@ class _GameScreenState extends State<GameScreen> {
     if (_saving) return;
     final confirmed = await _confirm(
       '离开对局',
-      '本局尚未保存。可取消返回并保存棋谱，或放弃本局离开。',
+      '可稍后继续本局，或放弃本局并离开。棋谱需另行保存。',
       '放弃并离开',
+      allowResume: !_session.finished,
     );
-    if (confirmed && mounted) Navigator.pop(context);
+    if (confirmed) {
+      await _persistence.close(abandon: true);
+      if (mounted) Navigator.pop(context);
+    }
   }
 
   Future<void> _save() async {
@@ -190,11 +233,17 @@ class _GameScreenState extends State<GameScreen> {
                   : () => setState(() => _flipped = !_flipped),
               icon: const Icon(Icons.flip_camera_android_outlined),
             ),
-            IconButton(
-              tooltip: '新对局',
-              onPressed: _saving ? null : _newGame,
-              icon: const Icon(Icons.add),
-            ),
+            if (_session.finished)
+              TextButton(
+                onPressed: _saving ? null : _newGame,
+                child: const Text('再来一局'),
+              )
+            else
+              IconButton(
+                tooltip: '新对局',
+                onPressed: _saving ? null : _newGame,
+                icon: const Icon(Icons.add),
+              ),
           ],
         ),
         body: PlayFeedback(

@@ -12,6 +12,7 @@ import '../../widgets/board/chess_board.dart';
 import '../library/records_repository.dart';
 import 'ai_difficulty.dart';
 import 'game_controller.dart';
+import 'game_persistence.dart';
 import 'game_session.dart';
 import 'new_game_screen.dart';
 import 'review_screen.dart';
@@ -24,6 +25,8 @@ class AiGameScreen extends StatefulWidget {
     this.engine,
     this.session,
     this.analytics,
+    this.gameStore,
+    this.resumed = false,
     this.openRepository = RecordsRepository.open,
   });
 
@@ -32,6 +35,8 @@ class AiGameScreen extends StatefulWidget {
   final StockfishService? engine;
   final GameSession? session;
   final Analytics? analytics;
+  final GameStore? gameStore;
+  final bool resumed;
   final Future<RecordsRepository> Function() openRepository;
 
   @override
@@ -41,9 +46,14 @@ class AiGameScreen extends StatefulWidget {
 class _AiGameScreenState extends State<AiGameScreen> {
   late final StockfishService _engine;
   late final GameController _game;
+  late final GamePersistence _persistence;
+  GameStore? _ownedStore;
+  Future<void>? _closingEngine;
   late bool _flipped;
   bool _saving = false;
   bool _reviewing = false;
+  bool _navigating = false;
+  bool _controllerDisposed = false;
   int _savedRevision = -1;
   String? _saveMessage;
 
@@ -67,15 +77,29 @@ class _AiGameScreenState extends State<AiGameScreen> {
       engine: _engine,
       session: widget.session,
       analytics: widget.analytics,
-    )..addListener(_changed);
+      resumed: widget.resumed,
+    );
+    final prefs = widget.rating.prefs;
+    if (widget.gameStore == null && prefs != null) {
+      _ownedStore = GameStore(prefs);
+    }
+    _persistence = GamePersistence(
+      store: widget.gameStore ?? _ownedStore,
+      session: () => _game.session,
+      config: widget.config,
+    );
+    _game.addListener(_changed);
     unawaited(_game.start());
   }
 
   void _changed() {
+    _persistence.save();
     if (mounted) setState(() {});
   }
 
-  Future<void> _closeEngine() async {
+  Future<void> _closeEngine() => _closingEngine ??= _disposeEngine();
+
+  Future<void> _disposeEngine() async {
     try {
       await _engine.dispose();
     } catch (error, stack) {
@@ -85,19 +109,41 @@ class _AiGameScreenState extends State<AiGameScreen> {
 
   @override
   void dispose() {
-    _game.removeListener(_changed);
-    _game.dispose();
+    _disposeController();
+    unawaited(_persistence.close());
+    _ownedStore?.dispose();
     unawaited(_closeEngine());
     super.dispose();
   }
 
-  Future<bool> _confirm(String title, String message, String action) async =>
+  void _disposeController() {
+    if (_controllerDisposed) return;
+    _controllerDisposed = true;
+    _game.removeListener(_changed);
+    _game.dispose();
+  }
+
+  Future<bool> _confirm(
+    String title,
+    String message,
+    String action, {
+    bool allowResume = false,
+  }) async =>
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: Text(title),
           content: Text(message),
           actions: [
+            if (allowResume && _persistence.store != null)
+              TextButton(
+                onPressed: () async {
+                  await _persistence.close();
+                  if (context.mounted) Navigator.pop(context, false);
+                  if (mounted) Navigator.pop(this.context);
+                },
+                child: const Text('稍后继续'),
+              ),
             TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('取消'),
@@ -113,23 +159,47 @@ class _AiGameScreenState extends State<AiGameScreen> {
 
   Future<void> _leave() async {
     if (_saving || _game.ratingSaving) return;
-    if (await _confirm('离开对局', '本局尚未保存，放弃本局并离开？', '放弃并离开') && mounted) {
-      Navigator.pop(context);
+    if (await _confirm(
+      '离开对局',
+      '可稍后继续本局，或放弃本局并离开。棋谱需另行保存。',
+      '放弃并离开',
+      allowResume: !_game.session.finished,
+    )) {
+      await _persistence.close(abandon: true);
+      if (mounted) Navigator.pop(context);
     }
   }
 
   Future<void> _newGame() async {
-    if (_dirty && !await _confirm('开始新对局', '本局尚未保存，放弃本局并重新开始？', '重新开始')) {
+    if (_navigating) return;
+    final rematch = _game.session.finished;
+    if (!rematch &&
+        _dirty &&
+        !await _confirm('开始新对局', '本局尚未保存，放弃本局并重新开始？', '重新开始')) {
       return;
     }
+    if (!mounted || _navigating) return;
+    setState(() => _navigating = true);
+    _disposeController();
+    await _persistence.close(abandon: true);
+    await _closeEngine();
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => NewGameScreen(
-          prefs: widget.rating.prefs,
-          analytics: widget.analytics,
-        ),
+        builder: (_) => rematch
+            ? AiGameScreen(
+                config: widget.config,
+                rating: widget.rating,
+                analytics: widget.analytics,
+                gameStore: widget.gameStore,
+                openRepository: widget.openRepository,
+              )
+            : NewGameScreen(
+                prefs: widget.rating.prefs,
+                analytics: widget.analytics,
+                gameStore: widget.gameStore,
+              ),
       ),
     );
   }
@@ -194,7 +264,7 @@ class _AiGameScreenState extends State<AiGameScreen> {
                       '${hint.promotion != null ? ' · 升变 ${board.san(hint)}' : ''}'
                 : '轮到你走棋${board.inCheck ? ' · 将军，请应将' : ''}',
         };
-    final locked = _saving || _reviewing || _game.ratingSaving;
+    final locked = _saving || _reviewing || _game.ratingSaving || _navigating;
     return PopScope(
       canPop: !_dirty && !locked,
       onPopInvokedWithResult: (didPop, result) {
@@ -210,7 +280,7 @@ class _AiGameScreenState extends State<AiGameScreen> {
               icon: const Icon(Icons.flip_camera_android_outlined),
             ),
             IconButton(
-              tooltip: '新对局',
+              tooltip: session.finished ? '再来一局' : '新对局',
               onPressed: locked ? null : _newGame,
               icon: const Icon(Icons.add),
             ),
@@ -363,11 +433,22 @@ class _AiGameScreenState extends State<AiGameScreen> {
                               FilledButton.icon(
                                 onPressed:
                                     session.finished && !locked && !_game.busy
-                                    ? _review
+                                    ? _newGame
                                     : null,
-                                icon: const Icon(Icons.query_stats),
-                                label: const Text('一键复盘'),
+                                icon: Icon(
+                                  session.finished
+                                      ? Icons.replay
+                                      : Icons.query_stats,
+                                ),
+                                label: Text(session.finished ? '再来一局' : '一键复盘'),
                               ),
+                              if (session.finished)
+                                TextButton(
+                                  onPressed: locked || _game.busy
+                                      ? null
+                                      : _review,
+                                  child: const Text('一键复盘'),
+                                ),
                             ],
                           ),
                         ],

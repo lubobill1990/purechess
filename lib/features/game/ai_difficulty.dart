@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart';
 
 class AiGameConfig {
@@ -20,16 +21,21 @@ class AiDifficulty {
   AiDifficulty(this.prefs);
 
   static const preferenceKey = 'chess.ai.recommendedLevel';
-  final SharedPreferences prefs;
+  final SharedPreferences? prefs;
 
   int get recommended {
-    final level = prefs.getInt(preferenceKey) ?? 1;
-    return RangeError.checkValueInInterval(level, 1, 10, 'recommended');
+    try {
+      final level = prefs?.getInt(preferenceKey) ?? 1;
+      return RangeError.checkValueInInterval(level, 1, 10, 'recommended');
+    } catch (error, stack) {
+      reportHandledError('game_preferences', error, stack);
+      return 1;
+    }
   }
 
   Future<void> recordResult(int level, {required bool? won}) async {
     final next = nextDifficulty(level, won: won);
-    if (!await prefs.setInt(preferenceKey, next)) {
+    if (await prefs?.setInt(preferenceKey, next) != true) {
       throw StateError('Could not save recommended difficulty');
     }
   }

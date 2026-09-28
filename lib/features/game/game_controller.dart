@@ -18,6 +18,7 @@ class GameController extends ChangeNotifier {
     required this.rating,
     GameSession? session,
     Analytics? analytics,
+    this.resumed = false,
   }) : session = session ?? GameSession(humanColor: config.humanColor),
        analytics = analytics ?? Analytics.instance {
     engine.status.addListener(_engineChanged);
@@ -28,6 +29,7 @@ class GameController extends ChangeNotifier {
   final AiDifficulty rating;
   final Analytics analytics;
   final GameSession session;
+  final bool resumed;
   GamePhase phase = GamePhase.playing;
   String? error;
   String? ratingError;
@@ -70,10 +72,11 @@ class GameController extends ChangeNotifier {
   Future<void> start() async {
     if (_started) return;
     _started = true;
-    analytics.event('game_start', {
+    analytics.event(resumed ? 'game_resume' : 'game_start', {
       'mode': 'ai',
       'difficulty': config.difficulty,
-      'player_color': config.humanColor.name,
+      if (!resumed) 'player_color': config.humanColor.name,
+      if (resumed) 'move_count': session.moveCount,
     });
     await _continueGame();
   }
@@ -140,6 +143,7 @@ class GameController extends ChangeNotifier {
       phase = GamePhase.playing;
       if (forHint) {
         hint = move;
+        session.hintsUsed++;
         _notify();
       } else {
         session.play(move);
