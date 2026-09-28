@@ -17,6 +17,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../support/memory_records_repository.dart';
 import 'fake_game_engine.dart';
 
+class SlowClosingEngine extends FakeGameEngine {
+  final closing = Completer<void>();
+
+  @override
+  Future<void> dispose() async {
+    await closing.future;
+    await super.dispose();
+  }
+}
+
 void main() {
   late SharedPreferences prefs;
   late FakeGameEngine engine;
@@ -172,6 +182,73 @@ void main() {
     await tester.pumpAndSettle();
     expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
   });
+
+  for (final exit in ['resume', 'abandon', 'saved', 'empty']) {
+    testWidgets('$exit waits for AI shutdown before returning home', (
+      tester,
+    ) async {
+      final slow = SlowClosingEngine();
+      final reply = Completer<PositionAnalysis>();
+      slow.replies.add((_) => reply.future);
+      final navigator = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: navigator,
+          home: const Scaffold(body: Text('测试首页')),
+        ),
+      );
+      unawaited(
+        navigator.currentState!.push(
+          MaterialPageRoute<void>(
+            builder: (_) => AiGameScreen(
+              config: AiGameConfig(),
+              rating: AiDifficulty(prefs),
+              engine: slow,
+              session: session,
+              openRepository: () async => repository,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      if (exit != 'empty') {
+        await move(tester);
+        if (exit == 'saved') {
+          await tester.tap(find.text('保存棋谱'));
+          await tester.pumpAndSettle();
+        }
+      }
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      if (exit == 'resume' || exit == 'abandon') {
+        await tester.tap(find.text(exit == 'resume' ? '稍后继续' : '放弃并离开'));
+        await tester.pumpAndSettle();
+      }
+      expect(find.byType(AiGameScreen), findsOneWidget);
+      expect(find.text('测试首页'), findsNothing);
+      expect(
+        tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled,
+        isFalse,
+      );
+      reply.complete(FakeGameEngine.result('e7e5'));
+      await tester.pumpAndSettle();
+      expect(session.moveCount, exit == 'empty' ? 0 : 1);
+      slow.closing.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('测试首页'), findsOneWidget);
+      expect(slow.disposals, 1);
+      expect(prefs.containsKey(GameStore.preferenceKey), exit != 'abandon');
+      if (exit != 'abandon') {
+        expect(
+          SavedGame.decode(prefs.getString(GameStore.preferenceKey)!)
+              .session
+              .moveCount,
+          session.moveCount,
+        );
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('rematch preserves current config rather than adaptive level', (
     tester,

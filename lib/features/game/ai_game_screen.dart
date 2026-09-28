@@ -138,9 +138,8 @@ class _AiGameScreenState extends State<AiGameScreen> {
             if (allowResume && _persistence.store != null)
               TextButton(
                 onPressed: () async {
-                  await _persistence.close();
-                  if (context.mounted) Navigator.pop(context, false);
-                  if (mounted) Navigator.pop(this.context);
+                  Navigator.pop(context, false);
+                  await _exit();
                 },
                 child: const Text('稍后继续'),
               ),
@@ -158,16 +157,28 @@ class _AiGameScreenState extends State<AiGameScreen> {
       false;
 
   Future<void> _leave() async {
-    if (_saving || _game.ratingSaving) return;
+    if (_saving || _reviewing || _game.ratingSaving || _navigating) return;
+    if (!_dirty) {
+      await _exit();
+      return;
+    }
     if (await _confirm(
       '离开对局',
       '可稍后继续本局，或放弃本局并离开。棋谱需另行保存。',
       '放弃并离开',
       allowResume: !_game.session.finished,
     )) {
-      await _persistence.close(abandon: true);
-      if (mounted) Navigator.pop(context);
+      await _exit(abandon: true);
     }
+  }
+
+  Future<void> _exit({bool abandon = false}) async {
+    if (!mounted || _navigating) return;
+    setState(() => _navigating = true);
+    _disposeController();
+    await _persistence.close(abandon: abandon);
+    await _closeEngine();
+    if (mounted) Navigator.pop(context);
   }
 
   Future<void> _newGame() async {
@@ -266,7 +277,7 @@ class _AiGameScreenState extends State<AiGameScreen> {
         };
     final locked = _saving || _reviewing || _game.ratingSaving || _navigating;
     return PopScope(
-      canPop: !_dirty && !locked,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) _leave();
       },
