@@ -303,6 +303,25 @@ widgets/board/  棋盘组件：自绘 8x8、拖拽走子+点击走子双模式�
     `NO_PROXY=localhost,127.0.0.1` 下 `flutter test` 全量 **1851 通过、
     1 项既有 opt-in 原生 AI 冒烟跳过**。
 
+### 批 5（第三期：连续性与奖章，用户 2026-09-28 需求，三 app 同构）
+- **M5a+M5b 连续性（task/continuity，一路执行——同在 game feature，拆开必冲突）**：
+  1. 新对局表单持久化：记住上次执子颜色与用户手动选择的难度档
+     （键 `newGame.color` / `newGame.level`），下次进入恢复；自适应
+     「推荐第 N 档」照旧显示，用户没手动改过则跟随推荐。
+  2. 断点续弈：对局进行中（AI 局）在每步落子后与 app 退后台/销毁时
+     自动存盘到 prefs（PGN + AiGameConfig + 已用提示等会话元数据；
+     `GameSession.snapshot()` 的 PGN round-trip 已可用）。终局/认输清除
+     存盘。启动时检测存盘 → main.dart 把 `canResumeGame` 接通（现为
+     恒 false 的 M3d stub），首页「继续对局」直接恢复 AiGameScreen；
+     Stockfish 无状态，走 FEN/着法重建即可。存盘损坏时静默丢弃并
+     reportHandledError，不得阻塞开局。
+- **M5c 打卡奖章（task/badges，等围棋通用设计文档到齐后启动）**：
+  本地统计 + 连续活跃 streak + 里程碑成就（教程毕业、各难度首胜、
+  题目里程碑），庆祝动效复用批 4 徽章叠层；无社交排行，遥测仅发
+  奖章类别不发内容，语义与围棋/象棋同构。
+- PM 补充（chess 特有，随 M5 实现）：双人对弈同享断点续弈；终局
+  「再来一局」沿用本局配置一键开局。
+
 ## pureweiqi 踩坑清单（执行者必读）
 
 1. flutter test 连不上 tester = 代理问题 → NO_PROXY=localhost,127.0.0.1。
