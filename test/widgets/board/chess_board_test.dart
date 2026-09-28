@@ -64,9 +64,15 @@ void main() {
     'painter raster contains alternating squares and all highlights',
     (tester) async {
       await tester.runAsync(() async {
-        for (final flipped in [false, true]) {
+        for (final (flipped, dark) in [
+          (false, false),
+          (true, false),
+          (false, true),
+          (true, true),
+        ]) {
           final recorder = ui.PictureRecorder();
           final painter = BoardPainter(
+            dark: dark,
             flipped: flipped,
             selected: chess.parseSquare('e2'),
             targets: {chess.parseSquare('e3')},
@@ -102,25 +108,25 @@ void main() {
             expect(actual.b * 255, closeTo(expected.b * 255, 1));
           }
 
-          expect(center('a8'), BoardPainter.lightSquare);
-          expect(center('b8'), BoardPainter.darkSquare);
+          final lightSquare = dark
+              ? BoardPainter.nightLightSquare
+              : BoardPainter.lightSquare;
+          final darkSquare = dark
+              ? BoardPainter.nightDarkSquare
+              : BoardPainter.darkSquare;
+          expect(center('a8'), lightSquare);
+          expect(center('b8'), darkSquare);
           for (final name in ['e2', 'e4']) {
             expectColor(
               center(name),
-              Color.alphaBlend(
-                const Color(0x80E7BC54),
-                BoardPainter.lightSquare,
-              ),
+              Color.alphaBlend(BoardPainter.lastMoveTint, lightSquare),
             );
           }
           expectColor(
             center('e8'),
-            Color.alphaBlend(const Color(0xDDCE5964), BoardPainter.lightSquare),
+            Color.alphaBlend(BoardPainter.checkTint, lightSquare),
           );
-          expectColor(
-            center('e3'),
-            Color.alphaBlend(const Color(0xA0233648), BoardPainter.darkSquare),
-          );
+          expectColor(center('e3'), BoardPainter.ivory);
           expect(flipped ? pixel(152, 75) : pixel(202, 325), BoardPainter.ink);
           image.dispose();
           picture.dispose();
@@ -128,6 +134,41 @@ void main() {
       });
     },
   );
+
+  testWidgets('hint outlines never obscure a piece or square center', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      for (final circle in [false, true]) {
+        final recorder = ui.PictureRecorder();
+        final canvas = Canvas(recorder);
+        const background = Color(0xFFCC7744);
+        canvas.drawRect(
+          const Rect.fromLTWH(0, 0, 50, 50),
+          Paint()..color = background,
+        );
+        final painter = boardHintDecoration(circle: circle)
+            .createBoxPainter(() {});
+        painter.paint(
+          canvas,
+          Offset.zero,
+          const ImageConfiguration(size: Size(50, 50)),
+        );
+        final picture = recorder.endRecording();
+        final image = await picture.toImage(50, 50);
+        final bytes = (await image.toByteData(
+          format: ui.ImageByteFormat.rawRgba,
+        ))!;
+        final center = (25 * 50 + 25) * 4;
+        expect(bytes.getUint8(center), 0xCC);
+        expect(bytes.getUint8(center + 1), 0x77);
+        expect(bytes.getUint8(center + 2), 0x44);
+        image.dispose();
+        picture.dispose();
+        painter.dispose();
+      }
+    });
+  });
 
   testWidgets('renders 64 accessible squares and 32 bundled SVG pieces', (
     tester,

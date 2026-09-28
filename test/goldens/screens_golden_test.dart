@@ -8,7 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:purechess/app/app_theme.dart';
+import 'package:purechess/app/play_feedback.dart';
+import 'package:purechess/app/notifications.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
+import 'package:purechess/core/board.dart';
 import 'package:purechess/core/move.dart' as chess;
 import 'package:purechess/features/achievements/achievements.dart';
 import 'package:purechess/features/achievements/achievements_screen.dart';
@@ -18,10 +22,15 @@ import 'package:purechess/features/game/game_screen.dart';
 import 'package:purechess/features/game/game_session.dart';
 import 'package:purechess/features/game/new_game_screen.dart';
 import 'package:purechess/features/home/home_screen.dart';
+import 'package:purechess/features/library/classic_library.dart';
+import 'package:purechess/features/library/classic_library_screen.dart';
+import 'package:purechess/features/library/classic_reader_screen.dart';
 import 'package:purechess/features/puzzle/puzzle_catalog.dart';
 import 'package:purechess/features/puzzle/puzzle_repository.dart';
 import 'package:purechess/features/puzzle/puzzle_screen.dart';
 import 'package:purechess/features/settings/settings.dart';
+import 'package:purechess/features/settings/backup.dart';
+import 'package:purechess/features/settings/privacy.dart';
 import 'package:purechess/features/tutorial/tutorial_engine.dart';
 import 'package:purechess/features/tutorial/tutorial_level.dart';
 import 'package:purechess/features/tutorial/tutorial_screen.dart';
@@ -30,6 +39,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/game/fake_game_engine.dart';
 import '../support/memory_records_repository.dart';
+import '../support/fake_reminder_backend.dart';
 
 const _surface = Size(1024, 1366);
 const _captureKey = ValueKey('golden-screen');
@@ -45,6 +55,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late PuzzleCatalog puzzles;
   late TutorialCatalog tutorials;
+  late List<ClassicGame> classics;
 
   setUpAll(() async {
     if (!Platform.isWindows) {
@@ -53,8 +64,7 @@ void main() {
         'other platforms; do not overwrite Windows baselines there.',
       );
     }
-    // StudyTheme replaces the outer text theme, so its default Windows family
-    // also needs CJK glyphs. This test-only alias does not change app fonts.
+    // Test-only font aliases keep Windows baselines reproducible.
     final chineseBytes = File(r'test\goldens\fonts\NotoSansSC.ttf')
         .readAsBytes()
         .then(ByteData.sublistView);
@@ -81,6 +91,7 @@ void main() {
     ]);
     puzzles = await PuzzleCatalog.load();
     tutorials = await TutorialCatalog.load();
+    classics = await ClassicLibrary.load();
     for (final side in ['w', 'b']) {
       for (final piece in ['K', 'Q', 'R', 'B', 'N', 'P']) {
         final loader = SvgAssetLoader('assets/pieces/$side$piece.svg');
@@ -107,9 +118,25 @@ void main() {
       'puzzle',
       'tutorial',
       'settings',
+      'library',
+      'reader',
+      'puzzle_catalog',
+      'puzzle_hint',
+      'tutorial_play',
+      'backup',
+      'privacy',
+      'celebration',
+      'reminder_time',
+      'board_selected',
+      'board_check',
+      'home_mobile',
+      'settings_mobile',
     ]) {
       testWidgets('$scene $themeName', (tester) async {
-        tester.view.physicalSize = _surface;
+        final surface = scene.endsWith('_mobile')
+            ? const Size(390, 844)
+            : _surface;
+        tester.view.physicalSize = surface;
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
@@ -147,9 +174,66 @@ void main() {
         FakeGameEngine? engine;
         late Widget screen;
         switch (scene) {
+          case 'board_selected':
+          case 'board_check':
+            screen = Scaffold(
+              body: Center(
+                child: SizedBox.square(
+                  dimension: 560,
+                  child: ChessBoard(
+                    board: Board.fromFen(
+                      scene == 'board_selected'
+                          ? _midgameFen
+                          : '4r2k/8/8/8/8/8/8/4K3 w - - 0 1',
+                    ),
+                    onMove: (_) {},
+                  ),
+                ),
+              ),
+            );
+          case 'library':
+            screen = ClassicLibraryScreen(
+              prefs: prefs,
+              load: () async => classics,
+            );
+          case 'reader':
+            screen = ClassicReaderScreen(
+              prefs: prefs,
+              game: classics.first,
+              initialPly: 8,
+            );
+          case 'puzzle_catalog':
+            screen = PuzzleScreen(
+              prefs: prefs,
+              analytics: analytics,
+              now: () => _now,
+              loadCatalog: () async => puzzles,
+            );
+          case 'backup':
+            screen = BackupScreen(prefs: prefs, analytics: analytics);
+          case 'privacy':
+            screen = const PrivacyPolicyScreen();
+          case 'celebration':
+            screen = const Scaffold(
+              body: Center(child: CelebrationBadge(title: '解题成功！')),
+            );
+          case 'reminder_time':
+            final reminders = DailyReminderService(
+              prefs,
+              analytics: analytics,
+              backend: FakeReminderBackend(),
+            );
+            addTearDown(reminders.dispose);
+            await reminders.refresh();
+            screen = SettingsScreen(
+              prefs: prefs,
+              analytics: analytics,
+              reminders: reminders,
+            );
           case 'achievements':
             screen = AchievementsScreen(prefs: prefs, now: () => _now);
           case 'home_learning':
+          case 'home_mobile':
           case 'home_graduated':
           case 'home_resume':
             screen = HomeScreen(
@@ -192,6 +276,7 @@ void main() {
               );
             }
           case 'puzzle':
+          case 'puzzle_hint':
             final repository = PuzzleRepository(prefs: prefs, catalog: puzzles);
             addTearDown(repository.dispose);
             screen = PuzzleSolveScreen(
@@ -200,6 +285,7 @@ void main() {
               analytics: analytics,
             );
           case 'tutorial':
+          case 'tutorial_play':
             screen = TutorialScreen(
               prefs: prefs,
               analytics: analytics,
@@ -207,19 +293,13 @@ void main() {
               createEngine: FakeEngine.new,
             );
           case 'settings':
+          case 'settings_mobile':
             screen = SettingsScreen(prefs: prefs, analytics: analytics);
           default:
             throw StateError('Unknown golden scene: $scene');
         }
         final brightness = dark ? Brightness.dark : Brightness.light;
-        // Match MyApp's light palette; dark is a test-only theme counterpart.
-        final base = ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF233648),
-            brightness: brightness,
-          ),
-          scaffoldBackgroundColor: dark ? null : const Color(0xFFF5F7FA),
-        );
+        final base = dark ? buildDarkTheme() : buildLightTheme();
         const fallback = ['NotoSansSC'];
         await tester.pumpWidget(
           MaterialApp(
@@ -241,7 +321,36 @@ void main() {
             home: screen,
           ),
         );
+        if (scene.startsWith('home_')) {
+          await tester.runAsync(
+            () => precacheImage(
+              const AssetImage('assets/icon/icon.png'),
+              tester.element(find.byType(MaterialApp)),
+            ),
+          );
+        }
         await tester.pumpAndSettle();
+        if (scene == 'reminder_time') {
+          await tester.tap(find.text('提醒时间'));
+          await tester.pumpAndSettle();
+          expect(find.text('选择提醒时间'), findsOneWidget);
+        }
+        if (scene == 'board_selected') {
+          await tester.tap(find.byKey(const ValueKey('square-g5')));
+          await tester.pumpAndSettle();
+        }
+        if (scene == 'puzzle_hint') {
+          await tester.tap(find.text('提示思路'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('亮起点格'));
+          await tester.pumpAndSettle();
+        }
+        if (scene == 'tutorial_play') {
+          await tester.tap(find.byKey(const ValueKey('tutorial-level-4')));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('提示'));
+          await tester.pumpAndSettle();
+        }
 
         expect(tester.takeException(), isNull);
         expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -250,7 +359,7 @@ void main() {
         )) {
           expect(progress.value, isNotNull);
         }
-        expect(tester.getSize(find.byKey(_captureKey)), _surface);
+        expect(tester.getSize(find.byKey(_captureKey)), surface);
         expect(
           Theme.of(tester.element(find.byType(Scaffold).first)).brightness,
           brightness,

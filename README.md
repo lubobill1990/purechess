@@ -3,10 +3,26 @@
 An international-chess learning app. The M1 rules core is implemented in pure
 Dart, with no Flutter imports or third-party chess dependencies.
 
+## 木与骑士视觉系统
+
+`lib/app/app_theme.dart` 提供全局明暗主题，跟随系统：米金纸面
+`#F7F0E0` / 深咖木 `#191510`，胡桃棕 `#62431F` / 烛光金
+`#D8AD55` 主色，与既有骑士图标同源。AppBar 与大标题使用 Georgia，
+回退 Songti SC / serif；正文使用系统字体，不新增字体或依赖。
+透明居中 AppBar、16px 微影卡片、12px 按钮及浮动 SnackBar 全局统一；
+`StudyTheme` 仅保留兼容入口，不覆盖上层主题。
+
+棋盘在明暗模式分别使用米金/胡桃木与低亮度木色，落点和选中描边按
+棋格明暗采用深棕/象牙双色，教程与谜题共用双色提示边框；将军保留红色。
+结果区、讲解区和庆祝叠层不改变棋盘几何位置。
+Windows golden 使用与应用相同的主题构造器；更新基线前先设置
+`$env:NO_PROXY='localhost,127.0.0.1'`，运行
+`flutter test --tags golden --update-goldens` 并逐张检查。
+
 ## Local two-player chess (M2a)
 
 The home screen opens **双人对弈**, **我的棋谱**, and the existing privacy settings.
-The slate-blue board supports tap-to-select/tap-to-move and direct dragging,
+The walnut-and-gold board supports tap-to-select/tap-to-move and direct dragging,
 legal destinations, last-move and check highlights, coordinates, and a flipped
 view. Promotion always asks for queen/rook/bishop/knight; cancel leaves the
 position unchanged. SVG pieces are bundled for offline use; see

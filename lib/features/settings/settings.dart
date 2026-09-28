@@ -89,48 +89,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('设置')),
-      body: ListView(
-        children: [
-          SwitchListTile(
-            title: const Text('音效'),
-            subtitle: const Text('落子、吃子、将军与完成提示音'),
-            value: widget.prefs.getBool(SoundService.enabledKey) ?? true,
-            onChanged: _savingSound ? null : _setSoundEnabled,
-          ),
-          AiStatusTile(analytics: widget.analytics, prefs: widget.prefs),
-          DailyReminderTiles(service: _reminders),
-          ListTile(
-            leading: const Icon(Icons.backup_outlined),
-            title: const Text('备份与恢复'),
-            subtitle: const Text('导出棋谱与学习进度，或合并恢复备份'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => BackupScreen(
-                  prefs: widget.prefs,
-                  analytics: widget.analytics,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              Card(
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      title: const Text('音效'),
+                      subtitle: const Text('落子、吃子、将军与完成提示音'),
+                      value:
+                          widget.prefs.getBool(SoundService.enabledKey) ?? true,
+                      onChanged: _savingSound ? null : _setSoundEnabled,
+                    ),
+                    AiStatusTile(
+                      analytics: widget.analytics,
+                      prefs: widget.prefs,
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-          SwitchListTile(
-            key: const ValueKey('analytics-toggle'),
-            title: const Text('匿名使用统计'),
-            subtitle: const Text('匿名使用与崩溃类别；不含棋局内容，可随时关闭'),
-            value: widget.analytics.enabled,
-            onChanged: _saving ? null : _setEnabled,
-          ),
-          ListTile(
-            leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('隐私政策'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const PrivacyPolicyScreen(),
+              Card(child: DailyReminderTiles(service: _reminders)),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.backup_outlined),
+                      title: const Text('备份与恢复'),
+                      subtitle: const Text('导出棋谱与学习进度，或合并恢复备份'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => BackupScreen(
+                            prefs: widget.prefs,
+                            analytics: widget.analytics,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SwitchListTile(
+                      key: const ValueKey('analytics-toggle'),
+                      title: const Text('匿名使用统计'),
+                      subtitle: const Text('匿名使用与崩溃类别；不含棋局内容，可随时关闭'),
+                      value: widget.analytics.enabled,
+                      onChanged: _saving ? null : _setEnabled,
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.privacy_tip_outlined),
+                      title: const Text('隐私政策'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const PrivacyPolicyScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

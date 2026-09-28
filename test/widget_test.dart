@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:purechess/app/app_theme.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/main.dart';
 import 'package:purechess/core/move.dart' as chess;
@@ -48,6 +49,36 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('system appearance updates home and pushed settings together', (
+    tester,
+  ) async {
+    addTearDown(
+      tester.binding.platformDispatcher.clearPlatformBrightnessTestValue,
+    );
+    await analytics.savePrivacyChoice(false, prefs);
+    await launch(tester);
+    for (final brightness in [Brightness.dark, Brightness.light]) {
+      tester.binding.platformDispatcher.platformBrightnessTestValue =
+          brightness;
+      await tester.pumpAndSettle();
+      final expected = brightness == Brightness.dark
+          ? buildDarkTheme()
+          : buildLightTheme();
+      expect(
+        Theme.of(tester.element(find.byType(Scaffold))).colorScheme,
+        expected.colorScheme,
+      );
+      await tester.tap(find.byTooltip('设置'));
+      await tester.pumpAndSettle();
+      expect(
+        Theme.of(tester.element(find.byType(Scaffold).last)).colorScheme,
+        expected.colorScheme,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
+  });
 
   testWidgets(
     'first launch blocks dismissal and exposes policy before choice',
@@ -228,6 +259,8 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('analytics-toggle')));
       await tester.pumpAndSettle();
       expect(analytics.enabled, isFalse);
+      await tester.ensureVisible(find.text('隐私政策'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('隐私政策'));
       await tester.pumpAndSettle();
       expect(find.text('纯弈国象隐私说明（占位稿）'), findsOneWidget);
