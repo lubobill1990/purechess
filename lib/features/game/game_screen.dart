@@ -15,6 +15,7 @@ import '../library/records_repository.dart';
 import '../library/records_screen.dart';
 import 'game_session.dart';
 import 'game_persistence.dart';
+import 'game_rail.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -244,6 +245,8 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final facingOpponent =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     final board = _session.board;
     final status =
         _session.outcome?.message ??
@@ -256,29 +259,6 @@ class _GameScreenState extends State<GameScreen> {
         if (!didPop) _leave();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('面对面对弈'),
-          actions: [
-            IconButton(
-              tooltip: '翻转棋盘',
-              onPressed: _saving
-                  ? null
-                  : () => setState(() => _flipped = !_flipped),
-              icon: const Icon(Icons.flip_camera_android_outlined),
-            ),
-            if (_session.finished)
-              TextButton(
-                onPressed: _saving ? null : _newGame,
-                child: const Text('再来一局'),
-              )
-            else
-              IconButton(
-                tooltip: '新对局',
-                onPressed: _saving ? null : _newGame,
-                icon: const Icon(Icons.add),
-              ),
-          ],
-        ),
         body: PlayFeedback(
           session: _session,
           board: board,
@@ -295,18 +275,33 @@ class _GameScreenState extends State<GameScreen> {
               : '${colorName(_session.outcome!.winner!)}获胜',
           child: SafeArea(
             child: BoardPanel(
-              above: BoardRail(
-                child: RotatedBox(
-                  key: const ValueKey('black-player-bar'),
-                  quarterTurns: 2,
-                  child: _playerBar(chess.Color.black),
-                ),
+              minimumSidebarWidth: 320,
+              above: Column(
+                children: [
+                  GameRail(
+                    title: '面对面对弈',
+                    onLeave: _leave,
+                    onFlip: _saving
+                        ? null
+                        : () => setState(() => _flipped = !_flipped),
+                    onNewGame: _saving ? null : _newGame,
+                    finished: _session.finished,
+                  ),
+                  BoardRail(
+                    child: RotatedBox(
+                      key: const ValueKey('black-player-bar'),
+                      quarterTurns: facingOpponent ? 2 : 0,
+                      child: _playerBar(chess.Color.black),
+                    ),
+                  ),
+                ],
               ),
               board: ChessBoard(
                 key: ObjectKey(_session),
                 board: board,
                 flipped: _flipped,
-                flipFingerOffset: _session.turn == chess.Color.black,
+                flipFingerOffset:
+                    facingOpponent && _session.turn == chess.Color.black,
                 enabled: _session.canPlay && !_saving,
                 onMove: (move) => _change(() => _session.play(move)),
               ),
@@ -348,34 +343,50 @@ class _GameScreenState extends State<GameScreen> {
                       ),
                     ),
                   ),
-                  BoardRail(child: _playerBar(chess.Color.white)),
+                  BoardRail(
+                    child: RotatedBox(
+                      key: const ValueKey('white-player-bar'),
+                      quarterTurns: 0,
+                      child: _playerBar(chess.Color.white),
+                    ),
+                  ),
                 ],
               ),
               controls: SizedBox(
                 height: 56,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: _saving || !_dirty ? null : _save,
-                      icon: const Icon(Icons.save_outlined),
-                      label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: _saving || !_dirty ? null : _save,
+                            icon: const Icon(Icons.save_outlined),
+                            label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                          ),
+                          const SizedBox(width: 12),
+                          TextButton(
+                            onPressed: _saving
+                                ? null
+                                : () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => RecordsScreen(
+                                        openRepository: widget.openRepository,
+                                      ),
+                                    ),
+                                  ),
+                            child: const Text('我的棋谱'),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    TextButton(
-                      onPressed: _saving
-                          ? null
-                          : () => Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (_) => RecordsScreen(
-                                  openRepository: widget.openRepository,
-                                ),
-                              ),
-                            ),
-                      child: const Text('我的棋谱'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

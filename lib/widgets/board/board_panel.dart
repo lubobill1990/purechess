@@ -14,6 +14,7 @@ class BoardPanel extends StatelessWidget {
     this.above = const SizedBox.shrink(),
     this.below = const SizedBox.shrink(),
     this.controls = const SizedBox.shrink(),
+    this.minimumSidebarWidth = 0,
     this.scrollController,
   });
 
@@ -25,6 +26,10 @@ class BoardPanel extends StatelessWidget {
   final Widget above;
   final Widget below;
   final Widget controls;
+
+  /// Reserve readable controls in compact landscape game windows.
+  /// Zero preserves the short-edge board sizing used by reading/learning pages.
+  final double minimumSidebarWidth;
   final ScrollController? scrollController;
 
   Widget _frame(BuildContext context, double size) {
@@ -32,20 +37,21 @@ class BoardPanel extends StatelessWidget {
     return SizedBox(
       width: size,
       child: DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(_radius),
-        border: Border.all(
-          color: (dark ? BoardPainter.ivory : BoardPainter.ink)
-              .withValues(alpha: .25),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: dark ? .5 : .18),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(
+            color: (dark ? BoardPainter.ivory : BoardPainter.ink).withValues(
+              alpha: .25,
+            ),
           ),
-        ],
-      ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: dark ? .5 : .18),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(_radius),
           child: SizedBox.square(dimension: size, child: board),
@@ -59,7 +65,13 @@ class BoardPanel extends StatelessWidget {
     builder: (context, constraints) {
       final landscape = constraints.maxWidth > constraints.maxHeight;
       if (landscape) {
-        final size = constraints.maxHeight - margin * 2;
+        final availableHeight = constraints.maxHeight - margin * 2;
+        final size = minimumSidebarWidth == 0
+            ? availableHeight
+            : math.min(
+                availableHeight,
+                constraints.maxWidth - minimumSidebarWidth - margin * 3 - 2,
+              );
         return Padding(
           padding: const EdgeInsets.all(margin),
           child: Row(
@@ -97,8 +109,7 @@ class BoardPanel extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(_radius),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.stretch,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [above, below],
                               ),
                             ),
@@ -135,10 +146,9 @@ class BoardPanel extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(
-                      alpha:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? .5
-                              : .18,
+                      alpha: Theme.of(context).brightness == Brightness.dark
+                          ? .5
+                          : .18,
                     ),
                     blurRadius: 14,
                     offset: const Offset(0, 4),
