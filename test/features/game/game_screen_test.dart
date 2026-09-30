@@ -374,7 +374,14 @@ void main() {
       expect(board.width, board.height);
       expect(board.left, greaterThanOrEqualTo(0));
       expect(board.right, lessThanOrEqualTo(size.width));
-      expect(tester.getSize(key('game-result-area')).height, 72);
+      if (size.width > size.height) {
+        // Symmetric face-to-face landscape: no center strip; the board is
+        // horizontally centered between the two player panes.
+        expect(board.center.dx, closeTo(size.width / 2, .001));
+        expect(key('game-result-area'), findsNothing);
+      } else {
+        expect(tester.getSize(key('game-result-area')).height, 72);
+      }
       await tester.tap(key('white-offer-draw'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

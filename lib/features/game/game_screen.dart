@@ -307,6 +307,64 @@ class _GameScreenState extends State<GameScreen> {
               child: BoardPanel(
                 minimumSidebarWidth: 320,
                 navigationBuilder: navigation,
+                // Landscape face-to-face: players sit left and right, so the
+                // board must be horizontally centered between two equal panes.
+                sideLeft: facingOpponent
+                    ? null
+                    : _playerPane(chess.Color.black, compact: compact),
+                sideRight: facingOpponent
+                    ? null
+                    : _playerPane(
+                        chess.Color.white,
+                        compact: compact,
+                        footer: [
+                          const Divider(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              status.isNotEmpty
+                                  ? [status, ?_saveMessage].join('\n')
+                                  : _session.lastSan != null
+                                  ? '第 ${(_session.moveCount + 1) ~/ 2} 回合 · ${_session.lastSan}'
+                                  : '对局开始 · 白方先行',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: status.isEmpty
+                                    ? FontWeight.w400
+                                    : FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          if (_achievementError != null)
+                            TextButton(
+                              onPressed: _achievementSaving
+                                  ? null
+                                  : _recordAchievement,
+                              child: Text('$_achievementError保存'),
+                            ),
+                          if (!compact)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                              child: Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  OutlinedButton(
+                                    onPressed: _saving || !_dirty
+                                        ? null
+                                        : _save,
+                                    child: Text(_saving ? '正在保存…' : '保存棋谱'),
+                                  ),
+                                  OutlinedButton(
+                                    onPressed: _saving ? null : openRecords,
+                                    child: const Text('我的棋谱'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                 above: BoardRail(
                   child: RotatedBox(
                     key: const ValueKey('black-player-bar'),
@@ -417,6 +475,130 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Vertical player card for the symmetric landscape layout: status header
+  /// with the turn highlight, then the same actions as [_playerBar]. When
+  /// [compact] (tiny landscape or huge text) the actions collapse into one
+  /// fitted row so the pane never needs to scroll.
+  Widget _playerPane(
+    chess.Color color, {
+    bool compact = false,
+    List<Widget> footer = const [],
+  }) {
+    final canAct = _session.canAct(color) && !_saving;
+    final active = !_session.finished && _session.turn == color;
+    final responding = _session.drawOffer?.opponent == color;
+    final label = colorName(color);
+    final actions = responding
+        ? [
+            GameActionChip(
+              key: ValueKey('${color.name}-decline-draw'),
+              onPressed: _saving
+                  ? null
+                  : () => _change(
+                      () => _session.respondToDraw(color, accept: false),
+                    ),
+              label: '继续对弈',
+            ),
+            GameActionChip(
+              key: ValueKey('${color.name}-accept-draw'),
+              onPressed: _saving
+                  ? null
+                  : () => _change(
+                      () => _session.respondToDraw(color, accept: true),
+                    ),
+              label: '同意和棋',
+            ),
+          ]
+        : [
+            OutlinedButton.icon(
+              key: ValueKey('${color.name}-undo'),
+              onPressed: _session.canUndo && !_saving
+                  ? () => _change(_session.undo)
+                  : null,
+              icon: const Icon(Icons.undo, size: 18),
+              label: const Text('悔棋'),
+            ),
+            OutlinedButton(
+              key: ValueKey('${color.name}-offer-draw'),
+              onPressed: canAct
+                  ? () => _change(() => _session.offerDraw(color))
+                  : null,
+              child: const Text('提和'),
+            ),
+            OutlinedButton(
+              key: ValueKey('${color.name}-resign'),
+              onPressed: canAct ? () => _resign(color) : null,
+              child: const Text('认输'),
+            ),
+          ];
+    return BoardRail(
+      child: Column(
+        key: ValueKey('${color.name}-player-bar'),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ColoredBox(
+            key: ValueKey('${color.name}-turn-highlight'),
+            color: active ? BoardPainter.lastMoveTint : Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Semantics(
+                liveRegion: true,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '$label\n${responding
+                        ? '对方提和'
+                        : _session.drawOffer == color
+                        ? '等待回应'
+                        : active
+                        ? '轮到你${_session.board.inCheck ? ' · 应将' : ''}'
+                        : (_session.finished ? '对局结束' : '等待对方')}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: active ? FontWeight.w700 : FontWeight.normal,
+                      color: BoardPainter.ink.withValues(
+                        alpha: active ? 1 : .55,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: compact
+                ? FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final action in actions) ...[
+                          action,
+                          if (action != actions.last)
+                            const SizedBox(width: 6),
+                        ],
+                      ],
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final action in actions) ...[
+                        action,
+                        if (action != actions.last) const SizedBox(height: 6),
+                      ],
+                    ],
+                  ),
+          ),
+          ...footer,
+        ],
       ),
     );
   }

@@ -103,7 +103,15 @@ void main() {
         final navigation = widget.navigationBuilder == null
             ? 0.0
             : BoardPanel.navigationWidth;
-        final expected = landscape
+        final symmetric =
+            landscape && widget.sideLeft != null && widget.sideRight != null;
+        final expected = symmetric
+            ? math.min(
+                    panel.height - m * 2,
+                    panel.width - 120.0 * 2 - m * 2,
+                  ) -
+                  rim * 2
+            : landscape
             ? math.min(
                     panel.height - m * 2,
                     panel.width -
@@ -131,7 +139,12 @@ void main() {
           ),
           findsNothing,
         );
-        if (landscape) {
+        if (symmetric) {
+          // Face-to-face landscape: the board is horizontally centered
+          // between the two player panes.
+          expect(board.center.dx, closeTo(panel.center.dx, .001));
+          expect(board.top, panel.top + m + rim);
+        } else if (landscape) {
           expect(board.left, panel.left + m + navigation + rim);
           expect(board.top, panel.top + m + rim);
           expect(board.bottom, lessThanOrEqualTo(panel.bottom - m - rim));
@@ -144,15 +157,27 @@ void main() {
             .map((rail) => tester.getRect(find.byWidget(rail)))
             .toList();
         expect(rails, isNotEmpty);
-        expect(
-          rails.any(
-            (rail) => landscape
-                ? rail.left == board.right + m + rim * 2
-                : rail.width >= board.width &&
-                      (rail.bottom == board.top || rail.top == board.bottom),
-          ),
-          isTrue,
-        );
+        if (symmetric) {
+          // One player pane on each side of the centered board.
+          expect(
+            rails.any((rail) => rail.right <= board.left),
+            isTrue,
+          );
+          expect(
+            rails.any((rail) => rail.left >= board.right),
+            isTrue,
+          );
+        } else {
+          expect(
+            rails.any(
+              (rail) => landscape
+                  ? rail.left == board.right + m + rim * 2
+                  : rail.width >= board.width &&
+                        (rail.bottom == board.top || rail.top == board.bottom),
+            ),
+            isTrue,
+          );
+        }
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pumpAndSettle();
       });

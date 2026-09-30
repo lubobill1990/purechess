@@ -485,22 +485,45 @@ void main() {
               );
             }
             if (scene.startsWith('game_human')) {
-              expect(
-                tester
-                    .widget<RotatedBox>(
-                      find.byKey(const ValueKey('black-player-bar')),
-                    )
-                    .quarterTurns,
-                surface.width > surface.height ? 0 : 2,
-              );
-              expect(
-                tester
-                    .widget<RotatedBox>(
-                      find.byKey(const ValueKey('white-player-bar')),
-                    )
-                    .quarterTurns,
-                0,
-              );
+              if (surface.width > surface.height) {
+                // Symmetric landscape: upright panes flanking the centered
+                // board, black left and white right.
+                final boardRect = tester.getRect(find.byType(ChessBoard));
+                expect(boardRect.center.dx, closeTo(surface.width / 2, .001));
+                expect(
+                  tester
+                      .getRect(
+                        find.byKey(const ValueKey('black-player-bar')),
+                      )
+                      .right,
+                  lessThan(boardRect.left),
+                );
+                expect(
+                  tester
+                      .getRect(
+                        find.byKey(const ValueKey('white-player-bar')),
+                      )
+                      .left,
+                  greaterThan(boardRect.right),
+                );
+              } else {
+                expect(
+                  tester
+                      .widget<RotatedBox>(
+                        find.byKey(const ValueKey('black-player-bar')),
+                      )
+                      .quarterTurns,
+                  2,
+                );
+                expect(
+                  tester
+                      .widget<RotatedBox>(
+                        find.byKey(const ValueKey('white-player-bar')),
+                      )
+                      .quarterTurns,
+                  0,
+                );
+              }
             }
             if (scene.endsWith('_finished')) {
               expect(find.byTooltip('再来一局'), findsWidgets);

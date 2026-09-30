@@ -348,19 +348,18 @@ void main() {
     expect(session.drawOffer, chess.Color.black);
     expect(board(tester).flipped, isTrue);
     expect(board(tester).flipFingerOffset, isFalse);
-    for (final side in ['black', 'white']) {
-      expect(
-        tester.widget<RotatedBox>(key('$side-player-bar')).quarterTurns,
-        0,
-      );
-      expect(
-        tester.getRect(key('$side-player-bar')).left,
-        greaterThan(tester.getRect(find.byType(ChessBoard)).right),
-      );
-    }
+    // Symmetric landscape: upright panes, black left of the centered board
+    // and white right of it (players sit on either side, same text
+    // direction for both).
+    final boardRect = tester.getRect(find.byType(ChessBoard));
+    expect(boardRect.center.dx, closeTo(844 / 2, .001));
     expect(
-      tester.getRect(key('black-player-bar')).top,
-      lessThan(tester.getRect(key('white-player-bar')).top),
+      tester.getRect(key('black-player-bar')).right,
+      lessThan(boardRect.left),
+    );
+    expect(
+      tester.getRect(key('white-player-bar')).left,
+      greaterThan(boardRect.right),
     );
     await tester.tap(key('white-decline-draw'));
     await tester.pumpAndSettle();

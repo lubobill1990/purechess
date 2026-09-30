@@ -31,6 +31,8 @@ class BoardPanel extends StatelessWidget {
     this.controls = const SizedBox.shrink(),
     this.minimumSidebarWidth = 240,
     this.navigationBuilder,
+    this.sideLeft,
+    this.sideRight,
   });
 
   static const margin = 10.0;
@@ -44,6 +46,13 @@ class BoardPanel extends StatelessWidget {
   final Widget controls;
   final double minimumSidebarWidth;
   final Widget Function(bool landscape)? navigationBuilder;
+
+  /// Face-to-face landscape: when both are given, the board is horizontally
+  /// centered between two equal-width player panes (one per player sitting
+  /// left and right of the device) and [above]/[below]/[controls] are unused
+  /// in that orientation. Portrait keeps the regular stacked layout.
+  final Widget? sideLeft;
+  final Widget? sideRight;
 
   Widget _frame(BuildContext context, Widget child) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -97,6 +106,64 @@ class BoardPanel extends StatelessWidget {
             child: controls,
           ),
         );
+        if (landscape && sideLeft != null && sideRight != null) {
+          // Symmetric face-to-face layout: the board sits exactly in the
+          // middle; navigation floats top-left so it costs no layout width.
+          const minSidePane = 120.0;
+          final size = math.min(
+            height,
+            math.max(0.0, width - minSidePane * 2 - margin * 2),
+          );
+          // The navigation pill owns the physical top-left corner; the right
+          // pane gets the same top inset so both player panes stay level.
+          final navigationInset = navigation == null ? 0.0 : 44.0 + margin;
+          // Pane content lays out at a fixed design width and scales down as
+          // a whole when the pane is shorter/narrower (tiny landscape, huge
+          // text): no scrolling, no overflow, actions stay tappable.
+          Widget pane(Widget side, {Widget? top}) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (navigationInset > 0)
+                SizedBox(
+                  height: navigationInset,
+                  child: top == null
+                      ? null
+                      : Align(alignment: Alignment.topLeft, child: top),
+                ),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: _frame(
+                    context,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(width: 220, child: side),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+          return Padding(
+            padding: const EdgeInsets.all(margin),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: pane(sideLeft!, top: navigation)),
+                const SizedBox(width: margin),
+                Center(
+                  child: SizedBox.square(
+                    dimension: size,
+                    child: _frame(context, board),
+                  ),
+                ),
+                const SizedBox(width: margin),
+                Expanded(child: pane(sideRight!)),
+              ],
+            ),
+          );
+        }
         if (landscape) {
           final navigationSpace = navigation == null ? 0.0 : navigationWidth;
           final size = math.min(
