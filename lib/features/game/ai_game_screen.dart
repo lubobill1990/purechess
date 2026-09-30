@@ -13,6 +13,7 @@ import '../library/records_repository.dart';
 import 'ai_difficulty.dart';
 import 'game_controller.dart';
 import 'game_persistence.dart';
+import 'game_rail.dart';
 import 'game_session.dart';
 import 'new_game_screen.dart';
 import 'review_screen.dart';
@@ -293,21 +294,6 @@ class _AiGameScreenState extends State<AiGameScreen> {
         if (!didPop) _leave();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('AI 对弈 · 第 ${widget.config.difficulty} 档'),
-          actions: [
-            IconButton(
-              tooltip: '翻转棋盘',
-              onPressed: () => setState(() => _flipped = !_flipped),
-              icon: const Icon(Icons.flip_camera_android_outlined),
-            ),
-            IconButton(
-              tooltip: session.finished ? '再来一局' : '新对局',
-              onPressed: locked ? null : _newGame,
-              icon: const Icon(Icons.add),
-            ),
-          ],
-        ),
         body: PlayFeedback(
           session: session,
           board: board,
@@ -326,13 +312,14 @@ class _AiGameScreenState extends State<AiGameScreen> {
               : null,
           child: SafeArea(
             child: BoardPanel(
-              above: BoardRail(
-                height: 36,
-                child: Center(
-                  child: Text(
-                    '你执${widget.config.humanColor == chess.Color.white ? '白棋 · 先走' : '黑棋 · 后走'}',
-                  ),
-                ),
+              minimumSidebarWidth: 320,
+              above: GameRail(
+                title:
+                    '第 ${widget.config.difficulty} 档 · 你执${widget.config.humanColor == chess.Color.white ? '白棋' : '黑棋'}',
+                onLeave: _leave,
+                onFlip: () => setState(() => _flipped = !_flipped),
+                onNewGame: locked ? null : _newGame,
+                finished: session.finished,
               ),
               board: ChessBoard(
                 board: board,

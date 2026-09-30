@@ -20,11 +20,14 @@ void main() {
     repository = MemoryRecordsRepository();
   });
 
-  Future<void> launch(WidgetTester tester, {Size? size}) async {
-    if (size != null) {
-      await tester.binding.setSurfaceSize(size);
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-    }
+  Future<void> launch(
+    WidgetTester tester, {
+    Size size = const Size(390, 844),
+  }) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: GameScreen(

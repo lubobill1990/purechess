@@ -280,7 +280,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.getRect(find.byType(ChessBoard)), boardRect);
     expect(AiDifficulty(prefs).recommended, 4);
-    await tester.tap(find.text('再来一局'));
+    await tester.tap(find.byTooltip('再来一局'));
     await tester.pumpAndSettle();
     expect(find.byType(NewGameScreen), findsNothing);
     final next = tester.widget<AiGameScreen>(find.byType(AiGameScreen));

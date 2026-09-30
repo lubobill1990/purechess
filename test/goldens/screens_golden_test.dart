@@ -22,6 +22,7 @@ import 'package:purechess/features/game/ai_difficulty.dart';
 import 'package:purechess/features/game/ai_game_screen.dart';
 import 'package:purechess/features/game/game_screen.dart';
 import 'package:purechess/features/game/game_session.dart';
+import 'package:purechess/features/game/game_rail.dart';
 import 'package:purechess/features/game/new_game_screen.dart';
 import 'package:purechess/features/game/review_screen.dart';
 import 'package:purechess/features/home/home_screen.dart';
@@ -446,8 +447,46 @@ void main() {
             expect(board.enabled, !scene.endsWith('_finished'));
             expect(board.board.lastMove, chess.Move.fromUci('h7h6'));
             expect(find.text('保存棋谱'), findsOneWidget);
+            expect(find.byType(AppBar), findsNothing);
+            final rail = find.byType(GameRail);
+            expect(tester.getSize(rail).height, 44);
+            expect(
+              find.descendant(of: rail, matching: find.byType(BackButton)),
+              findsOneWidget,
+            );
+            expect(
+              find.descendant(of: rail, matching: find.byTooltip('翻转棋盘')),
+              findsOneWidget,
+            );
+            expect(
+              find.descendant(
+                of: rail,
+                matching: find.byTooltip(
+                  scene.endsWith('_finished') ? '再来一局' : '新对局',
+                ),
+              ),
+              findsOneWidget,
+            );
+            if (scene.startsWith('game_human')) {
+              expect(
+                tester
+                    .widget<RotatedBox>(
+                      find.byKey(const ValueKey('black-player-bar')),
+                    )
+                    .quarterTurns,
+                surface.width > surface.height ? 0 : 2,
+              );
+              expect(
+                tester
+                    .widget<RotatedBox>(
+                      find.byKey(const ValueKey('white-player-bar')),
+                    )
+                    .quarterTurns,
+                0,
+              );
+            }
             if (scene.endsWith('_finished')) {
-              expect(find.text('再来一局'), findsOneWidget);
+              expect(find.byTooltip('再来一局'), findsOneWidget);
               expect(find.text('黑方胜 · 对方认输'), findsOneWidget);
             }
             if (engine != null) {

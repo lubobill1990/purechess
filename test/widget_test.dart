@@ -172,7 +172,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.getRect(find.byType(ChessBoard)), rect);
       expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
-      await tester.tap(find.text('再来一局'));
+      await tester.tap(find.byTooltip('再来一局'));
       await tester.pumpAndSettle();
       expect(
         tester.widget<ChessBoard>(find.byType(ChessBoard)).board.plyCount,
@@ -234,6 +234,9 @@ void main() {
     expect(find.text('面对面对弈'), findsOneWidget);
     expect(find.byKey(const ValueKey('square-e2')), findsOneWidget);
     await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('离开对局'), findsOneWidget);
+    await tester.tap(find.text('放弃并离开'));
     await tester.pumpAndSettle();
     expect(find.text('双人对弈'), findsOneWidget);
   });
