@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/telemetry/crash_guard.dart';
 import '../../widgets/board/chess_board.dart';
+import '../../widgets/board/board_panel.dart';
 import '../home/study_theme.dart';
 import 'classic_library.dart';
 
@@ -82,19 +83,12 @@ class _ClassicReaderScreenState extends State<ClassicReaderScreen> {
             child: Scaffold(
               appBar: AppBar(title: Text(game.title)),
               body: SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth >= 800;
-                    final board = ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 560),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: ChessBoard(
-                          board: game.record.boardAt(node),
-                          enabled: false,
-                          onMove: (_) {},
-                        ),
-                      ),
+                child: Builder(
+                  builder: (context) {
+                    final board = ChessBoard(
+                      board: game.record.boardAt(node),
+                      enabled: false,
+                      onMove: (_) {},
                     );
                     final notes = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,8 +99,6 @@ class _ClassicReaderScreenState extends State<ClassicReaderScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(game.players, style: theme.textTheme.bodyMedium),
-                        const SizedBox(height: 24),
-                        Text(move, style: theme.textTheme.headlineSmall),
                         const SizedBox(height: 16),
                         Semantics(
                           liveRegion: true,
@@ -138,97 +130,84 @@ class _ClassicReaderScreenState extends State<ClassicReaderScreen> {
                         ),
                       ],
                     );
-                    return SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 1120),
-                          child: wide
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(child: board),
-                                    const SizedBox(width: 32),
-                                    Expanded(child: notes),
-                                  ],
-                                )
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Center(child: board),
-                                    const SizedBox(height: 24),
-                                    notes,
-                                  ],
-                                ),
-                        ),
+                    return BoardPanel(
+                      board: board,
+                      above: BoardRail(
+                        height: 48,
+                        child: Center(child: Text(move)),
+                      ),
+                      below: BoardRail(
+                        emphasized: true,
+                        child: _controls(game),
+                      ),
+                      controls: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: notes,
                       ),
                     );
                   },
-                ),
-              ),
-              bottomNavigationBar: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_error != null)
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              _error!,
-                              style: TextStyle(color: theme.colorScheme.error),
-                            ),
-                            TextButton(
-                              onPressed: _saving ? null : _save,
-                              child: const Text('重试'),
-                            ),
-                          ],
-                        ),
-                      Text(
-                        '$_ply / ${game.plies} 半回合',
-                        key: const ValueKey('reader-progress'),
-                      ),
-                      Slider(
-                        value: _ply.toDouble(),
-                        max: game.plies.toDouble(),
-                        divisions: game.plies,
-                        semanticFormatterCallback: (value) =>
-                            '第 ${value.round()} 半回合',
-                        onChanged: _saving
-                            ? null
-                            : (value) => _go(value.round()),
-                      ),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 16,
-                        runSpacing: 8,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: _saving || _ply == 0
-                                ? null
-                                : () => _go(_ply - 1),
-                            icon: const Icon(Icons.chevron_left),
-                            label: const Text('上一步'),
-                          ),
-                          FilledButton.icon(
-                            onPressed: _saving || _ply == game.plies
-                                ? null
-                                : () => _go(_ply + 1),
-                            icon: const Icon(Icons.chevron_right),
-                            label: const Text('下一步'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),
           ),
         );
       },
+    ),
+  );
+
+  Widget _controls(ClassicGame game) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_error != null)
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                _error!,
+                style: const TextStyle(
+                  color: BoardPainter.ivory,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextButton(
+                onPressed: _saving ? null : _save,
+                child: const Text('重试'),
+              ),
+            ],
+          ),
+        Text(
+          '$_ply / ${game.plies} 半回合',
+          key: const ValueKey('reader-progress'),
+        ),
+        Slider(
+          value: _ply.toDouble(),
+          max: game.plies.toDouble(),
+          divisions: game.plies,
+          semanticFormatterCallback: (value) => '第 ${value.round()} 半回合',
+          onChanged: _saving ? null : (value) => _go(value.round()),
+        ),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 16,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              onPressed: _saving || _ply == 0 ? null : () => _go(_ply - 1),
+              icon: const Icon(Icons.chevron_left),
+              label: const Text('上一步'),
+            ),
+            FilledButton.icon(
+              onPressed: _saving || _ply == game.plies
+                  ? null
+                  : () => _go(_ply + 1),
+              icon: const Icon(Icons.chevron_right),
+              label: const Text('下一步'),
+            ),
+          ],
+        ),
+      ],
     ),
   );
 }

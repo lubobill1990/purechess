@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,12 +17,16 @@ void main() {
   late StateSetter rebuild;
   bool flipped = false;
   bool enabled = true;
+  bool fingerOffset = false;
+  bool flipFingerOffset = false;
 
   setUp(() {
     board = Board();
     moves = [];
     flipped = false;
     enabled = true;
+    fingerOffset = false;
+    flipFingerOffset = false;
   });
 
   Future<void> launch(WidgetTester tester) async {
@@ -39,6 +44,8 @@ void main() {
                     board: board,
                     flipped: flipped,
                     enabled: enabled,
+                    fingerOffset: fingerOffset,
+                    flipFingerOffset: flipFingerOffset,
                     onMove: (move) => setState(() {
                       moves.add(move);
                       board.play(move);
@@ -59,6 +66,181 @@ void main() {
       .map((widget) => widget.painter)
       .whereType<BoardPainter>()
       .single;
+
+  testWidgets('touch previews immediately, lifts 1.5 cells and commits on up', (
+    tester,
+  ) async {
+    fingerOffset = true;
+    await launch(tester);
+    final gesture = await tester.startGesture(tester.getCenter(square('e2')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('board-aim-ghost')), findsOneWidget);
+    expect(moves, isEmpty);
+    final target = tester.getCenter(square('e4'));
+    await gesture.moveTo(target + const Offset(0, 75));
+    await tester.pump();
+    expect(painter(tester).aim, chess.parseSquare('e4'));
+    expect(painter(tester).aimLegal, isTrue);
+    expect(
+      tester.getCenter(find.byKey(const ValueKey('board-aim-ghost'))),
+      target,
+    );
+    // Test either side of the exact cell boundary, not just a rounded center.
+    await gesture.moveTo(target + const Offset(0, 99));
+    await tester.pump();
+    expect(painter(tester).aim, chess.parseSquare('e4'));
+    await gesture.moveTo(target + const Offset(0, 101));
+    await tester.pump();
+    expect(painter(tester).aim, chess.parseSquare('e3'));
+    await gesture.moveTo(target + const Offset(0, 75));
+    expect(moves, isEmpty);
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(moves.single.uci, 'e2e4');
+    expect(painter(tester).aim, isNull);
+    expect(find.byKey(const ValueKey('board-aim-ghost')), findsNothing);
+  });
+
+  for (final flip in [false, true]) {
+    testWidgets('opposite seat reverses touch lift with flipped=$flip', (
+      tester,
+    ) async {
+      board.playUci('e2e4');
+      flipped = flip;
+      fingerOffset = true;
+      flipFingerOffset = true;
+      await launch(tester);
+      final gesture = await tester.startGesture(tester.getCenter(square('e7')));
+      final target = tester.getCenter(square('e5'));
+      await gesture.moveTo(target - const Offset(0, 75));
+      await tester.pump();
+      expect(painter(tester).aim, chess.parseSquare('e5'));
+      expect(painter(tester).aimLegal, isTrue);
+      expect(moves, isEmpty);
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(moves.single.uci, 'e7e5');
+    });
+  }
+
+  for (final ending in [
+    'outside',
+    'illegal',
+    'cancel',
+    'disabled',
+    'position',
+  ]) {
+    testWidgets('touch $ending clears preview without committing', (
+      tester,
+    ) async {
+      fingerOffset = true;
+      await launch(tester);
+      final gesture = await tester.startGesture(tester.getCenter(square('e2')));
+      await gesture.moveTo(
+        tester.getCenter(square('e4')) + const Offset(0, 75),
+      );
+      await tester.pump();
+      expect(painter(tester).aimLegal, isTrue);
+      switch (ending) {
+        case 'outside':
+          final rect = tester.getRect(find.byType(ChessBoard));
+          await gesture.moveTo(Offset(rect.center.dx, rect.bottom + 1));
+          await tester.pump();
+          expect(painter(tester).aim, isNull);
+          await gesture.up();
+        case 'illegal':
+          await gesture.moveTo(
+            tester.getCenter(square('e5')) + const Offset(0, 75),
+          );
+          await tester.pump();
+          expect(painter(tester).aim, chess.parseSquare('e5'));
+          expect(painter(tester).aimLegal, isFalse);
+          await gesture.up();
+        case 'cancel':
+          await gesture.cancel();
+        case 'disabled':
+          rebuild(() => enabled = false);
+          await tester.pump();
+          await gesture.up();
+        case 'position':
+          rebuild(() => board.playUci('d2d4'));
+          await tester.pump();
+          await gesture.up();
+      }
+      await tester.pumpAndSettle();
+      expect(moves, isEmpty);
+      expect(painter(tester).aim, isNull);
+      expect(painter(tester).selected, isNull);
+      expect(find.byKey(const ValueKey('board-aim-ghost')), findsNothing);
+    });
+  }
+
+  testWidgets(
+    'mouse hover never lifts and click-click commits only on release',
+    (tester) async {
+      fingerOffset = true;
+      flipFingerOffset = true;
+      await launch(tester);
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: tester.getCenter(square('e2')));
+      await mouse.down(tester.getCenter(square('e2')));
+      await tester.pump();
+      expect(painter(tester).selected, isNull);
+      await mouse.up();
+      await tester.pump();
+      expect(painter(tester).selected, chess.parseSquare('e2'));
+      await mouse.moveTo(tester.getCenter(square('e4')));
+      await tester.pump();
+      expect(painter(tester).aim, chess.parseSquare('e4'));
+      expect(painter(tester).aimLegal, isTrue);
+      expect(find.byKey(const ValueKey('board-aim-ghost')), findsNothing);
+      await mouse.down(tester.getCenter(square('e4')));
+      expect(moves, isEmpty);
+      await mouse.up();
+      await tester.pumpAndSettle();
+      expect(moves.single.uci, 'e2e4');
+      await mouse.removePointer();
+      await tester.pump();
+      expect(painter(tester).aim, isNull);
+    },
+  );
+
+  testWidgets('near edge eases touch lift so the home rank remains reachable', (
+    tester,
+  ) async {
+    fingerOffset = true;
+    board = Board.fromFen('7k/8/8/8/8/8/8/R6K w - - 0 1');
+    await launch(tester);
+    final gesture = await tester.startGesture(tester.getCenter(square('a1')));
+    final target = tester.getCenter(square('b1'));
+    await gesture.moveTo(target + const Offset(0, 12.5));
+    await tester.pump();
+    expect(painter(tester).aim, chess.parseSquare('b1'));
+    await gesture.up();
+    await tester.pumpAndSettle();
+    expect(moves.single.uci, 'a1b1');
+  });
+
+  testWidgets(
+    'touch promotion clears ghost before asking and cancel never moves',
+    (tester) async {
+      fingerOffset = true;
+      board = Board.fromFen('7k/P7/8/8/8/8/8/7K w - - 0 1');
+      await launch(tester);
+      final gesture = await tester.startGesture(tester.getCenter(square('a7')));
+      await gesture.moveTo(
+        tester.getCenter(square('a8')) + const Offset(0, 75),
+      );
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(find.text('选择升变棋子'), findsOneWidget);
+      expect(find.byKey(const ValueKey('board-aim-ghost')), findsNothing);
+      await tester.tap(find.text('取消'));
+      await tester.pumpAndSettle();
+      expect(moves, isEmpty);
+      expect(painter(tester).selected, isNull);
+    },
+  );
 
   testWidgets(
     'painter raster contains alternating squares and all highlights',
@@ -201,10 +383,10 @@ void main() {
     tester,
   ) async {
     await launch(tester);
-    await tester.tap(square('e7'));
+    await tester.tap(square('e7'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(painter(tester).selected, isNull);
-    await tester.tap(square('e2'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(painter(tester).selected, chess.parseSquare('e2'));
     expect(painter(tester).targets, {
@@ -215,7 +397,7 @@ void main() {
       tester.widget<Semantics>(square('e4')).properties.label,
       contains('合法着点'),
     );
-    await tester.tap(square('e4'));
+    await tester.tap(square('e4'), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
     expect(moves.single.uci, 'e2e4');
     expect(painter(tester).selected, isNull);
@@ -228,15 +410,15 @@ void main() {
     tester,
   ) async {
     await launch(tester);
-    await tester.tap(square('e2'));
-    await tester.tap(square('d2'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
+    await tester.tap(square('d2'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(painter(tester).selected, chess.parseSquare('d2'));
-    await tester.tap(square('d2'));
+    await tester.tap(square('d2'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(painter(tester).selected, isNull);
-    await tester.tap(square('e2'));
-    await tester.tap(square('e5'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
+    await tester.tap(square('e5'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(moves, isEmpty);
     expect(board.toFen(), Fen.initial);
@@ -288,7 +470,7 @@ void main() {
     tester,
   ) async {
     await launch(tester);
-    await tester.tap(square('e2'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
     rebuild(() => flipped = true);
     await tester.pumpAndSettle();
     expect(painter(tester).selected, isNull);
@@ -300,8 +482,8 @@ void main() {
       tester.getTopLeft(square('h1')).dy,
       lessThan(tester.getTopLeft(square('h8')).dy),
     );
-    await tester.tap(square('e2'));
-    await tester.tap(square('e4'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
+    await tester.tap(square('e4'), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
     expect(moves.single.uci, 'e2e4');
   });
@@ -311,8 +493,8 @@ void main() {
   ) async {
     enabled = false;
     await launch(tester);
-    await tester.tap(square('e2'));
-    await tester.tap(square('e4'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
+    await tester.tap(square('e4'), kind: PointerDeviceKind.mouse);
     await tester.dragFrom(
       tester.getCenter(square('e2')),
       const Offset(0, -100),
@@ -326,7 +508,7 @@ void main() {
     tester,
   ) async {
     await launch(tester);
-    await tester.tap(square('e2'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
     rebuild(() => board.playUci('d2d4'));
     await tester.pumpAndSettle();
     expect(painter(tester).selected, isNull);
@@ -338,7 +520,7 @@ void main() {
   ) async {
     board = Board.fromFen('4r2k/8/8/8/8/8/4R3/4K3 w - - 0 1');
     await launch(tester);
-    await tester.tap(square('e2'));
+    await tester.tap(square('e2'), kind: PointerDeviceKind.mouse);
     await tester.pump();
     expect(painter(tester).targets.contains(chess.parseSquare('d2')), isFalse);
     rebuild(() => board = Board.fromFen('4r2k/8/8/8/8/8/8/4K3 w - - 0 1'));
@@ -359,8 +541,8 @@ void main() {
     testWidgets('promotion explicitly chooses ${type.name}', (tester) async {
       board = Board.fromFen('7k/P7/8/8/8/8/8/7K w - - 0 1');
       await launch(tester);
-      await tester.tap(square('a7'));
-      await tester.tap(square('a8'));
+      await tester.tap(square('a7'), kind: PointerDeviceKind.mouse);
+      await tester.tap(square('a8'), kind: PointerDeviceKind.mouse);
       await tester.pumpAndSettle();
       expect(find.text('选择升变棋子'), findsOneWidget);
       expect(moves, isEmpty);
@@ -388,8 +570,8 @@ void main() {
   ) async {
     board = Board.fromFen('7k/P7/8/8/8/8/8/7K w - - 0 1');
     await launch(tester);
-    await tester.tap(square('a7'));
-    await tester.tap(square('a8'));
+    await tester.tap(square('a7'), kind: PointerDeviceKind.mouse);
+    await tester.tap(square('a8'), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
     rebuild(() => board = Board());
     await tester.pumpAndSettle();
@@ -409,8 +591,8 @@ void main() {
     ) async {
       board = Board.fromFen(fen);
       await launch(tester);
-      await tester.tap(square(from));
-      await tester.tap(square(to));
+      await tester.tap(square(from), kind: PointerDeviceKind.mouse);
+      await tester.tap(square(to), kind: PointerDeviceKind.mouse);
       await tester.pumpAndSettle();
       expect(moves.single.uci, '$from$to');
       expect(board.pieceAt(chess.parseSquare(removed)), isNull);

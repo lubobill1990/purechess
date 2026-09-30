@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/router.dart';
@@ -42,9 +43,9 @@ void main() {
   }
 
   Future<void> move(WidgetTester tester, String from, String to) async {
-    await tester.tap(key('square-$from'));
+    await tester.tap(key('square-$from'), kind: PointerDeviceKind.mouse);
     await tester.pump();
-    await tester.tap(key('square-$to'));
+    await tester.tap(key('square-$to'), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
   }
 
@@ -172,7 +173,7 @@ void main() {
       expect(c.board.toFen(), fen);
       expect(c.solved, isFalse);
       // Cancellation leaves the pawn selected in the shared board.
-      await tester.tap(key('square-a8'));
+      await tester.tap(key('square-a8'), kind: PointerDeviceKind.mouse);
       await tester.pumpAndSettle();
       await tester.tap(key('promotion-queen'));
       await tester.pumpAndSettle();

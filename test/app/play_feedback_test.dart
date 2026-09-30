@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -158,8 +159,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('双人对弈'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('square-e2')));
-    await tester.tap(find.byKey(const ValueKey('square-e4')));
+    await tester.tap(
+      find.byKey(const ValueKey('square-e2')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('square-e4')),
+      kind: PointerDeviceKind.mouse,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('翻转棋盘'));
     await tester.pumpAndSettle();
@@ -336,8 +343,14 @@ void main() {
       );
       final rect = tester.getRect(find.byType(ChessBoard));
       store.failKey = 'flutter.${TutorialController.progressKey}';
-      await tester.tap(find.byKey(const ValueKey('square-d4')));
-      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.tap(
+        find.byKey(const ValueKey('square-d4')),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('square-e4')),
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pumpAndSettle();
       expect(find.byType(CelebrationBadge), findsNothing);
       expect(celebrations(), isEmpty);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/router.dart';
@@ -53,8 +54,14 @@ void main() {
   }
 
   Future<void> move(WidgetTester tester, String from, String to) async {
-    await tester.tap(find.byKey(ValueKey('square-$from')));
-    await tester.tap(find.byKey(ValueKey('square-$to')));
+    await tester.tap(
+      find.byKey(ValueKey('square-$from')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.tap(
+      find.byKey(ValueKey('square-$to')),
+      kind: PointerDeviceKind.mouse,
+    );
     await tester.pumpAndSettle();
   }
 

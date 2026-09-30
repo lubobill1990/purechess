@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +11,7 @@ import '../../core/move.dart' as chess;
 import '../../core/puzzle.dart';
 import '../../engine/stockfish_service.dart';
 import '../../widgets/board/chess_board.dart';
+import '../../widgets/board/board_panel.dart';
 import '../achievements/achievements.dart';
 import 'tutorial_controller.dart';
 import 'tutorial_engine.dart';
@@ -253,7 +253,7 @@ class TutorialPlayScreen extends StatelessWidget {
                   ? 'AI 正在走棋，请稍候'
                   : c.failed
                   ? '再试一次'
-                  : '你执白 · 点选棋子，再点目标格',
+                  : '你执白 · 按住棋子瞄准，松手走棋',
               explanation: c.explanation,
               notice: c.level.graduation ? c.aiNotice : null,
               actions: [
@@ -460,99 +460,85 @@ class _LessonLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SafeArea(
-    child: Column(
-      children: [
-        SizedBox(
-          key: const ValueKey('tutorial-explanation'),
-          height: 156,
-          child: SingleChildScrollView(
-            key: ValueKey('$status:${notice != null}'),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(status, style: Theme.of(context).textTheme.titleMedium),
+    child: BoardPanel(
+      above: BoardRail(
+        key: const ValueKey('tutorial-explanation'),
+        height: 156,
+        child: SingleChildScrollView(
+          key: ValueKey('$status:${notice != null}'),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                status,
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(color: BoardPainter.ink),
+              ),
+              const SizedBox(height: 8),
+              if (notice != null) ...[
                 const SizedBox(height: 8),
-                if (notice != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    notice!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
+                Text(
+                  notice!,
+                  style: const TextStyle(
+                    color: BoardPainter.ink,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 8),
-                ],
-                Text(explanation),
+                ),
+                const SizedBox(height: 8),
               ],
-            ),
+              Text(explanation),
+            ],
           ),
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final size = math.min(
-                  constraints.maxWidth,
-                  constraints.maxHeight,
-                );
-                return Center(
-                  child: SizedBox.square(
-                    dimension: size,
-                    child: Stack(
-                      children: [
-                        ChessBoard(
-                          board: board,
-                          enabled: enabled,
-                          onMove: onMove,
+      ),
+      board: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = constraints.maxWidth;
+          return Stack(
+            children: [
+              ChessBoard(board: board, enabled: enabled, onMove: onMove),
+              if (hint != null)
+                for (final square in [hint!.from, hint!.to])
+                  Positioned(
+                    left: (square & 7) * size / 8,
+                    top: (7 - (square >> 4)) * size / 8,
+                    width: size / 8,
+                    height: size / 8,
+                    child: IgnorePointer(
+                      child: Semantics(
+                        label:
+                            '${square == hint!.from ? '起点' : '目标'} '
+                            '${chess.squareName(square)}',
+                        child: Container(
+                          margin: const EdgeInsets.all(3),
+                          decoration: boardHintDecoration(
+                            circle: square == hint!.to,
+                          ),
                         ),
-                        if (hint != null)
-                          for (final square in [hint!.from, hint!.to])
-                            Positioned(
-                              left: (square & 7) * size / 8,
-                              top: (7 - (square >> 4)) * size / 8,
-                              width: size / 8,
-                              height: size / 8,
-                              child: IgnorePointer(
-                                child: Semantics(
-                                  label:
-                                      '${square == hint!.from ? '起点' : '目标'} '
-                                      '${chess.squareName(square)}',
-                                  child: Container(
-                                    margin: const EdgeInsets.all(3),
-                                    decoration: boardHintDecoration(
-                                      circle: square == hint!.to,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                      ],
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
+            ],
+          );
+        },
+      ),
+      below: BoardRail(
+        height: 64,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              for (final action in actions)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: action,
+                ),
+            ],
           ),
         ),
-        SizedBox(
-          height: 64,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                for (final action in actions)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: action,
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     ),
   );
 }

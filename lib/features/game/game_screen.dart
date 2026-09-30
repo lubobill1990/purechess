@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +8,7 @@ import '../../app/telemetry/analytics.dart';
 import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
 import '../../widgets/board/chess_board.dart';
+import '../../widgets/board/board_panel.dart';
 import '../../widgets/board/piece_image.dart';
 import '../achievements/achievements.dart';
 import '../library/records_repository.dart';
@@ -294,104 +294,90 @@ class _GameScreenState extends State<GameScreen> {
               ? null
               : '${colorName(_session.outcome!.winner!)}获胜',
           child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final width = math.min(constraints.maxWidth, 640.0);
-                final boardSize = math.max(
-                  0.0,
-                  math.min(width - 24, constraints.maxHeight - 240),
-                );
-                return Center(
-                  child: SizedBox(
-                    width: width,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RotatedBox(
-                          key: const ValueKey('black-player-bar'),
-                          quarterTurns: 2,
-                          child: _playerBar(chess.Color.black),
-                        ),
-                        SizedBox(
-                          width: boardSize,
-                          height: boardSize,
-                          child: ChessBoard(
-                            key: ObjectKey(_session),
-                            board: board,
-                            flipped: _flipped,
-                            enabled: _session.canPlay && !_saving,
-                            onMove: (move) =>
-                                _change(() => _session.play(move)),
-                          ),
-                        ),
-                        _playerBar(chess.Color.white),
-                        SizedBox(
-                          key: const ValueKey('game-result-area'),
-                          height: 72,
-                          child: Center(
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Semantics(
-                                liveRegion: true,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      _saveMessage == null
-                                          ? status
-                                          : '$status\n$_saveMessage',
-                                      textAlign: TextAlign.center,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    if (_achievementError != null)
-                                      TextButton(
-                                        onPressed: _achievementSaving
-                                            ? null
-                                            : _recordAchievement,
-                                        child: Text('$_achievementError保存'),
-                                      ),
-                                  ],
+            child: BoardPanel(
+              above: BoardRail(
+                child: RotatedBox(
+                  key: const ValueKey('black-player-bar'),
+                  quarterTurns: 2,
+                  child: _playerBar(chess.Color.black),
+                ),
+              ),
+              board: ChessBoard(
+                key: ObjectKey(_session),
+                board: board,
+                flipped: _flipped,
+                flipFingerOffset: _session.turn == chess.Color.black,
+                enabled: _session.canPlay && !_saving,
+                onMove: (move) => _change(() => _session.play(move)),
+              ),
+              below: Column(
+                children: [
+                  BoardRail(
+                    emphasized: true,
+                    child: SizedBox(
+                      key: const ValueKey('game-result-area'),
+                      height: 72,
+                      child: Center(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Column(
+                              children: [
+                                Text(
+                                  _saveMessage == null
+                                      ? status
+                                      : '$status\n$_saveMessage',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
+                                if (_achievementError != null)
+                                  TextButton(
+                                    onPressed: _achievementSaving
+                                        ? null
+                                        : _recordAchievement,
+                                    child: Text('$_achievementError保存'),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 56,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              FilledButton.icon(
-                                onPressed: _saving || !_dirty ? null : _save,
-                                icon: const Icon(Icons.save_outlined),
-                                label: Text(_saving ? '正在保存…' : '保存棋谱'),
-                              ),
-                              const SizedBox(width: 12),
-                              TextButton(
-                                onPressed: _saving
-                                    ? null
-                                    : () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute<void>(
-                                          builder: (_) => RecordsScreen(
-                                            openRepository:
-                                                widget.openRepository,
-                                          ),
-                                        ),
-                                      ),
-                                child: const Text('我的棋谱'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                );
-              },
+                  BoardRail(child: _playerBar(chess.Color.white)),
+                ],
+              ),
+              controls: SizedBox(
+                height: 56,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: _saving || !_dirty ? null : _save,
+                      icon: const Icon(Icons.save_outlined),
+                      label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                    ),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: _saving
+                          ? null
+                          : () => Navigator.push(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (_) => RecordsScreen(
+                                  openRepository: widget.openRepository,
+                                ),
+                              ),
+                            ),
+                      child: const Text('我的棋谱'),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -406,9 +392,7 @@ class _GameScreenState extends State<GameScreen> {
     return SizedBox(
       height: 56,
       child: ColoredBox(
-        color: canAct
-            ? Theme.of(context).colorScheme.primaryContainer
-            : Colors.transparent,
+        color: canAct ? BoardPainter.lastMoveTint : Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
@@ -418,7 +402,8 @@ class _GameScreenState extends State<GameScreen> {
                   '$label${canAct ? ' · 走棋' : ''}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelLarge,
+                  style: Theme.of(context).textTheme.labelLarge
+                      ?.copyWith(color: BoardPainter.ink),
                 ),
               ),
               if (responding) ...[
