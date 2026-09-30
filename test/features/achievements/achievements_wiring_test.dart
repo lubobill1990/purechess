@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 
 import '../../support/preferences_store.dart';
+import '../../support/game_navigation.dart';
 import '../game/fake_game_engine.dart';
 import '../puzzle/fixtures.dart';
 
@@ -122,7 +123,7 @@ void main() {
       expect(data().counters['gamesFinished'], 1);
       expect(data().counters['winsVsAi'], 0);
       expect(tester.getRect(find.byType(ChessBoard)), rect);
-      await tester.tap(find.byTooltip('翻转棋盘'));
+      await tapGameNavigation(tester, '翻转棋盘');
       await tester.pumpAndSettle();
       expect(data().counters['gamesFinished'], 1);
       await tester.pumpWidget(const SizedBox());

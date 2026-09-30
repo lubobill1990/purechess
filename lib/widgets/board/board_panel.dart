@@ -4,9 +4,24 @@ import 'package:flutter/material.dart';
 
 import 'chess_board.dart';
 
-/// Keeps the board square and nearly flush with the short edge, framed as
-/// one physical panel: rails and board share a rounded, hairline-bordered
-/// surface with a breathing margin so the wood never touches the screen edge.
+Color boardTableColor(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark
+    ? const Color(0xFF0F0C08)
+    : const Color(0xFF4A3826);
+
+AppBar boardAppBar(BuildContext context, String title) {
+  final theme = Theme.of(context);
+  return AppBar(
+    foregroundColor: BoardPainter.ivory,
+    titleTextStyle:
+        (theme.appBarTheme.titleTextStyle ?? theme.textTheme.titleLarge)
+            ?.copyWith(color: BoardPainter.ivory),
+    title: Text(title),
+  );
+}
+
+/// A bounded board on a walnut table. Only reading-page notes may scroll;
+/// the board itself never participates in a scrollable.
 class BoardPanel extends StatelessWidget {
   const BoardPanel({
     super.key,
@@ -14,169 +29,151 @@ class BoardPanel extends StatelessWidget {
     this.above = const SizedBox.shrink(),
     this.below = const SizedBox.shrink(),
     this.controls = const SizedBox.shrink(),
-    this.minimumSidebarWidth = 0,
-    this.scrollController,
+    this.minimumSidebarWidth = 240,
+    this.navigationBuilder,
   });
 
-  /// Breathing room between the panel and the screen/pane edges.
   static const margin = 10.0;
+  static const rim = 3.0;
+  static const navigationWidth = 54.0;
   static const _radius = 14.0;
 
   final Widget board;
   final Widget above;
   final Widget below;
   final Widget controls;
-
-  /// Reserve readable controls in compact landscape game windows.
-  /// Zero preserves the short-edge board sizing used by reading/learning pages.
   final double minimumSidebarWidth;
-  final ScrollController? scrollController;
+  final Widget Function(bool landscape)? navigationBuilder;
 
-  Widget _frame(BuildContext context, double size) {
+  Widget _frame(BuildContext context, Widget child) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    return SizedBox(
-      width: size,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(
-            color: (dark ? BoardPainter.ivory : BoardPainter.ink).withValues(
-              alpha: .25,
-            ),
+    return Container(
+      padding: const EdgeInsets.all(rim),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFFB69A68) : const Color(0xFFE8CD95),
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: dark ? .7 : .38),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: dark ? .5 : .18),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(_radius),
-          child: SizedBox.square(dimension: size, child: board),
-        ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_radius - rim),
+        child: child,
       ),
     );
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final landscape = constraints.maxWidth > constraints.maxHeight;
-      if (landscape) {
-        final availableHeight = constraints.maxHeight - margin * 2;
-        final size = minimumSidebarWidth == 0
-            ? availableHeight
-            : math.min(
-                availableHeight,
-                constraints.maxWidth - minimumSidebarWidth - margin * 3 - 2,
-              );
-        return Padding(
-          padding: const EdgeInsets.all(margin),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _frame(context, size),
-              const SizedBox(width: margin + 2),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: math.max(
-                      240,
-                      constraints.maxWidth - size - margin * 3 - 2,
-                    ),
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Status rails grouped into a card that speaks the
-                          // same rounded/hairline language as the board frame.
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(_radius),
-                              border: Border.all(
-                                color:
-                                    (Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? BoardPainter.ivory
-                                            : BoardPainter.ink)
-                                        .withValues(alpha: .25),
-                              ),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(_radius),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [above, below],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: margin),
-                          controls,
-                        ],
-                      ),
+  Widget build(BuildContext context) => ColoredBox(
+    color: boardTableColor(context),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final landscape = constraints.maxWidth > constraints.maxHeight;
+        final height = constraints.maxHeight - margin * 2;
+        final width = constraints.maxWidth - margin * 2;
+        final navigation = navigationBuilder?.call(landscape);
+        final sidebar = BoardRail(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [above, below],
+          ),
+        );
+        final theme = Theme.of(context);
+        final actions = Theme(
+          data: theme.copyWith(
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: boardActionStyle(theme.colorScheme.onSurface),
+            ),
+          ),
+          child: Material(
+            color: theme.colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(11),
+            clipBehavior: Clip.antiAlias,
+            child: controls,
+          ),
+        );
+        if (landscape) {
+          final navigationSpace = navigation == null ? 0.0 : navigationWidth;
+          final size = math.min(
+            height,
+            math.max(
+              0.0,
+              width - navigationSpace - minimumSidebarWidth - margin,
+            ),
+          );
+          return Padding(
+            padding: const EdgeInsets.all(margin),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (navigation != null)
+                  SizedBox(
+                    width: navigationWidth,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: navigation,
                     ),
                   ),
+                SizedBox.square(dimension: size, child: _frame(context, board)),
+                const SizedBox(width: margin),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _frame(context, sidebar),
+                      const SizedBox(height: margin),
+                      Flexible(child: actions),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.all(margin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Flexible(
+                child: _frame(
+                  context,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ?navigation,
+                      above,
+                      Flexible(
+                        child: Center(
+                          heightFactor: 1,
+                          child: AspectRatio(aspectRatio: 1, child: board),
+                        ),
+                      ),
+                      below,
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: margin),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: height * .3),
+                child: actions,
               ),
             ],
           ),
         );
-      }
-      final size = constraints.maxWidth - margin * 2;
-      return SingleChildScrollView(
-        controller: scrollController,
-        padding: const EdgeInsets.all(margin),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(_radius),
-                border: Border.all(
-                  color:
-                      (Theme.of(context).brightness == Brightness.dark
-                              ? BoardPainter.ivory
-                              : BoardPainter.ink)
-                          .withValues(alpha: .25),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: Theme.of(context).brightness == Brightness.dark
-                          ? .5
-                          : .18,
-                    ),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(_radius),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    above,
-                    SizedBox.square(dimension: size, child: board),
-                    below,
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: margin),
-            controls,
-          ],
-        ),
-      );
-    },
+      },
+    ),
   );
 }
 
-/// A flush wood rail, without margins or rounded corners between it and the board.
+/// A flush wood rail, without margins between it and the board.
 class BoardRail extends StatelessWidget {
   const BoardRail({
     super.key,
@@ -194,7 +191,7 @@ class BoardRail extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final foreground = emphasized ? BoardPainter.ivory : BoardPainter.ink;
     final theme = Theme.of(context);
-    return ColoredBox(
+    return Material(
       color: emphasized
           ? (dark ? BoardPainter.nightDarkSquare : BoardPainter.darkSquare)
           : (dark ? BoardPainter.nightLightSquare : BoardPainter.lightSquare),
@@ -203,21 +200,17 @@ class BoardRail extends StatelessWidget {
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
               foregroundColor: foreground,
-              disabledForegroundColor: foreground.withValues(alpha: .5),
-            ).merge(theme.textButtonTheme.style),
+              enableFeedback: false,
+            ),
           ),
           iconButtonTheme: IconButtonThemeData(
             style: IconButton.styleFrom(
               foregroundColor: foreground,
-              disabledForegroundColor: foreground.withValues(alpha: .5),
-            ).merge(theme.iconButtonTheme.style),
+              enableFeedback: false,
+            ),
           ),
           outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: foreground,
-              disabledForegroundColor: foreground.withValues(alpha: .5),
-              side: BorderSide(color: foreground.withValues(alpha: .5)),
-            ).merge(theme.outlinedButtonTheme.style),
+            style: boardActionStyle(foreground),
           ),
         ),
         child: DefaultTextStyle.merge(
@@ -228,3 +221,24 @@ class BoardRail extends StatelessWidget {
     );
   }
 }
+
+ButtonStyle boardActionStyle(Color foreground) =>
+    OutlinedButton.styleFrom(
+      enableFeedback: false,
+      foregroundColor: foreground,
+      disabledForegroundColor: foreground.withValues(alpha: .32),
+      minimumSize: const Size(40, 40),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+    ).copyWith(
+      side: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? BorderSide.none
+            : BorderSide(color: foreground.withValues(alpha: .55)),
+      ),
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? Colors.transparent
+            : foreground.withValues(alpha: .07),
+      ),
+    );

@@ -16,6 +16,7 @@ import 'package:purechess/widgets/board/chess_board.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../support/memory_records_repository.dart';
+import '../../support/game_navigation.dart';
 import 'fake_game_engine.dart';
 
 class SlowClosingEngine extends FakeGameEngine {
@@ -192,7 +193,7 @@ void main() {
       kind: PointerDeviceKind.mouse,
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('新对局'));
+    await tapGameNavigation(tester, '新对局');
     await tester.pumpAndSettle();
     await tester.tap(find.text('重新开始'));
     await tester.pumpAndSettle();
@@ -237,7 +238,7 @@ void main() {
           await tester.pumpAndSettle();
         }
       }
-      await tester.pageBack();
+      await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       if (exit == 'resume' || exit == 'abandon') {
         await tester.tap(find.text(exit == 'resume' ? '稍后继续' : '放弃并离开'));
@@ -374,7 +375,7 @@ void main() {
       await tester.tap(find.text('保存棋谱'));
       await tester.pumpAndSettle();
       expect(find.textContaining('棋谱保存失败'), findsOneWidget);
-      await tester.tap(find.byTooltip('新对局'));
+      await tapGameNavigation(tester, '新对局');
       await tester.pumpAndSettle();
       expect(find.text('重新开始'), findsOneWidget);
       await tester.tap(find.text('取消'));
@@ -383,7 +384,7 @@ void main() {
       await tester.tap(find.text('保存棋谱'));
       await tester.pumpAndSettle();
       expect(repository.saved.single.mainLine.length, 3);
-      await tester.tap(find.byTooltip('新对局'));
+      await tapGameNavigation(tester, '新对局');
       await tester.pumpAndSettle();
       expect(find.byType(NewGameScreen), findsOneWidget);
       expect(engine.disposals, 1);
@@ -449,9 +450,12 @@ void main() {
     const Size(844, 390),
     const Size(1024, 1366),
   ]) {
-    testWidgets('AI game fits $size with scrollable controls', (tester) async {
+    testWidgets('AI game fits $size without scrollable controls', (
+      tester,
+    ) async {
       await launch(tester, size: size);
       expect(tester.takeException(), isNull);
+      expect(find.byType(Scrollable), findsNothing);
       await tester.ensureVisible(find.text('认输'));
       await tester.tap(find.text('认输'));
       await tester.pumpAndSettle();

@@ -221,10 +221,10 @@ class TutorialPlayScreen extends StatelessWidget {
       return PopScope(
         canPop: !c.thinking && !c.saving,
         child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              '${c.index! + 1} / ${c.catalog.levels.length} · ${c.level.title}',
-            ),
+          backgroundColor: boardTableColor(context),
+          appBar: boardAppBar(
+            context,
+            '${c.index! + 1} / ${c.catalog.levels.length} · ${c.level.title}',
           ),
           body: PlayFeedback(
             session: (c, c.index),
@@ -386,7 +386,8 @@ class _TutorialDailyScreenState extends State<TutorialDailyScreen> {
   Widget build(BuildContext context) {
     final session = _session;
     return Scaffold(
-      appBar: AppBar(title: const Text('每日战术题 · 入门练习')),
+      backgroundColor: boardTableColor(context),
+      appBar: boardAppBar(context, '每日战术题 · 入门练习'),
       body: _error != null
           ? _LoadError(message: _error!, retry: _load)
           : session == null

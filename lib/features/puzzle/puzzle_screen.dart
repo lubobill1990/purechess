@@ -556,10 +556,10 @@ class _PuzzleSolveScreenState extends State<PuzzleSolveScreen> {
       if (!didPop) _leave();
     },
     child: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '第 ${_index + 1} / ${widget.ids.length} 题 · ${_attempt.problem.rating}',
-        ),
+      backgroundColor: boardTableColor(context),
+      appBar: boardAppBar(
+        context,
+        '第 ${_index + 1} / ${widget.ids.length} 题 · ${_attempt.problem.rating}',
       ),
       body: PlayFeedback(
         session: _attempt,
@@ -587,7 +587,7 @@ class _PuzzleSolveScreenState extends State<PuzzleSolveScreen> {
             board: LayoutBuilder(
               builder: (context, constraints) => _board(constraints.maxWidth),
             ),
-            below: _controls(),
+            below: BoardRail(child: _controls()),
           ),
         ),
       ),

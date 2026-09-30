@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/core/move.dart' as chess;
 import 'package:purechess/features/game/game_screen.dart';
 import 'package:purechess/features/game/game_session.dart';
+import 'package:purechess/features/game/game_rail.dart';
 import 'package:purechess/features/library/records_repository.dart';
 import 'package:purechess/widgets/board/chess_board.dart';
 
@@ -58,13 +59,13 @@ void main() {
     expect(active(tester, 'white-offer-draw'), isTrue);
     expect(active(tester, 'black-resign'), isFalse);
     expect(active(tester, 'black-offer-draw'), isFalse);
-    expect(tester.widget<IconButton>(key('white-undo')).onPressed, isNull);
-    expect(tester.widget<IconButton>(key('black-undo')).onPressed, isNull);
+    expect(active(tester, 'white-undo'), isFalse);
+    expect(active(tester, 'black-undo'), isFalse);
     await move(tester, 'e2', 'e4');
     expect(active(tester, 'white-resign'), isFalse);
     expect(active(tester, 'black-resign'), isTrue);
-    expect(tester.widget<IconButton>(key('white-undo')).onPressed, isNotNull);
-    expect(tester.widget<IconButton>(key('black-undo')).onPressed, isNotNull);
+    expect(active(tester, 'white-undo'), isTrue);
+    expect(active(tester, 'black-undo'), isTrue);
     await tester.tap(key('black-undo'));
     await tester.pumpAndSettle();
     expect(session.moveCount, 0);
@@ -80,7 +81,8 @@ void main() {
     await launch(tester);
     await tester.tap(key('white-offer-draw'));
     await tester.pumpAndSettle();
-    expect(find.text('白方提和 · 等待对方回应'), findsOneWidget);
+    expect(find.text('白方\n等待回应'), findsOneWidget);
+    expect(find.text('黑方\n对方提和'), findsOneWidget);
     expect(tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled, isFalse);
     expect(key('white-accept-draw'), findsNothing);
     await tester.tap(key('black-decline-draw'));
@@ -143,7 +145,7 @@ void main() {
     expect(tester.getRect(find.byType(ChessBoard)), before);
     expect(
       tester
-          .widget<FilledButton>(find.widgetWithText(FilledButton, '保存棋谱'))
+          .widget<OutlinedButton>(find.widgetWithText(OutlinedButton, '保存棋谱'))
           .onPressed,
       isNull,
     );
@@ -189,7 +191,7 @@ void main() {
       tester.widget<ChessBoard>(find.byType(ChessBoard)).board.plyCount,
       0,
     );
-    expect(find.text('白方走棋'), findsOneWidget);
+    expect(find.text('白方\n轮到你'), findsOneWidget);
   });
 
   testWidgets(
@@ -289,16 +291,22 @@ void main() {
         tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled,
         isFalse,
       );
+      await tester.tap(find.byTooltip('对局菜单'));
+      await tester.pumpAndSettle();
       expect(
         tester
-            .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add))
-            .onPressed,
-        isNull,
+            .widget<GameMenuItem>(find.widgetWithText(GameMenuItem, '新对局'))
+            .enabled,
+        isFalse,
       );
-      expect(tester.widget<IconButton>(key('white-undo')).onPressed, isNull);
+      await tester.tapAt(const Offset(700, 550));
+      await tester.pumpAndSettle();
+      expect(active(tester, 'white-undo'), isFalse);
       expect(
         tester
-            .widget<FilledButton>(find.widgetWithText(FilledButton, '正在保存…'))
+            .widget<OutlinedButton>(
+              find.widgetWithText(OutlinedButton, '正在保存…'),
+            )
             .onPressed,
         isNull,
       );
@@ -336,13 +344,13 @@ void main() {
     await tester.tap(find.text('打开对弈'));
     await tester.pumpAndSettle();
     await move(tester, 'e2', 'e4');
-    await tester.pageBack();
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.text('离开对局'), findsOneWidget);
     await tester.tap(find.text('取消'));
     await tester.pumpAndSettle();
     expect(find.byType(ChessBoard), findsOneWidget);
-    await tester.pageBack();
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     await tester.tap(find.text('放弃并离开'));
     await tester.pumpAndSettle();

@@ -144,6 +144,10 @@ void main() {
       'reader_phone',
       'game_ai_landscape',
       'game_human_landscape',
+      'game_ai_small',
+      'game_human_small',
+      'game_ai_narrow',
+      'game_human_narrow',
       'puzzle_landscape',
       'tutorial_play_landscape',
       'review_landscape',
@@ -152,11 +156,17 @@ void main() {
     ]) {
       testWidgets('$captureScene $themeName', (tester) async {
         final scene = captureScene.replaceFirst(
-          RegExp(r'_(phone|landscape)$'),
+          RegExp(r'_(phone|landscape|small|narrow)$'),
           '',
         );
-        final surface =
-            captureScene.endsWith('_mobile') || captureScene.endsWith('_phone')
+        final compact =
+            captureScene.endsWith('_small') || captureScene.endsWith('_narrow');
+        final surface = captureScene.endsWith('_small')
+            ? const Size(320, 568)
+            : captureScene.endsWith('_narrow')
+            ? const Size(568, 320)
+            : captureScene.endsWith('_mobile') ||
+                  captureScene.endsWith('_phone')
             ? const Size(390, 844)
             : captureScene.endsWith('_landscape')
             ? const Size(844, 390)
@@ -348,7 +358,9 @@ void main() {
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context).copyWith(
                 platformBrightness: brightness,
-                textScaler: TextScaler.noScaling,
+                textScaler: compact
+                    ? const TextScaler.linear(2)
+                    : TextScaler.noScaling,
                 disableAnimations: true,
               ),
               child: RepaintBoundary(key: _captureKey, child: child!),
@@ -446,27 +458,32 @@ void main() {
             expect(board.board.toFen(), _midgameFen);
             expect(board.enabled, !scene.endsWith('_finished'));
             expect(board.board.lastMove, chess.Move.fromUci('h7h6'));
-            expect(find.text('保存棋谱'), findsOneWidget);
+            expect(find.text('保存棋谱'), compact ? findsNothing : findsOneWidget);
             expect(find.byType(AppBar), findsNothing);
             final rail = find.byType(GameRail);
             expect(tester.getSize(rail).height, 44);
-            expect(
-              find.descendant(of: rail, matching: find.byType(BackButton)),
-              findsOneWidget,
-            );
-            expect(
-              find.descendant(of: rail, matching: find.byTooltip('翻转棋盘')),
-              findsOneWidget,
-            );
-            expect(
-              find.descendant(
-                of: rail,
-                matching: find.byTooltip(
-                  scene.endsWith('_finished') ? '再来一局' : '新对局',
+            if (surface.width > surface.height) {
+              expect(find.byTooltip('对局菜单'), findsOneWidget);
+              expect(tester.getTopLeft(rail), const Offset(10, 10));
+            } else {
+              expect(
+                find.descendant(of: rail, matching: find.byType(BackButton)),
+                findsOneWidget,
+              );
+              expect(
+                find.descendant(of: rail, matching: find.byTooltip('翻转棋盘')),
+                findsOneWidget,
+              );
+              expect(
+                find.descendant(
+                  of: rail,
+                  matching: find.byTooltip(
+                    scene.endsWith('_finished') ? '再来一局' : '新对局',
+                  ),
                 ),
-              ),
-              findsOneWidget,
-            );
+                findsOneWidget,
+              );
+            }
             if (scene.startsWith('game_human')) {
               expect(
                 tester
@@ -486,7 +503,7 @@ void main() {
               );
             }
             if (scene.endsWith('_finished')) {
-              expect(find.byTooltip('再来一局'), findsOneWidget);
+              expect(find.byTooltip('再来一局'), findsWidgets);
               expect(find.text('黑方胜 · 对方认输'), findsOneWidget);
             }
             if (engine != null) {
