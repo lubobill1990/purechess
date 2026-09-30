@@ -325,6 +325,10 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 below: Column(
                   children: [
+                    // Fixed-height center strip (never moves the board): the
+                    // symmetric last-move record while playing — turn state
+                    // lives in the two player bars — and the verdict, save
+                    // feedback or achievement retry once there is one.
                     BoardRail(
                       emphasized: true,
                       child: SizedBox(
@@ -332,7 +336,9 @@ class _GameScreenState extends State<GameScreen> {
                         height: 72,
                         child: Center(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Semantics(
@@ -340,13 +346,21 @@ class _GameScreenState extends State<GameScreen> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      _saveMessage == null
-                                          ? status
-                                          : '$status\n$_saveMessage',
+                                      [
+                                        if (status.isNotEmpty)
+                                          status
+                                        else if (_session.lastSan != null)
+                                          '第 ${(_session.moveCount + 1) ~/ 2} 回合 · ${_session.lastSan}'
+                                        else
+                                          '对局开始 · 白方先行',
+                                        ?_saveMessage,
+                                      ].join('\n'),
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: status.isEmpty
+                                            ? FontWeight.w400
+                                            : FontWeight.w600,
                                       ),
                                     ),
                                     if (_achievementError != null)

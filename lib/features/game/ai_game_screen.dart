@@ -373,7 +373,7 @@ class _AiGameScreenState extends State<AiGameScreen> {
                   emphasized: true,
                   child: SizedBox(
                     key: const ValueKey('ai-result-area'),
-                    height: 72,
+                    height: 48,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,

@@ -122,6 +122,22 @@ class GameSession {
   bool canAct(Color actor) => canPlay && actor == turn;
   GameRecord snapshot() => Pgn.parse(Pgn.generate(_record));
 
+  String? _lastSan;
+  int _lastSanRevision = -1;
+
+  /// SAN of the most recent move, or null at the initial position. Cached by
+  /// revision: recomputing replays the record up to the parent node.
+  String? get lastSan {
+    if (_lastSanRevision == _revision) return _lastSan;
+    _lastSanRevision = _revision;
+    final move = _node.move;
+    final parent = _node.parent;
+    _lastSan = move == null || parent == null
+        ? null
+        : _record.boardAt(parent).san(move);
+    return _lastSan;
+  }
+
   void play(Move move) {
     if (!canPlay) throw StateError('The game is not accepting moves');
     final next = _record.addMove(_node, move);

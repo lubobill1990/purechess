@@ -320,7 +320,7 @@ void main() {
       expect(tester.getRect(find.byType(ChessBoard)), before);
       expect(
         tester.getSize(find.byKey(const ValueKey('ai-result-area'))).height,
-        72,
+        48,
       );
       await tester.ensureVisible(find.text('重试 AI'));
       await tester.tap(find.text('重试 AI'));
