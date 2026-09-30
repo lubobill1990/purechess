@@ -91,14 +91,20 @@ void main() {
         final panel = tester.getRect(find.byType(BoardPanel));
         final board = tester.getRect(find.byType(ChessBoard));
         final landscape = panel.width > panel.height;
-        expect(board.size, Size.square(landscape ? panel.height : panel.width));
-        expect(board.left, panel.left);
+        const m = BoardPanel.margin;
+        // Near-full use of the short edge with a breathing margin around the
+        // framed panel.
+        expect(
+          board.size,
+          Size.square((landscape ? panel.height : panel.width) - m * 2),
+        );
+        expect(board.left, panel.left + m);
         if (landscape) {
-          expect(board.top, panel.top);
-          expect(board.bottom, panel.bottom);
+          expect(board.top, panel.top + m);
+          expect(board.bottom, panel.bottom - m);
         } else {
-          expect(board.width, size.width);
-          expect(board.right, panel.right);
+          expect(board.width, size.width - m * 2);
+          expect(board.right, panel.right - m);
         }
         final rails = tester
             .widgetList<BoardRail>(find.byType(BoardRail))
@@ -108,7 +114,7 @@ void main() {
         expect(
           rails.any(
             (rail) => landscape
-                ? rail.left == board.right
+                ? rail.left == board.right + m + 2
                 : rail.width == board.width &&
                       (rail.bottom == board.top || rail.top == board.bottom),
           ),
