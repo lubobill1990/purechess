@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/core/move.dart' as chess;
@@ -40,8 +41,8 @@ void main() {
       tester.widget<ButtonStyleButton>(key(name)).onPressed != null;
 
   Future<void> move(WidgetTester tester, String from, String to) async {
-    await tester.tap(key('square-$from'));
-    await tester.tap(key('square-$to'));
+    await tester.tap(key('square-$from'), kind: PointerDeviceKind.mouse);
+    await tester.tap(key('square-$to'), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
   }
 

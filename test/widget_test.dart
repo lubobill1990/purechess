@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/app_theme.dart';
@@ -133,8 +134,14 @@ void main() {
       await launch(tester);
       await tester.tap(find.text('双人对弈'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('square-e2')));
-      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.tap(
+        find.byKey(const ValueKey('square-e2')),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('square-e4')),
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pumpAndSettle();
       final fen = tester
           .widget<ChessBoard>(find.byType(ChessBoard))

@@ -4,6 +4,7 @@ library;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,6 +14,7 @@ import 'package:purechess/app/play_feedback.dart';
 import 'package:purechess/app/notifications.dart';
 import 'package:purechess/app/telemetry/analytics.dart';
 import 'package:purechess/core/board.dart';
+import 'package:purechess/core/pgn.dart';
 import 'package:purechess/core/move.dart' as chess;
 import 'package:purechess/features/achievements/achievements.dart';
 import 'package:purechess/features/achievements/achievements_screen.dart';
@@ -21,6 +23,7 @@ import 'package:purechess/features/game/ai_game_screen.dart';
 import 'package:purechess/features/game/game_screen.dart';
 import 'package:purechess/features/game/game_session.dart';
 import 'package:purechess/features/game/new_game_screen.dart';
+import 'package:purechess/features/game/review_screen.dart';
 import 'package:purechess/features/home/home_screen.dart';
 import 'package:purechess/features/library/classic_library.dart';
 import 'package:purechess/features/library/classic_library_screen.dart';
@@ -105,7 +108,7 @@ void main() {
 
   for (final dark in [false, true]) {
     final themeName = dark ? 'dark' : 'light';
-    for (final scene in [
+    for (final captureScene in [
       'home_learning',
       'home_graduated',
       'home_resume',
@@ -131,10 +134,31 @@ void main() {
       'board_check',
       'home_mobile',
       'settings_mobile',
+      'review',
+      'game_ai_phone',
+      'game_human_phone',
+      'puzzle_phone',
+      'tutorial_play_phone',
+      'review_phone',
+      'reader_phone',
+      'game_ai_landscape',
+      'game_human_landscape',
+      'puzzle_landscape',
+      'tutorial_play_landscape',
+      'review_landscape',
+      'reader_landscape',
+      'board_aim',
     ]) {
-      testWidgets('$scene $themeName', (tester) async {
-        final surface = scene.endsWith('_mobile')
+      testWidgets('$captureScene $themeName', (tester) async {
+        final scene = captureScene.replaceFirst(
+          RegExp(r'_(phone|landscape)$'),
+          '',
+        );
+        final surface =
+            captureScene.endsWith('_mobile') || captureScene.endsWith('_phone')
             ? const Size(390, 844)
+            : captureScene.endsWith('_landscape')
+            ? const Size(844, 390)
             : _surface;
         tester.view.physicalSize = surface;
         tester.view.devicePixelRatio = 1;
@@ -176,20 +200,30 @@ void main() {
         switch (scene) {
           case 'board_selected':
           case 'board_check':
+          case 'board_aim':
             screen = Scaffold(
               body: Center(
                 child: SizedBox.square(
                   dimension: 560,
                   child: ChessBoard(
-                    board: Board.fromFen(
-                      scene == 'board_selected'
-                          ? _midgameFen
-                          : '4r2k/8/8/8/8/8/8/4K3 w - - 0 1',
-                    ),
+                    board: scene == 'board_aim'
+                        ? Board()
+                        : Board.fromFen(
+                            scene == 'board_selected'
+                                ? _midgameFen
+                                : '4r2k/8/8/8/8/8/8/4K3 w - - 0 1',
+                          ),
                     onMove: (_) {},
                   ),
                 ),
               ),
+            );
+          case 'review':
+            final reviewEngine = FakeGameEngine();
+            addTearDown(reviewEngine.dispose);
+            screen = ReviewScreen(
+              record: Pgn.parse('1. e4 e5 2. Nf3 Nc6 *'),
+              engine: reviewEngine,
             );
           case 'library':
             screen = ClassicLibraryScreen(
@@ -336,8 +370,23 @@ void main() {
           expect(find.text('选择提醒时间'), findsOneWidget);
         }
         if (scene == 'board_selected') {
-          await tester.tap(find.byKey(const ValueKey('square-g5')));
+          await tester.tap(
+            find.byKey(const ValueKey('square-g5')),
+            kind: PointerDeviceKind.mouse,
+          );
           await tester.pumpAndSettle();
+        }
+        TestGesture? aim;
+        if (scene == 'board_aim') {
+          aim = await tester.startGesture(
+            tester.getCenter(find.byKey(const ValueKey('square-e2'))),
+          );
+          await aim.moveTo(
+            tester.getCenter(find.byKey(const ValueKey('square-e4'))) +
+                const Offset(0, 105),
+          );
+          await tester.pumpAndSettle();
+          expect(find.byKey(const ValueKey('board-aim-ghost')), findsOneWidget);
         }
         if (scene == 'puzzle_hint') {
           await tester.tap(find.text('提示思路'));
@@ -346,6 +395,10 @@ void main() {
           await tester.pumpAndSettle();
         }
         if (scene == 'tutorial_play') {
+          await tester.scrollUntilVisible(
+            find.byKey(const ValueKey('tutorial-level-4')),
+            120,
+          );
           await tester.tap(find.byKey(const ValueKey('tutorial-level-4')));
           await tester.pumpAndSettle();
           await tester.tap(find.text('提示'));
@@ -431,8 +484,9 @@ void main() {
         }
         await expectLater(
           find.byKey(_captureKey),
-          matchesGoldenFile('windows/${scene}_$themeName.png'),
+          matchesGoldenFile('windows/${captureScene}_$themeName.png'),
         );
+        await aim?.cancel();
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pumpAndSettle();
         if (engine != null) expect(engine.disposals, 1);

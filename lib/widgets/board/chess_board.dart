@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/board.dart';
@@ -12,6 +15,8 @@ class ChessBoard extends StatefulWidget {
     required this.onMove,
     this.flipped = false,
     this.enabled = true,
+    this.fingerOffset = true,
+    this.flipFingerOffset = false,
   });
 
   final Board board;
@@ -19,17 +24,27 @@ class ChessBoard extends StatefulWidget {
   final bool flipped;
   final bool enabled;
 
+  /// Lift touch previews 1.5 cells; ease back at the near edge to keep it reachable.
+  final bool fingerOffset;
+
+  /// The opposite seat aims below the finger, independent of board orientation.
+  final bool flipFingerOffset;
+
   @override
   State<ChessBoard> createState() => _ChessBoardState();
 }
 
 class _ChessBoardState extends State<ChessBoard> {
   int? _selected;
-  int? _dragFrom;
+  int? _pointer;
+  int? _pressedSquare;
   Offset? _pointerDown;
-  Offset? _dragPosition;
+  int? _aim;
+  bool _touch = false;
+  bool _dragging = false;
   bool _promoting = false;
   int _generation = 0;
+  double? _size;
   late String _fen;
 
   @override
@@ -44,12 +59,12 @@ class _ChessBoardState extends State<ChessBoard> {
     final fen = widget.board.toFen();
     if (_fen != fen ||
         oldWidget.flipped != widget.flipped ||
-        oldWidget.enabled != widget.enabled) {
+        oldWidget.enabled != widget.enabled ||
+        oldWidget.fingerOffset != widget.fingerOffset ||
+        oldWidget.flipFingerOffset != widget.flipFingerOffset) {
       _generation++;
       _selected = null;
-      _dragFrom = null;
-      _dragPosition = null;
-      _pointerDown = null;
+      _clearPointer();
     }
     _fen = fen;
   }
@@ -139,23 +154,81 @@ class _ChessBoardState extends State<ChessBoard> {
     widget.onMove(move);
   }
 
-  void _endDrag(double size) {
-    final from = _dragFrom;
-    final to = _dragPosition == null ? null : _squareAt(_dragPosition!, size);
+  void _clearPointer() {
+    _pointer = null;
+    _pressedSquare = null;
+    _pointerDown = null;
+    _aim = null;
+    _dragging = false;
+  }
+
+  void _updateAim(Offset local, double size) {
+    final lift = _touch && widget.fingerOffset
+        ? math.min(
+            size / 8 * 1.5,
+            widget.flipFingerOffset ? local.dy : size - local.dy,
+          )
+        : 0.0;
+    // Leaving the physical board cancels even if the lifted aim is still inside.
+    _aim = _squareAt(local, size) == null
+        ? null
+        : _squareAt(
+            local - Offset(0, lift * (widget.flipFingerOffset ? -1 : 1)),
+            size,
+          );
+  }
+
+  void _down(PointerDownEvent event, double size) {
+    if (!_interactive || _pointer != null || event.buttons != kPrimaryButton) {
+      return;
+    }
     setState(() {
-      _dragFrom = null;
-      _dragPosition = null;
-      _pointerDown = null;
+      _pointer = event.pointer;
+      _touch = event.kind == PointerDeviceKind.touch;
+      _pointerDown = event.localPosition;
+      _pressedSquare = _squareAt(event.localPosition, size);
+      if (_touch && _pressedSquare != null && _ownPiece(_pressedSquare!)) {
+        _selected = _pressedSquare;
+      }
+      _updateAim(event.localPosition, size);
     });
-    if (!_interactive || from == null || to == null) return;
+  }
+
+  void _move(PointerMoveEvent event, double size) {
+    if (event.pointer != _pointer || !_interactive) return;
+    setState(() {
+      if ((event.localPosition - _pointerDown!).distance > kTouchSlop) {
+        _dragging = true;
+        if (!_touch && _pressedSquare != null && _ownPiece(_pressedSquare!)) {
+          _selected = _pressedSquare;
+        }
+      }
+      _updateAim(event.localPosition, size);
+    });
+  }
+
+  void _up(PointerUpEvent event, double size) {
+    if (event.pointer != _pointer || !_interactive) return;
+    _updateAim(event.localPosition, size);
+    final from = _selected;
+    final to = _aim;
+    final click = !_touch && !_dragging;
+    setState(() {
+      _clearPointer();
+      if (!click) _selected = null;
+    });
+    if (click) {
+      if (to != null) _tap(to);
+      return;
+    }
+    if (from == null || to == null) return;
     final moves = _movesTo(from, to);
     if (moves.isNotEmpty) _submit(moves);
   }
 
-  void _cancelDrag() => setState(() {
-    _dragFrom = null;
-    _dragPosition = null;
-    _pointerDown = null;
+  void _cancel() => setState(() {
+    if (_pointer != null && _touch) _selected = null;
+    _clearPointer();
   });
 
   @override
@@ -185,74 +258,93 @@ class _ChessBoardState extends State<ChessBoard> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = constraints.maxWidth;
+          if (_size != null && _size != size) {
+            _generation++;
+            _selected = null;
+            _clearPointer();
+          }
+          _size = size;
           final cell = size / 8;
-          return Listener(
-            // A cancelled, accepted pan can dispatch onPanEnd instead of
-            // onPanCancel. Clear its move before the recognizer handles it.
-            onPointerCancel: (_) => _cancelDrag(),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTapUp: (details) {
-                final square = _squareAt(details.localPosition, size);
-                if (square != null) _tap(square);
+          final aimRow = _aim == null
+              ? 0
+              : widget.flipped
+              ? _aim! >> 4
+              : 7 - (_aim! >> 4);
+          final aimCol = _aim == null
+              ? 0
+              : widget.flipped
+              ? 7 - (_aim! & 7)
+              : _aim! & 7;
+          return MouseRegion(
+            onHover: (event) {
+              if (!_interactive || _pointer != null) return;
+              setState(() {
+                _touch = false;
+                _updateAim(event.localPosition, size);
+              });
+            },
+            onExit: (_) {
+              if (_pointer == null) _cancel();
+            },
+            child: Listener(
+              onPointerDown: (event) => _down(event, size),
+              onPointerMove: (event) => _move(event, size),
+              onPointerUp: (event) => _up(event, size),
+              onPointerCancel: (event) {
+                if (event.pointer == _pointer) _cancel();
               },
-              onPanDown: (details) => _pointerDown = details.localPosition,
-              onPanStart: (details) {
-                if (!_interactive) return;
-                final square = _squareAt(
-                  _pointerDown ?? details.localPosition,
-                  size,
-                );
-                if (square == null || !_ownPiece(square)) return;
-                setState(() {
-                  _selected = square;
-                  _dragFrom = square;
-                  _dragPosition = details.localPosition;
-                });
-              },
-              onPanUpdate: (details) {
-                if (_dragFrom != null) {
-                  setState(() => _dragPosition = details.localPosition);
-                }
-              },
-              onPanEnd: (_) => _endDrag(size),
-              onPanCancel: _cancelDrag,
-              child: CustomPaint(
-                painter: BoardPainter(
-                  dark: Theme.of(context).brightness == Brightness.dark,
-                  flipped: widget.flipped,
-                  selected: _selected,
-                  targets: targets,
-                  lastMove: board.lastMove,
-                  checkedKing: checkedKing,
-                ),
-                child: Stack(
-                  children: [
-                    for (var row = 0; row < 8; row++)
-                      for (var col = 0; col < 8; col++)
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                // Claim board drags before a surrounding page can scroll.
+                onPanStart: _interactive ? (_) {} : null,
+                child: CustomPaint(
+                  painter: BoardPainter(
+                    dark: Theme.of(context).brightness == Brightness.dark,
+                    flipped: widget.flipped,
+                    selected: _selected,
+                    targets: targets,
+                    lastMove: board.lastMove,
+                    checkedKing: checkedKing,
+                    aim: _aim,
+                    aimLegal: targets.contains(_aim),
+                  ),
+                  child: Stack(
+                    children: [
+                      for (var row = 0; row < 8; row++)
+                        for (var col = 0; col < 8; col++)
+                          Positioned(
+                            left: col * cell,
+                            top: row * cell,
+                            width: cell,
+                            height: cell,
+                            child: _cell(
+                              _square(row, col),
+                              cell,
+                              targets,
+                              checkedKing,
+                            ),
+                          ),
+                      if (_aim != null &&
+                          _selected != null &&
+                          _pointer != null &&
+                          (_touch || _dragging))
                         Positioned(
-                          left: col * cell,
-                          top: row * cell,
+                          left: aimCol * cell,
+                          top: aimRow * cell,
                           width: cell,
                           height: cell,
-                          child: _cell(
-                            _square(row, col),
-                            cell,
-                            targets,
-                            checkedKing,
+                          child: IgnorePointer(
+                            child: Opacity(
+                              key: const ValueKey('board-aim-ghost'),
+                              opacity: .65,
+                              child: PieceImage(
+                                piece: board.pieceAt(_selected!)!,
+                              ),
+                            ),
                           ),
                         ),
-                    if (_dragFrom != null && _dragPosition != null)
-                      Positioned(
-                        left: _dragPosition!.dx - cell / 2,
-                        top: _dragPosition!.dy - cell / 2,
-                        width: cell,
-                        height: cell,
-                        child: IgnorePointer(
-                          child: PieceImage(piece: board.pieceAt(_dragFrom!)!),
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -278,7 +370,7 @@ class _ChessBoardState extends State<ChessBoard> {
         color: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.all(size * .09),
-          child: piece == null || square == _dragFrom
+          child: piece == null
               ? const SizedBox.expand()
               : PieceImage(piece: piece),
         ),
@@ -295,6 +387,8 @@ class BoardPainter extends CustomPainter {
     required this.lastMove,
     required this.checkedKing,
     this.dark = false,
+    this.aim,
+    this.aimLegal = false,
   });
 
   static const lightSquare = Color(0xFFE8D5AD);
@@ -311,6 +405,8 @@ class BoardPainter extends CustomPainter {
   final Set<int> targets;
   final chess.Move? lastMove;
   final int? checkedKing;
+  final int? aim;
+  final bool aimLegal;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -356,6 +452,22 @@ class BoardPainter extends CustomPainter {
               ..color = light ? ink : ivory
               ..style = PaintingStyle.stroke
               ..strokeWidth = 2,
+          );
+        }
+        if (aim == square) {
+          canvas.drawRect(
+            rect.deflate(3),
+            Paint()
+              ..color = aimLegal ? ivory : checkTint
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 5,
+          );
+          canvas.drawRect(
+            rect.deflate(6),
+            Paint()
+              ..color = ink
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.5,
           );
         }
         final name = chess.squareName(square);

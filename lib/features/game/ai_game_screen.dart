@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -9,6 +8,7 @@ import '../../app/telemetry/crash_guard.dart';
 import '../../core/move.dart' as chess;
 import '../../engine/stockfish_service.dart';
 import '../../widgets/board/chess_board.dart';
+import '../../widgets/board/board_panel.dart';
 import '../library/records_repository.dart';
 import 'ai_difficulty.dart';
 import 'game_controller.dart';
@@ -281,7 +281,8 @@ class _AiGameScreenState extends State<AiGameScreen> {
                       '${hint.promotion != null ? ' · 升变 ${board.san(hint)}' : ''}'
                 : '轮到你走棋${board.inCheck ? ' · 将军，请应将' : ''}',
         };
-    final locked = _saving ||
+    final locked =
+        _saving ||
         _reviewing ||
         _game.ratingSaving ||
         _game.achievementSaving ||
@@ -324,169 +325,146 @@ class _AiGameScreenState extends State<AiGameScreen> {
               ? '你赢了！'
               : null,
           child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final width = math.min(constraints.maxWidth, 640.0);
-                final size = math.min(
-                  width - 24,
-                  math.max(120.0, constraints.maxHeight - 260),
-                );
-                return SingleChildScrollView(
-                  child: Center(
-                    child: SizedBox(
-                      width: width,
+            child: BoardPanel(
+              above: BoardRail(
+                height: 36,
+                child: Center(
+                  child: Text(
+                    '你执${widget.config.humanColor == chess.Color.white ? '白棋 · 先走' : '黑棋 · 后走'}',
+                  ),
+                ),
+              ),
+              board: ChessBoard(
+                board: board,
+                flipped: _flipped,
+                enabled: _game.humanTurn && !locked,
+                onMove: (move) {
+                  _saveMessage = null;
+                  unawaited(_game.play(move));
+                },
+              ),
+              below: BoardRail(
+                emphasized: true,
+                child: SizedBox(
+                  key: const ValueKey('ai-result-area'),
+                  height: 112,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Semantics(
+                      liveRegion: true,
                       child: Column(
                         children: [
-                          SizedBox(
-                            height: 36,
-                            child: Center(
-                              child: Text(
-                                '你执${widget.config.humanColor == chess.Color.white ? '白棋 · 先走' : '黑棋 · 后走'}',
+                          Text(status, textAlign: TextAlign.center),
+                          if (_saveMessage != null) Text(_saveMessage!),
+                          if (_game.achievementError != null) ...[
+                            Text(_game.achievementError!),
+                            TextButton(
+                              onPressed: _game.achievementSaving
+                                  ? null
+                                  : _game.saveAchievement,
+                              child: const Text('重试保存成就'),
+                            ),
+                          ],
+                          if (_game.error != null) ...[
+                            Text(
+                              _game.error!,
+                              style: const TextStyle(
+                                color: BoardPainter.ivory,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: size,
-                            height: size,
-                            child: ChessBoard(
-                              board: board,
-                              flipped: _flipped,
-                              enabled: _game.humanTurn && !locked,
-                              onMove: (move) {
-                                _saveMessage = null;
-                                unawaited(_game.play(move));
-                              },
+                            TextButton(
+                              onPressed: _game.busy || locked
+                                  ? null
+                                  : _game.retry,
+                              child: const Text('重试 AI'),
                             ),
-                          ),
-                          SizedBox(
-                            key: const ValueKey('ai-result-area'),
-                            height: 112,
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              child: Semantics(
-                                liveRegion: true,
-                                child: Column(
-                                  children: [
-                                    Text(status, textAlign: TextAlign.center),
-                                    if (_saveMessage != null)
-                                      Text(_saveMessage!),
-                                    if (_game.achievementError != null) ...[
-                                      Text(_game.achievementError!),
-                                      TextButton(
-                                        onPressed: _game.achievementSaving
-                                            ? null
-                                            : _game.saveAchievement,
-                                        child: const Text('重试保存成就'),
-                                      ),
-                                    ],
-                                    if (_game.error != null) ...[
-                                      Text(
-                                        _game.error!,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .error,
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: _game.busy || locked
-                                            ? null
-                                            : _game.retry,
-                                        child: const Text('重试 AI'),
-                                      ),
-                                    ],
-                                    if (_game.ratingError != null) ...[
-                                      Text(_game.ratingError!),
-                                      TextButton(
-                                        onPressed: _game.ratingSaving
-                                            ? null
-                                            : _game.saveRating,
-                                        child: const Text('重试保存推荐'),
-                                      ),
-                                    ],
-                                    if (session.finished &&
-                                        _game.ratingError == null)
-                                      Text(
-                                        _game.ratingSaving
-                                            ? '正在保存推荐难度…'
-                                            : '下局推荐第 ${widget.rating.recommended} 档',
-                                      ),
-                                  ],
-                                ),
-                              ),
+                          ],
+                          if (_game.ratingError != null) ...[
+                            Text(_game.ratingError!),
+                            TextButton(
+                              onPressed: _game.ratingSaving
+                                  ? null
+                                  : _game.saveRating,
+                              child: const Text('重试保存推荐'),
                             ),
-                          ),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 8,
-                            children: [
-                              TextButton.icon(
-                                onPressed: _game.humanTurn && !locked
-                                    ? _game.requestHint
-                                    : null,
-                                icon: const Icon(Icons.lightbulb_outline),
-                                label: const Text('提示'),
-                              ),
-                              TextButton.icon(
-                                onPressed: _game.canUndo && !locked
-                                    ? () {
-                                        _saveMessage = null;
-                                        unawaited(_game.undo());
-                                      }
-                                    : null,
-                                icon: const Icon(Icons.undo),
-                                label: const Text('悔棋'),
-                              ),
-                              TextButton(
-                                onPressed:
-                                    session.finished ||
-                                        locked ||
-                                        _game.phase == GamePhase.cancelling
-                                    ? null
-                                    : _resign,
-                                child: const Text('认输'),
-                              ),
-                            ],
-                          ),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 12,
-                            children: [
-                              OutlinedButton.icon(
-                                onPressed: locked || !_dirty ? null : _save,
-                                icon: const Icon(Icons.save_outlined),
-                                label: Text(_saving ? '正在保存…' : '保存棋谱'),
-                              ),
-                              FilledButton.icon(
-                                onPressed:
-                                    session.finished && !locked && !_game.busy
-                                    ? _newGame
-                                    : null,
-                                icon: Icon(
-                                  session.finished
-                                      ? Icons.replay
-                                      : Icons.query_stats,
-                                ),
-                                label: Text(session.finished ? '再来一局' : '一键复盘'),
-                              ),
-                              if (session.finished)
-                                TextButton(
-                                  onPressed: locked || _game.busy
-                                      ? null
-                                      : _review,
-                                  child: const Text('一键复盘'),
-                                ),
-                            ],
-                          ),
+                          ],
+                          if (session.finished && _game.ratingError == null)
+                            Text(
+                              _game.ratingSaving
+                                  ? '正在保存推荐难度…'
+                                  : '下局推荐第 ${widget.rating.recommended} 档',
+                            ),
                         ],
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+              ),
+              controls: Column(
+                children: [
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _game.humanTurn && !locked
+                            ? _game.requestHint
+                            : null,
+                        icon: const Icon(Icons.lightbulb_outline),
+                        label: const Text('提示'),
+                      ),
+                      TextButton.icon(
+                        onPressed: _game.canUndo && !locked
+                            ? () {
+                                _saveMessage = null;
+                                unawaited(_game.undo());
+                              }
+                            : null,
+                        icon: const Icon(Icons.undo),
+                        label: const Text('悔棋'),
+                      ),
+                      TextButton(
+                        onPressed:
+                            session.finished ||
+                                locked ||
+                                _game.phase == GamePhase.cancelling
+                            ? null
+                            : _resign,
+                        child: const Text('认输'),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: locked || !_dirty ? null : _save,
+                        icon: const Icon(Icons.save_outlined),
+                        label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                      ),
+                      FilledButton.icon(
+                        onPressed: session.finished && !locked && !_game.busy
+                            ? _newGame
+                            : null,
+                        icon: Icon(
+                          session.finished ? Icons.replay : Icons.query_stats,
+                        ),
+                        label: Text(session.finished ? '再来一局' : '一键复盘'),
+                      ),
+                      if (session.finished)
+                        TextButton(
+                          onPressed: locked || _game.busy ? null : _review,
+                          child: const Text('一键复盘'),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

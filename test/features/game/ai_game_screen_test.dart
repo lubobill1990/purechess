@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/core/move.dart' as chess;
@@ -61,8 +62,14 @@ void main() {
   }
 
   Future<void> move(WidgetTester tester) async {
-    await tester.tap(find.byKey(const ValueKey('square-e2')));
-    await tester.tap(find.byKey(const ValueKey('square-e4')));
+    await tester.tap(
+      find.byKey(const ValueKey('square-e2')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('square-e4')),
+      kind: PointerDeviceKind.mouse,
+    );
     await tester.pumpAndSettle();
   }
 
@@ -93,8 +100,14 @@ void main() {
       expect(saved().session.hintsUsed, 1);
       final gate = Completer<PositionAnalysis>();
       engine.replies.add((_) => gate.future);
-      await tester.tap(find.byKey(const ValueKey('square-e2')));
-      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.tap(
+        find.byKey(const ValueKey('square-e2')),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('square-e4')),
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pumpAndSettle();
       expect(saved().session.moveCount, 1);
       gate.complete(FakeGameEngine.result('e7e5'));
@@ -170,8 +183,14 @@ void main() {
     await launch(tester);
     final gate = Completer<PositionAnalysis>();
     engine.replies.add((_) => gate.future);
-    await tester.tap(find.byKey(const ValueKey('square-e2')));
-    await tester.tap(find.byKey(const ValueKey('square-e4')));
+    await tester.tap(
+      find.byKey(const ValueKey('square-e2')),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('square-e4')),
+      kind: PointerDeviceKind.mouse,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('新对局'));
     await tester.pumpAndSettle();
@@ -281,8 +300,14 @@ void main() {
       final before = tester.getRect(find.byType(ChessBoard));
       final gate = Completer<PositionAnalysis>();
       engine.replies.add((_) => gate.future);
-      await tester.tap(find.byKey(const ValueKey('square-e2')));
-      await tester.tap(find.byKey(const ValueKey('square-e4')));
+      await tester.tap(
+        find.byKey(const ValueKey('square-e2')),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.tap(
+        find.byKey(const ValueKey('square-e4')),
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pump();
       expect(
         tester.widget<ChessBoard>(find.byType(ChessBoard)).enabled,
@@ -536,7 +561,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.drag(
+      find.byType(SingleChildScrollView).first,
+      const Offset(0, -500),
+    );
     await tester.pumpAndSettle();
     final target = find.byKey(const ValueKey('review-mistake-3'));
     await tester.ensureVisible(target);

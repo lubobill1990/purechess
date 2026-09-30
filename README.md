@@ -15,6 +15,11 @@ Dart, with no Flutter imports or third-party chess dependencies.
 棋盘在明暗模式分别使用米金/胡桃木与低亮度木色，落点和选中描边按
 棋格明暗采用深棕/象牙双色，教程与谜题共用双色提示边框；将军保留红色。
 结果区、讲解区和庆祝叠层不改变棋盘几何位置。
+对弈（人机 / 面对面）、战术题、互动教程、复盘和名局阅读共用
+`BoardPanel`：SafeArea 内竖屏棋盘占满全宽，横屏占满可用高度，
+信息与操作移至侧栏。坐标画在棋格内，无棋盘外边距或最大宽度上限；
+短屏上可滚动信息 / 操作，不缩小棋盘。`BoardRail` 以同色木纹色板
+衔接棋盘边缘；回合、将军和结果变化不改变状态区高度。
 Windows golden 使用与应用相同的主题构造器；更新基线前先设置
 `$env:NO_PROXY='localhost,127.0.0.1'`，运行
 `flutter test --tags golden --update-goldens` 并逐张检查。
@@ -22,15 +27,26 @@ Windows golden 使用与应用相同的主题构造器；更新基线前先设�
 ## Local two-player chess (M2a)
 
 The home screen opens **双人对弈**, **我的棋谱**, and the existing privacy settings.
-The walnut-and-gold board supports tap-to-select/tap-to-move and direct dragging,
+The walnut-and-gold board supports mouse click-to-select/click-to-move (with
+hover highlights), mouse dragging, and touch aiming,
 legal destinations, last-move and check highlights, coordinates, and a flipped
 view. Promotion always asks for queen/rook/bishop/knight; cancel leaves the
 position unchanged. SVG pieces are bundled for offline use; see
 [asset credits and licensing](docs/CREDITS.md).
 
+触屏按住己方棋子即可瞄准：半透明棋子吸附到候选格，双色框标明合法
+目标，红框标明非法目标；拖动仅更新预览，松手才提交合法着法。
+默认瞄准点上移 1.5 格（`fingerOffset`），靠近本侧边缘时逐渐减小
+偏移，使底线格仍可到达；手指或瞄准点越界、非法格松手以及系统取消
+均不走棋且清除预览。页面滚动不抢占棋盘拖动；局面、可操作性、朝向
+或尺寸改变会使旧手势失效。鼠标和笔不使用手指偏移，无障碍点按仍可
+点选再走子。升变仍须明确四选一，音效仅在父层实际走子后触发。
+
 Black's controls stay at the top, rotated 180 degrees toward the opposite seat;
-white's controls stay below. Flipping changes the board view, not ownership of
-the controls. Only the active player can resign or offer a draw. Resignation
+white's controls stay below (both move into the sidebar in landscape).
+Black's touch aim is offset downward for the opposite seat. Flipping changes
+the board view, not ownership of the controls or the seat's offset direction.
+Only the active player can resign or offer a draw. Resignation
 requires confirmation; a draw offer pauses moves until the other player's bar
 accepts or declines. Both sides can undo one half-move, including after a
 finished game; undo removes that continuation from the saved main line.

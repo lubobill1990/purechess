@@ -265,6 +265,7 @@ void main() {
           Theme.of(tester.element(find.byType(Scaffold))).brightness,
           brightness,
         );
+        await tester.ensureVisible(find.text('下一步'));
         await tester.tap(find.text('下一步'));
         await tester.pumpAndSettle();
         expect(find.text('1 / 33 半回合'), findsOneWidget);
