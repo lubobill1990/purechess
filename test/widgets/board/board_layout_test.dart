@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,23 +90,54 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
+        expect(
+          tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
+          const Color(0xFF4A3826),
+        );
         final panel = tester.getRect(find.byType(BoardPanel));
         final board = tester.getRect(find.byType(ChessBoard));
         final landscape = panel.width > panel.height;
         const m = BoardPanel.margin;
-        // Near-full use of the short edge with a breathing margin around the
-        // framed panel.
+        const rim = BoardPanel.rim;
+        final widget = tester.widget<BoardPanel>(find.byType(BoardPanel));
+        final navigation = widget.navigationBuilder == null
+            ? 0.0
+            : BoardPanel.navigationWidth;
+        final expected = landscape
+            ? math.min(
+                    panel.height - m * 2,
+                    panel.width -
+                        m * 3 -
+                        navigation -
+                        widget.minimumSidebarWidth,
+                  ) -
+                  rim * 2
+            : math.min(
+                panel.width - m * 2 - rim * 2,
+                panel.height -
+                    m * 3 -
+                    rim * 2 -
+                    tester.getSize(find.byWidget(widget.above)).height -
+                    (widget.navigationBuilder == null ? 0 : 44) -
+                    tester.getSize(find.byWidget(widget.below)).height -
+                    tester.getSize(find.byWidget(widget.controls)).height,
+              );
+        expect(board.width, closeTo(expected, .001));
+        expect(board.height, closeTo(expected, .001));
         expect(
-          board.size,
-          Size.square((landscape ? panel.height : panel.width) - m * 2),
+          find.ancestor(
+            of: find.byType(ChessBoard),
+            matching: find.byType(Scrollable),
+          ),
+          findsNothing,
         );
-        expect(board.left, panel.left + m);
         if (landscape) {
-          expect(board.top, panel.top + m);
-          expect(board.bottom, panel.bottom - m);
+          expect(board.left, panel.left + m + navigation + rim);
+          expect(board.top, panel.top + m + rim);
+          expect(board.bottom, lessThanOrEqualTo(panel.bottom - m - rim));
         } else {
-          expect(board.width, size.width - m * 2);
-          expect(board.right, panel.right - m);
+          expect(board.center.dx, panel.center.dx);
+          expect(board.right, lessThanOrEqualTo(panel.right - m - rim));
         }
         final rails = tester
             .widgetList<BoardRail>(find.byType(BoardRail))
@@ -114,8 +147,8 @@ void main() {
         expect(
           rails.any(
             (rail) => landscape
-                ? rail.left == board.right + m + 2
-                : rail.width == board.width &&
+                ? rail.left == board.right + m + rim * 2
+                : rail.width >= board.width &&
                       (rail.bottom == board.top || rail.top == board.bottom),
           ),
           isTrue,

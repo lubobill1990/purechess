@@ -81,7 +81,8 @@ class _ClassicReaderScreenState extends State<ClassicReaderScreen> {
           child: Focus(
             autofocus: true,
             child: Scaffold(
-              appBar: AppBar(title: Text(game.title)),
+              backgroundColor: boardTableColor(context),
+              appBar: boardAppBar(context, game.title),
               body: SafeArea(
                 child: Builder(
                   builder: (context) {
@@ -140,9 +141,11 @@ class _ClassicReaderScreenState extends State<ClassicReaderScreen> {
                         emphasized: true,
                         child: _controls(game),
                       ),
-                      controls: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: notes,
+                      controls: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: notes,
+                        ),
                       ),
                     );
                   },

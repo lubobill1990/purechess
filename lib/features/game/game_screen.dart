@@ -16,6 +16,7 @@ import '../library/records_screen.dart';
 import 'game_session.dart';
 import 'game_persistence.dart';
 import 'game_rail.dart';
+import 'game_fullscreen.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -248,146 +249,170 @@ class _GameScreenState extends State<GameScreen> {
     final facingOpponent =
         MediaQuery.of(context).orientation == Orientation.portrait;
     final board = _session.board;
-    final status =
-        _session.outcome?.message ??
-        (_session.drawOffer != null
-            ? '${colorName(_session.drawOffer!)}提和 · 等待对方回应'
-            : '${colorName(_session.turn)}走棋${board.inCheck ? ' · 将军，请应将' : ''}');
-    return PopScope(
-      canPop: !_dirty && !_saving,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) _leave();
-      },
-      child: Scaffold(
-        body: PlayFeedback(
-          session: _session,
-          board: board,
-          source: 'local',
-          prefs: widget.prefs,
-          analytics: widget.analytics,
-          result: !_session.finished
-              ? FeedbackResult.playing
-              : _session.outcome!.winner == null
-              ? FeedbackResult.draw
-              : FeedbackResult.win,
-          celebration: _session.outcome?.winner == null
-              ? null
-              : '${colorName(_session.outcome!.winner!)}获胜',
-          child: SafeArea(
-            child: BoardPanel(
-              minimumSidebarWidth: 320,
-              above: Column(
-                children: [
-                  GameRail(
-                    title: '面对面对弈',
-                    onLeave: _leave,
-                    onFlip: _saving
-                        ? null
-                        : () => setState(() => _flipped = !_flipped),
-                    onNewGame: _saving ? null : _newGame,
-                    finished: _session.finished,
-                  ),
-                  BoardRail(
-                    child: RotatedBox(
-                      key: const ValueKey('black-player-bar'),
-                      quarterTurns: facingOpponent ? 2 : 0,
-                      child: _playerBar(chess.Color.black),
-                    ),
-                  ),
-                ],
+    final status = _session.outcome?.message ?? '';
+    final compact =
+        MediaQuery.sizeOf(context).width < 360 ||
+        MediaQuery.textScalerOf(context).scale(14) > 21;
+    void openRecords() => Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => RecordsScreen(openRepository: widget.openRepository),
+      ),
+    );
+    GameRail navigation(bool landscape) => GameRail(
+      landscape: landscape,
+      title: '面对面对弈',
+      onLeave: _leave,
+      onFlip: _saving ? null : () => setState(() => _flipped = !_flipped),
+      onNewGame: _saving ? null : _newGame,
+      finished: _session.finished,
+      actions: compact
+          ? [
+              GameMenuItem(
+                value: _save,
+                enabled: !_saving && _dirty,
+                child: Text(_saving ? '正在保存…' : '保存棋谱'),
               ),
-              board: ChessBoard(
-                key: ObjectKey(_session),
-                board: board,
-                flipped: _flipped,
-                flipFingerOffset:
-                    facingOpponent && _session.turn == chess.Color.black,
-                enabled: _session.canPlay && !_saving,
-                onMove: (move) => _change(() => _session.play(move)),
+              GameMenuItem(
+                value: openRecords,
+                enabled: !_saving,
+                child: const Text('我的棋谱'),
               ),
-              below: Column(
-                children: [
-                  BoardRail(
-                    emphasized: true,
-                    child: SizedBox(
-                      key: const ValueKey('game-result-area'),
-                      height: 72,
-                      child: Center(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Column(
-                              children: [
-                                Text(
-                                  _saveMessage == null
-                                      ? status
-                                      : '$status\n$_saveMessage',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+            ]
+          : const [],
+    );
+    return GameFullscreen(
+      child: PopScope(
+        canPop: !_dirty && !_saving,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) _leave();
+        },
+        child: Scaffold(
+          backgroundColor: boardTableColor(context),
+          body: PlayFeedback(
+            session: _session,
+            board: board,
+            source: 'local',
+            prefs: widget.prefs,
+            analytics: widget.analytics,
+            result: !_session.finished
+                ? FeedbackResult.playing
+                : _session.outcome!.winner == null
+                ? FeedbackResult.draw
+                : FeedbackResult.win,
+            celebration: _session.outcome?.winner == null
+                ? null
+                : '${colorName(_session.outcome!.winner!)}获胜',
+            child: SafeArea(
+              child: BoardPanel(
+                minimumSidebarWidth: 320,
+                navigationBuilder: navigation,
+                above: BoardRail(
+                  child: RotatedBox(
+                    key: const ValueKey('black-player-bar'),
+                    quarterTurns: facingOpponent ? 2 : 0,
+                    child: _playerBar(chess.Color.black),
+                  ),
+                ),
+                board: ChessBoard(
+                  key: ObjectKey(_session),
+                  board: board,
+                  flipped: _flipped,
+                  flipFingerOffset:
+                      facingOpponent && _session.turn == chess.Color.black,
+                  enabled: _session.canPlay && !_saving,
+                  onMove: (move) => _change(() => _session.play(move)),
+                ),
+                below: Column(
+                  children: [
+                    // Fixed-height center strip (never moves the board): the
+                    // symmetric last-move record while playing — turn state
+                    // lives in the two player bars — and the verdict, save
+                    // feedback or achievement retry once there is one.
+                    BoardRail(
+                      emphasized: true,
+                      child: SizedBox(
+                        key: const ValueKey('game-result-area'),
+                        height: 72,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Semantics(
+                                liveRegion: true,
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      [
+                                        if (status.isNotEmpty)
+                                          status
+                                        else if (_session.lastSan != null)
+                                          '第 ${(_session.moveCount + 1) ~/ 2} 回合 · ${_session.lastSan}'
+                                        else
+                                          '对局开始 · 白方先行',
+                                        ?_saveMessage,
+                                      ].join('\n'),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: status.isEmpty
+                                            ? FontWeight.w400
+                                            : FontWeight.w600,
+                                      ),
+                                    ),
+                                    if (_achievementError != null)
+                                      TextButton(
+                                        onPressed: _achievementSaving
+                                            ? null
+                                            : _recordAchievement,
+                                        child: Text('$_achievementError保存'),
+                                      ),
+                                  ],
                                 ),
-                                if (_achievementError != null)
-                                  TextButton(
-                                    onPressed: _achievementSaving
-                                        ? null
-                                        : _recordAchievement,
-                                    child: Text('$_achievementError保存'),
-                                  ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  BoardRail(
-                    child: RotatedBox(
-                      key: const ValueKey('white-player-bar'),
-                      quarterTurns: 0,
-                      child: _playerBar(chess.Color.white),
-                    ),
-                  ),
-                ],
-              ),
-              controls: SizedBox(
-                height: 56,
-                child: LayoutBuilder(
-                  builder: (context, constraints) => SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FilledButton.icon(
-                            onPressed: _saving || !_dirty ? null : _save,
-                            icon: const Icon(Icons.save_outlined),
-                            label: Text(_saving ? '正在保存…' : '保存棋谱'),
-                          ),
-                          const SizedBox(width: 12),
-                          TextButton(
-                            onPressed: _saving
-                                ? null
-                                : () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => RecordsScreen(
-                                        openRepository: widget.openRepository,
-                                      ),
-                                    ),
-                                  ),
-                            child: const Text('我的棋谱'),
-                          ),
-                        ],
+                    BoardRail(
+                      child: RotatedBox(
+                        key: const ValueKey('white-player-bar'),
+                        quarterTurns: 0,
+                        child: _playerBar(chess.Color.white),
                       ),
                     ),
-                  ),
+                  ],
                 ),
+                controls: compact
+                    ? const SizedBox.shrink()
+                    : SizedBox(
+                        height: 56,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: _saving || !_dirty ? null : _save,
+                                  icon: const Icon(Icons.save_outlined),
+                                  label: Text(_saving ? '正在保存…' : '保存棋谱'),
+                                ),
+                                const SizedBox(width: 12),
+                                OutlinedButton(
+                                  onPressed: _saving ? null : openRecords,
+                                  child: const Text('我的棋谱'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
               ),
             ),
           ),
@@ -398,61 +423,90 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _playerBar(chess.Color color) {
     final canAct = _session.canAct(color) && !_saving;
+    final active = !_session.finished && _session.turn == color;
     final responding = _session.drawOffer?.opponent == color;
     final label = colorName(color);
     return SizedBox(
-      height: 56,
+      height: 64,
       child: ColoredBox(
-        color: canAct ? BoardPainter.lastMoveTint : Colors.transparent,
+        key: ValueKey('${color.name}-turn-highlight'),
+        color: active ? BoardPainter.lastMoveTint : Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
               Expanded(
-                child: Text(
-                  '$label${canAct ? ' · 走棋' : ''}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelLarge
-                      ?.copyWith(color: BoardPainter.ink),
+                child: Semantics(
+                  liveRegion: true,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '$label\n${responding
+                          ? '对方提和'
+                          : _session.drawOffer == color
+                          ? '等待回应'
+                          : active
+                          ? '轮到你${_session.board.inCheck ? ' · 应将' : ''}'
+                          : (_session.finished ? '对局结束' : '等待对方')}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: active
+                            ? FontWeight.w700
+                            : FontWeight.normal,
+                        color: BoardPainter.ink.withValues(
+                          alpha: active ? 1 : .55,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               if (responding) ...[
-                TextButton(
-                  key: ValueKey('${color.name}-decline-draw'),
-                  onPressed: _saving
-                      ? null
-                      : () => _change(
-                          () => _session.respondToDraw(color, accept: false),
-                        ),
-                  child: const Text('继续对弈'),
+                Expanded(
+                  child: GameActionChip(
+                    key: ValueKey('${color.name}-decline-draw'),
+                    onPressed: _saving
+                        ? null
+                        : () => _change(
+                            () => _session.respondToDraw(color, accept: false),
+                          ),
+                    label: '继续对弈',
+                  ),
                 ),
-                FilledButton(
-                  key: ValueKey('${color.name}-accept-draw'),
-                  onPressed: _saving
-                      ? null
-                      : () => _change(
-                          () => _session.respondToDraw(color, accept: true),
-                        ),
-                  child: const Text('同意和棋'),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: GameActionChip(
+                    key: ValueKey('${color.name}-accept-draw'),
+                    onPressed: _saving
+                        ? null
+                        : () => _change(
+                            () => _session.respondToDraw(color, accept: true),
+                          ),
+                    label: '同意和棋',
+                  ),
                 ),
               ] else ...[
-                IconButton(
+                OutlinedButton(
                   key: ValueKey('${color.name}-undo'),
-                  tooltip: '$label悔棋',
                   onPressed: _session.canUndo && !_saving
                       ? () => _change(_session.undo)
                       : null,
-                  icon: const Icon(Icons.undo),
+                  child: Tooltip(
+                    message: '$label悔棋',
+                    child: const Icon(Icons.undo, size: 20),
+                  ),
                 ),
-                TextButton(
+                const SizedBox(width: 4),
+                OutlinedButton(
                   key: ValueKey('${color.name}-offer-draw'),
                   onPressed: canAct
                       ? () => _change(() => _session.offerDraw(color))
                       : null,
                   child: const Text('提和'),
                 ),
-                TextButton(
+                const SizedBox(width: 4),
+                OutlinedButton(
                   key: ValueKey('${color.name}-resign'),
                   onPressed: canAct ? () => _resign(color) : null,
                   child: const Text('认输'),

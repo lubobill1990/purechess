@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:purechess/app/app_theme.dart';
 import 'package:purechess/core/move.dart' as chess;
@@ -87,6 +88,81 @@ void main() {
   }
 
   for (final ai in [false, true]) {
+    testWidgets('$ai safe insets keep landscape navigation clear of content', (
+      tester,
+    ) async {
+      tester.view.padding = const FakeViewPadding(
+        left: 24,
+        top: 12,
+        bottom: 10,
+      );
+      addTearDown(tester.view.resetPadding);
+      await launch(tester, ai: ai, size: const Size(844, 390));
+      expect(tester.getTopLeft(find.byType(GameRail)), const Offset(34, 22));
+      expect(tester.getSize(find.byType(GameRail)), const Size(44, 44));
+      expect(find.byType(Scrollable), findsNothing);
+      await tester.tap(find.byTooltip('对局菜单'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('翻转棋盘'));
+      await tester.pumpAndSettle();
+      expect(board(tester).flipped, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      '$ai immersive restores on push, pop, replacement and disposal',
+      (tester) async {
+        final modes = <String>[];
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          (call) async {
+            if (call.method == 'SystemChrome.setEnabledSystemUIMode') {
+              modes.add(call.arguments as String);
+            }
+            return null;
+          },
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            SystemChannels.platform,
+            null,
+          ),
+        );
+        await launch(tester, ai: ai);
+        expect(modes.last, 'SystemUiMode.immersiveSticky');
+        final navigator = Navigator.of(tester.element(find.byType(GameRail)));
+        unawaited(
+          navigator.push(
+            MaterialPageRoute<void>(
+              builder: (_) => const Scaffold(body: Text('另一页')),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(modes.last, 'SystemUiMode.edgeToEdge');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        expect(modes.last, 'SystemUiMode.immersiveSticky');
+        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pump();
+        expect(modes.last, 'SystemUiMode.immersiveSticky');
+        unawaited(
+          navigator.pushReplacement(
+            MaterialPageRoute<void>(
+              builder: (_) => const Scaffold(body: Text('替换页')),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(modes.last, 'SystemUiMode.edgeToEdge');
+        await tester.pumpWidget(const SizedBox.shrink());
+        expect(modes.last, 'SystemUiMode.edgeToEdge');
+      },
+    );
+
     for (final dark in [false, true]) {
       for (final size in [
         const Size(320, 568),
@@ -104,6 +180,27 @@ void main() {
           final rail = find.byType(GameRail);
           final rect = tester.getRect(rail);
           expect(rect.height, 44);
+          expect(find.byType(Scrollable), findsNothing);
+          if (size.width > size.height) {
+            expect(rect.topLeft, const Offset(10, 10));
+            final boardRect = tester.getRect(find.byType(ChessBoard));
+            expect(rect.right, lessThan(boardRect.left));
+            for (final side in ['black', 'white']) {
+              if (!ai) {
+                expect(
+                  rect.overlaps(tester.getRect(key('$side-player-bar'))),
+                  isFalse,
+                );
+              }
+            }
+            await tester.tap(find.byTooltip('对局菜单'));
+            await tester.pumpAndSettle();
+            for (final label in ['返回', '翻转棋盘', '新对局', '保存棋谱']) {
+              expect(find.text(label).hitTestable(), findsOneWidget);
+            }
+            expect(tester.takeException(), isNull);
+            return;
+          }
           final back = find.descendant(
             of: rail,
             matching: find.byType(BackButton),
@@ -111,7 +208,7 @@ void main() {
           final flip = find.byTooltip('翻转棋盘');
           final restart = find.byTooltip('新对局');
           expect(tester.getRect(back).left, rect.left);
-          expect(tester.getRect(restart).right, rect.right);
+          expect(tester.getRect(restart).right, lessThanOrEqualTo(rect.right));
           for (final action in [back, flip, restart]) {
             expect(action.hitTestable(), findsOneWidget);
             expect(tester.getRect(action).height, lessThanOrEqualTo(44));
@@ -126,6 +223,47 @@ void main() {
           expect(tester.takeException(), isNull);
         });
       }
+    }
+
+    for (final size in [const Size(320, 568), const Size(568, 320)]) {
+      testWidgets(
+        'symmetric turn chips and draw response stay fixed at $size',
+        (tester) async {
+          await launch(tester, size: size, scale: 2);
+          final rect = tester.getRect(find.byType(ChessBoard));
+          Color highlight(String side) =>
+              tester.widget<ColoredBox>(key('$side-turn-highlight')).color;
+          expect(highlight('white'), BoardPainter.lastMoveTint);
+          expect(highlight('black'), Colors.transparent);
+          expect(find.text('白方\n轮到你'), findsOneWidget);
+          final buttonContext = tester.element(key('black-resign'));
+          final disabled = OutlinedButtonTheme.of(buttonContext).style!;
+          expect(
+            disabled.side!.resolve({WidgetState.disabled}),
+            BorderSide.none,
+          );
+          expect(disabled.side!.resolve({})!.width, greaterThan(0));
+          expect(
+            disabled.foregroundColor!.resolve({WidgetState.disabled})!.a,
+            lessThan(disabled.foregroundColor!.resolve({})!.a),
+          );
+          await move(tester, 'e2', 'e4');
+          expect(highlight('black'), BoardPainter.lastMoveTint);
+          expect(highlight('white'), Colors.transparent);
+          expect(find.text('黑方\n轮到你'), findsOneWidget);
+          expect(tester.getRect(find.byType(ChessBoard)), rect);
+          await tester.tap(key('black-offer-draw'));
+          await tester.pumpAndSettle();
+          expect(key('white-decline-draw').hitTestable(), findsOneWidget);
+          expect(key('white-accept-draw').hitTestable(), findsOneWidget);
+          expect(tester.getRect(find.byType(ChessBoard)), rect);
+          await tester.tap(key('white-decline-draw'));
+          await tester.pumpAndSettle();
+          expect(find.byType(Scrollable), findsNothing);
+          expect(tester.getRect(find.byType(ChessBoard)), rect);
+          expect(tester.takeException(), isNull);
+        },
+      );
     }
 
     testWidgets('$ai rail flip and new game retain confirmation flow', (

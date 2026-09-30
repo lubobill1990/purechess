@@ -99,10 +99,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
         if (!didPop) unawaited(_leave());
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('本局复盘')),
+        backgroundColor: boardTableColor(context),
+        appBar: boardAppBar(context, '本局复盘'),
         body: SafeArea(
           child: BoardPanel(
-            scrollController: _scroll,
             board: ChessBoard(
               board: _review.board,
               enabled: false,
@@ -128,109 +128,120 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 ),
               ),
             ),
-            controls: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (_review.running)
-                    LinearProgressIndicator(
-                      value: _review.completed / _review.line.length,
-                    ),
-                  if (_review.running)
-                    TextButton(
-                      onPressed: _review.cancelling || _leaving
-                          ? null
-                          : _review.cancel,
-                      child: const Text('暂停分析'),
-                    ),
-                  if (_review.error != null) ...[
-                    Text(
-                      _review.error!,
-                      style: TextStyle(color: theme.colorScheme.error),
-                    ),
-                    TextButton(
-                      onPressed:
-                          _review.running || _review.cancelling || _leaving
-                          ? null
-                          : _review.run,
-                      child: const Text('继续分析'),
-                    ),
-                  ],
-                  Row(
-                    children: [
-                      IconButton(
-                        tooltip: '上一手',
-                        onPressed: _review.selectedPly > 0
-                            ? () => _review.select(_review.selectedPly - 1)
-                            : null,
-                        icon: const Icon(Icons.chevron_left),
+            controls: SingleChildScrollView(
+              controller: _scroll,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_review.running)
+                      LinearProgressIndicator(
+                        value: _review.completed / _review.line.length,
                       ),
-                      Expanded(
-                        child: Slider(
-                          key: const ValueKey('review-position'),
-                          min: 0,
-                          max: math.max(1, _review.line.length - 1).toDouble(),
-                          divisions: math.max(1, _review.line.length - 1),
-                          value: _review.selectedPly.toDouble(),
-                          label: '第 ${_review.selectedPly} 手',
-                          onChanged: _review.line.length > 1
-                              ? (value) => _review.select(value.round())
-                              : null,
-                        ),
+                    if (_review.running)
+                      TextButton(
+                        onPressed: _review.cancelling || _leaving
+                            ? null
+                            : _review.cancel,
+                        child: const Text('暂停分析'),
                       ),
-                      IconButton(
-                        tooltip: '下一手',
-                        onPressed: _review.selectedPly < _review.line.length - 1
-                            ? () => _review.select(_review.selectedPly + 1)
-                            : null,
-                        icon: const Icon(Icons.chevron_right),
+                    if (_review.error != null) ...[
+                      Text(
+                        _review.error!,
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                      TextButton(
+                        onPressed:
+                            _review.running || _review.cancelling || _leaving
+                            ? null
+                            : _review.run,
+                        child: const Text('继续分析'),
                       ),
                     ],
-                  ),
-                  Text('每手损失 · 1 兵 = 100', style: theme.textTheme.titleMedium),
-                  const Text('横轴为手数，纵轴为损失。将杀前后不折算兵值，曲线留空。'),
-                  const SizedBox(height: 8),
-                  Semantics(
-                    label: '逐手损失曲线，可用上方滑块选择手数',
-                    child: SizedBox(
-                      height: 140,
-                      child: CustomPaint(
-                        key: const ValueKey('review-loss-chart'),
-                        painter: LossChartPainter(
-                          losses: _review.losses,
-                          selectedPly: _review.selectedPly,
-                          color: theme.colorScheme.primary,
-                          gridColor: theme.colorScheme.outlineVariant,
-                          textColor: theme.colorScheme.onSurface,
+                    Row(
+                      children: [
+                        IconButton(
+                          tooltip: '上一手',
+                          onPressed: _review.selectedPly > 0
+                              ? () => _review.select(_review.selectedPly - 1)
+                              : null,
+                          icon: const Icon(Icons.chevron_left),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            key: const ValueKey('review-position'),
+                            min: 0,
+                            max: math
+                                .max(1, _review.line.length - 1)
+                                .toDouble(),
+                            divisions: math.max(1, _review.line.length - 1),
+                            value: _review.selectedPly.toDouble(),
+                            label: '第 ${_review.selectedPly} 手',
+                            onChanged: _review.line.length > 1
+                                ? (value) => _review.select(value.round())
+                                : null,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: '下一手',
+                          onPressed:
+                              _review.selectedPly < _review.line.length - 1
+                              ? () => _review.select(_review.selectedPly + 1)
+                              : null,
+                          icon: const Icon(Icons.chevron_right),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '每手损失 · 1 兵 = 100',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const Text('横轴为手数，纵轴为损失。将杀前后不折算兵值，曲线留空。'),
+                    const SizedBox(height: 8),
+                    Semantics(
+                      label: '逐手损失曲线，可用上方滑块选择手数',
+                      child: SizedBox(
+                        height: 140,
+                        child: CustomPaint(
+                          key: const ValueKey('review-loss-chart'),
+                          painter: LossChartPainter(
+                            losses: _review.losses,
+                            selectedPly: _review.selectedPly,
+                            color: theme.colorScheme.primary,
+                            gridColor: theme.colorScheme.outlineVariant,
+                            textColor: theme.colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('3 大恶手 · 双方', style: theme.textTheme.titleLarge),
-                  if (_review.mistakes.isEmpty)
-                    Text(
-                      _review.running ? '分析后在这里查看损失较大的着法' : '已分析的着法中没有可量化的正损失',
-                    ),
-                  for (final mistake in _review.mistakes)
-                    ListTile(
-                      key: ValueKey('review-mistake-${mistake.ply}'),
-                      contentPadding: EdgeInsets.zero,
-                      selected: _review.selectedPly == mistake.ply,
-                      title: Text(
-                        '第 ${mistake.ply} 手 · ${_review.record.boardAt(_review.line[mistake.ply - 1]).san(_review.line[mistake.ply].move!)}',
+                    const SizedBox(height: 16),
+                    Text('3 大恶手 · 双方', style: theme.textTheme.titleLarge),
+                    if (_review.mistakes.isEmpty)
+                      Text(
+                        _review.running
+                            ? '分析后在这里查看损失较大的着法'
+                            : '已分析的着法中没有可量化的正损失',
                       ),
-                      subtitle: Text(
-                        '损失 ${mistake.loss} · ${(mistake.loss / 100).toStringAsFixed(2)} 兵',
+                    for (final mistake in _review.mistakes)
+                      ListTile(
+                        key: ValueKey('review-mistake-${mistake.ply}'),
+                        contentPadding: EdgeInsets.zero,
+                        selected: _review.selectedPly == mistake.ply,
+                        title: Text(
+                          '第 ${mistake.ply} 手 · ${_review.record.boardAt(_review.line[mistake.ply - 1]).san(_review.line[mistake.ply].move!)}',
+                        ),
+                        subtitle: Text(
+                          '损失 ${mistake.loss} · ${(mistake.loss / 100).toStringAsFixed(2)} 兵',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          _review.select(mistake.ply);
+                          _scroll.jumpTo(0);
+                        },
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        _review.select(mistake.ply);
-                        _scroll.jumpTo(0);
-                      },
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

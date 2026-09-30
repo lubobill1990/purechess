@@ -18,6 +18,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_platfor
 
 import 'support/preferences_store.dart';
 import 'support/fake_reminder_backend.dart';
+import 'support/game_navigation.dart';
 
 void main() {
   late Directory dir;
@@ -119,7 +120,7 @@ void main() {
       expect(game.resumed, isTrue);
       expect(game.config.difficulty, 6);
       expect(game.session!.board.toFen(), session.board.toFen());
-      await tester.pageBack();
+      await tapGameNavigation(tester, '返回');
       await tester.pumpAndSettle();
       await tester.tap(find.text('稍后继续'));
       await tester.pumpAndSettle();
@@ -147,7 +148,7 @@ void main() {
           .widget<ChessBoard>(find.byType(ChessBoard))
           .board
           .toFen();
-      await tester.pageBack();
+      await tapGameNavigation(tester, '返回');
       await tester.pumpAndSettle();
       await tester.tap(find.text('稍后继续'));
       await tester.pumpAndSettle();
@@ -157,7 +158,7 @@ void main() {
         tester.widget<ChessBoard>(find.byType(ChessBoard)).board.toFen(),
         fen,
       );
-      await tester.pageBack();
+      await tapGameNavigation(tester, '返回');
       await tester.pumpAndSettle();
       await tester.tap(find.text('放弃并离开'));
       await tester.pumpAndSettle();
@@ -172,7 +173,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.getRect(find.byType(ChessBoard)), rect);
       expect(prefs.containsKey(GameStore.preferenceKey), isFalse);
-      await tester.tap(find.byTooltip('再来一局'));
+      await tapGameNavigation(tester, '再来一局');
       await tester.pumpAndSettle();
       expect(
         tester.widget<ChessBoard>(find.byType(ChessBoard)).board.plyCount,
@@ -231,9 +232,9 @@ void main() {
     expect(find.text('双人对弈'), findsOneWidget);
     await tester.tap(find.text('双人对弈'));
     await tester.pumpAndSettle();
-    expect(find.text('面对面对弈'), findsOneWidget);
+    expect(find.byTooltip('对局菜单'), findsOneWidget);
     expect(find.byKey(const ValueKey('square-e2')), findsOneWidget);
-    await tester.pageBack();
+    await tapGameNavigation(tester, '返回');
     await tester.pumpAndSettle();
     expect(find.text('离开对局'), findsOneWidget);
     await tester.tap(find.text('放弃并离开'));

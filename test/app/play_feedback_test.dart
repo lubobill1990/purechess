@@ -29,6 +29,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_platfor
 import '../features/game/fake_game_engine.dart';
 import '../features/puzzle/fixtures.dart';
 import '../support/preferences_store.dart';
+import '../support/game_navigation.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -168,7 +169,7 @@ void main() {
       kind: PointerDeviceKind.mouse,
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('翻转棋盘'));
+    await tapGameNavigation(tester, '翻转棋盘');
     await tester.pumpAndSettle();
     expect(sounds, isEmpty);
   });
@@ -183,7 +184,7 @@ void main() {
     expect(sounds.length, 4);
     await tester.tap(find.byKey(const ValueKey('black-undo')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('翻转棋盘'));
+    await tapGameNavigation(tester, '翻转棋盘');
     await tester.pumpAndSettle();
     expect(sounds.length, 4);
     expect(find.byType(CelebrationBadge), findsNothing);
@@ -212,7 +213,7 @@ void main() {
     expect(tester.getRect(find.byType(ChessBoard)), rect);
     expect(celebrations(), hasLength(1));
     expect(celebrations().single['params']['source'], 'ai');
-    await tester.tap(find.byTooltip('翻转棋盘'));
+    await tapGameNavigation(tester, '翻转棋盘');
     await tester.pumpAndSettle();
     expect(celebrations(), hasLength(1));
     await tester.pump(const Duration(seconds: 3));
